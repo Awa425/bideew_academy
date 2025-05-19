@@ -1,42 +1,77 @@
-<div class="courses-container" style="font-family: 'Roboto', sans-serif; color: #444; line-height: 1.7; background-color: #f9f9f9; padding: 2em;">
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
+<link
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+<div class="courses-container container py-5">
   <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="hero-content">
-        <h1>Explorez nos formations en Cybersécurité</h1>
-        <p>Développez des compétences recherchées grâce à nos cours complets et pratiques</p>
-        <div class="search-bar">
-            <i class="search-icon" aria-hidden="true">🔍</i>
-            <input type="text" placeholder="Rechercher un cours..." aria-label="Rechercher un cours">
-            <button class="search-btn" aria-label="Rechercher">Rechercher</button>
+  <section class="hero-section animate__animated animate__fadeInDown">
+    <div class="hero-content text-center mb-5">
+      <h1>Explorez nos formations en Cybersécurité</h1>
+      <p>
+        Développez des compétences recherchées grâce à nos cours complets et
+        pratiques
+      </p>
+      <div class="search-bar input-group mb-3">
+        <i class="search-icon" aria-hidden="true">🔍</i>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Rechercher un cours..."
+          aria-label="Rechercher un cours"
+        />
+        <div class="input-group-append">
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            aria-label="Rechercher"
+          >
+            Rechercher
+          </button>
         </div>
+      </div>
     </div>
     <div class="hero-illustration">
-        <div class="floating-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
-        </div>
+      <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+      </div>
     </div>
-</section>
+  </section>
 
-
-  <div class="courses-content" style="display: flex; gap: 2em;">
+  <div class="courses-content" style="display: flex; gap: 2em">
     <!-- Filters Section -->
-    <aside class="filters-sidebar">
-      
-      
-      
-      
-      
-    </aside>
+    <aside
+      class="filters-sidebar animate__animated animate__fadeInLeft"
+    ></aside>
 
     <!-- Main Courses Grid -->
     <main class="courses-main">
-      <div class="courses-header" style="text-align: center;">
+      <div class="courses-header" style="text-align: center">
         <h2>Nos Cours Populaires</h2>
-        <div class="sort-options" style="display: inline-block; margin: 10px 0; padding: 5px; border: 1px solid #ddd; border-radius: 5px; background-color: #f5f5f5;">
+        <div
+          class="sort-options"
+          style="
+            display: inline-block;
+            margin: 10px 0;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+          "
+        >
           <span>Trier par :</span>
-          <select style="border: none; background-color: transparent; font-weight: bold;">
+          <select
+            style="
+              border: none;
+              background-color: transparent;
+              font-weight: bold;
+            "
+          >
             <option>Pertinence</option>
             <option>Nouveautés</option>
             <option>Note la plus haute</option>
@@ -45,18 +80,54 @@
         </div>
       </div>
 
-      <div class="courses-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2em; justify-items: center; align-items: stretch;">
+      <div
+        class="courses-grid"
+        style="
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 2em;
+          justify-items: center;
+          align-items: stretch;
+        "
+      >
         <!-- Course 1 -->
-        <article class="course-card animate__animated animate__fadeInUp" style="box-shadow: 0 4px 16px rgba(0,0,0,0.1); border-radius: 15px; overflow: hidden; transition: transform 0.3s; background-color: #fff; text-align: center; margin-bottom: 2em; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
-          
+        <article
+          class="course-card animate__animated animate__fadeInUp"
+          style="
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            background-color: #fff;
+            text-align: center;
+            margin-bottom: 2em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+          "
+        >
           <div class="course-image">
-            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=300&fit=crop" alt="Introduction à la Cybersécurité">
+            <img
+              src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=300&fit=crop"
+              alt="Introduction à la Cybersécurité"
+            />
             <div class="course-overlay">
-              <button class="start-btn" style="background-color: #0056b3; color: #fff; padding: 0.5em 1em; border-radius: 5px; transition: background-color 0.3s;">Commencer</button>
+              <button
+                class="start-btn"
+                style="
+                  background-color: #0056b3;
+                  color: #fff;
+                  padding: 0.5em 1em;
+                  border-radius: 5px;
+                  transition: background-color 0.3s;
+                "
+              >
+                Commencer
+              </button>
             </div>
           </div>
           <div class="course-content">
-            
             <h3>Introduction à la Cybersécurité</h3>
             <div class="course-meta">
               <div class="meta-item">
@@ -73,7 +144,8 @@
               </div>
             </div>
             <div class="course-footer">
-              <div class="price"><i>💰</i> <span>Prix:</span>
+              <div class="price">
+                <i>💰</i> <span>Prix:</span>
                 <span class="price">65,000 CFA</span>
               </div>
               <button class="enroll-btn">S'inscrire</button>
@@ -82,11 +154,40 @@
         </article>
 
         <!-- Course 5 -->
-        <article class="course-card animate__animated animate__fadeInUp" style="box-shadow: 0 4px 16px rgba(0,0,0,0.1); border-radius: 15px; overflow: hidden; transition: transform 0.3s; background-color: #fff; text-align: center; margin-bottom: 2em; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+        <article
+          class="course-card animate__animated animate__fadeInUp"
+          style="
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            background-color: #fff;
+            text-align: center;
+            margin-bottom: 2em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+          "
+        >
           <div class="course-image">
-            <img src="https://unsplash.com/photos/FXFz-sW0uwo/download?ixid=M3wxMjA3fDB8MXxzZWFyY2h8Nnx8Y3liZXJzZWN1cml0eXxlbnwwfHx8fDE3NDcwNzQ1NTR8MA&force=true" alt="Sécurité des Applications">
+            <img
+              src="https://unsplash.com/photos/FXFz-sW0uwo/download?ixid=M3wxMjA3fDB8MXxzZWFyY2h8Nnx8Y3liZXJzZWN1cml0eXxlbnwwfHx8fDE3NDcwNzQ1NTR8MA&force=true"
+              alt="Sécurité des Applications"
+            />
             <div class="course-overlay">
-              <button class="start-btn" style="background-color: #0056b3; color: #fff; padding: 0.5em 1em; border-radius: 5px; transition: background-color 0.3s;">Commencer</button>
+              <button
+                class="start-btn"
+                style="
+                  background-color: #0056b3;
+                  color: #fff;
+                  padding: 0.5em 1em;
+                  border-radius: 5px;
+                  transition: background-color 0.3s;
+                "
+              >
+                Commencer
+              </button>
             </div>
           </div>
           <div class="course-content">
@@ -106,7 +207,8 @@
               </div>
             </div>
             <div class="course-footer">
-              <div class="price"><i>💰</i> <span>Prix:</span>
+              <div class="price">
+                <i>💰</i> <span>Prix:</span>
                 <span class="price">85,000 CFA</span>
               </div>
               <button class="enroll-btn">S'inscrire</button>
@@ -115,11 +217,40 @@
         </article>
 
         <!-- Course 6 -->
-        <article class="course-card animate__animated animate__fadeInUp" style="box-shadow: 0 4px 16px rgba(0,0,0,0.1); border-radius: 15px; overflow: hidden; transition: transform 0.3s; background-color: #fff; text-align: center; margin-bottom: 2em; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+        <article
+          class="course-card animate__animated animate__fadeInUp"
+          style="
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            background-color: #fff;
+            text-align: center;
+            margin-bottom: 2em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+          "
+        >
           <div class="course-image">
-            <img src="https://images.unsplash.com/photo-1593642634367-d91a135587b5?w=600&h=300&fit=crop" alt="Cybersécurité Avancée">
+            <img
+              src="https://images.unsplash.com/photo-1593642634367-d91a135587b5?w=600&h=300&fit=crop"
+              alt="Cybersécurité Avancée"
+            />
             <div class="course-overlay">
-              <button class="start-btn" style="background-color: #0056b3; color: #fff; padding: 0.5em 1em; border-radius: 5px; transition: background-color 0.3s;">Commencer</button>
+              <button
+                class="start-btn"
+                style="
+                  background-color: #0056b3;
+                  color: #fff;
+                  padding: 0.5em 1em;
+                  border-radius: 5px;
+                  transition: background-color 0.3s;
+                "
+              >
+                Commencer
+              </button>
             </div>
           </div>
           <div class="course-content">
@@ -139,7 +270,8 @@
               </div>
             </div>
             <div class="course-footer">
-              <div class="price"><i>💰</i> <span>Prix:</span>
+              <div class="price">
+                <i>💰</i> <span>Prix:</span>
                 <span class="price">110,000 CFA</span>
               </div>
               <button class="enroll-btn">S'inscrire</button>
@@ -147,15 +279,27 @@
           </div>
         </article>
         <article class="course-card featured">
-          
           <div class="course-image">
-            <img src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&h=300&fit=crop" alt="Sécurité des Réseaux">
+            <img
+              src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&h=300&fit=crop"
+              alt="Sécurité des Réseaux"
+            />
             <div class="course-overlay">
-              <button class="start-btn" style="background-color: #0056b3; color: #fff; padding: 0.5em 1em; border-radius: 5px; transition: background-color 0.3s;">Commencer</button>
+              <button
+                class="start-btn"
+                style="
+                  background-color: #0056b3;
+                  color: #fff;
+                  padding: 0.5em 1em;
+                  border-radius: 5px;
+                  transition: background-color 0.3s;
+                "
+              >
+                Commencer
+              </button>
             </div>
           </div>
           <div class="course-content">
-            
             <h3>Sécurité des Réseaux Avancée</h3>
             <div class="course-meta">
               <div class="meta-item">
@@ -172,7 +316,8 @@
               </div>
             </div>
             <div class="course-footer">
-              <div class="price"><i>💰</i> <span>Prix:</span>
+              <div class="price">
+                <i>💰</i> <span>Prix:</span>
                 <span class="price">79,000 CFA</span>
               </div>
               <button class="enroll-btn">S'inscrire</button>
@@ -181,15 +326,43 @@
         </article>
 
         <!-- Course 3 -->
-        <article class="course-card animate__animated animate__fadeInUp" style="box-shadow: 0 4px 16px rgba(0,0,0,0.1); border-radius: 15px; overflow: hidden; transition: transform 0.3s; background-color: #fff; text-align: center; margin-bottom: 2em; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+        <article
+          class="course-card animate__animated animate__fadeInUp"
+          style="
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            background-color: #fff;
+            text-align: center;
+            margin-bottom: 2em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+          "
+        >
           <div class="course-image">
-            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=300&fit=crop" alt="Test d'Intrusion">
+            <img
+              src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=300&fit=crop"
+              alt="Test d'Intrusion"
+            />
             <div class="course-overlay">
-              <button class="start-btn" style="background-color: #0056b3; color: #fff; padding: 0.5em 1em; border-radius: 5px; transition: background-color 0.3s;">Commencer</button>
+              <button
+                class="start-btn"
+                style="
+                  background-color: #0056b3;
+                  color: #fff;
+                  padding: 0.5em 1em;
+                  border-radius: 5px;
+                  transition: background-color 0.3s;
+                "
+              >
+                Commencer
+              </button>
             </div>
           </div>
           <div class="course-content">
-            
             <h3>Tests d'Intrusion Éthique</h3>
             <div class="course-meta">
               <div class="meta-item">
@@ -206,7 +379,8 @@
               </div>
             </div>
             <div class="course-footer">
-              <div class="price"><i>💰</i> <span>Prix:</span>
+              <div class="price">
+                <i>💰</i> <span>Prix:</span>
                 <span class="price">98,000 CFA</span>
               </div>
               <button class="enroll-btn">S'inscrire</button>
@@ -215,16 +389,43 @@
         </article>
 
         <!-- Course 4 -->
-        <article class="course-card animate__animated animate__fadeInUp" style="box-shadow: 0 4px 16px rgba(0,0,0,0.1); border-radius: 15px; overflow: hidden; transition: transform 0.3s; background-color: #fff; text-align: center; margin-bottom: 2em; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
-          
+        <article
+          class="course-card animate__animated animate__fadeInUp"
+          style="
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            background-color: #fff;
+            text-align: center;
+            margin-bottom: 2em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+          "
+        >
           <div class="course-image">
-            <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&h=300&fit=crop" alt="Droit et Éthique">
+            <img
+              src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&h=300&fit=crop"
+              alt="Droit et Éthique"
+            />
             <div class="course-overlay">
-              <button class="start-btn" style="background-color: #0056b3; color: #fff; padding: 0.5em 1em; border-radius: 5px; transition: background-color 0.3s;">Commencer</button>
+              <button
+                class="start-btn"
+                style="
+                  background-color: #0056b3;
+                  color: #fff;
+                  padding: 0.5em 1em;
+                  border-radius: 5px;
+                  transition: background-color 0.3s;
+                "
+              >
+                Commencer
+              </button>
             </div>
           </div>
           <div class="course-content">
-            
             <h3>Droit et Éthique en Cybersécurité</h3>
             <div class="course-meta">
               <div class="meta-item">
@@ -241,7 +442,8 @@
               </div>
             </div>
             <div class="course-footer">
-              <div class="price"><i>💰</i> <span>Prix:</span>
+              <div class="price">
+                <i>💰</i> <span>Prix:</span>
                 <span class="price">72,000 CFA</span>
               </div>
               <button class="enroll-btn">S'inscrire</button>
@@ -249,10 +451,7 @@
           </div>
         </article>
       </div>
-
-      
-    
-</main>
+    </main>
   </div>
 
   <!-- CTA Section -->
@@ -263,10 +462,11 @@
         <p>Rejoignez plus de 50 000 apprenants qui développent déjà leurs compétences avec nos formations certifiantes.</p>
       </div>
       <div class="cta-buttons">
-        <button class="primary-btn">Explorer les formations</button>
-        <button class="secondary-btn">Nous contacter</button>
+        <button class="btn primary-btn">Explorer les formations</button>
+        <button class="btn secondary-btn">Nous contacter</button>
       </div>
     </div>
+    
     <div class="cta-illustration">
       <div class="floating-elements">
         <div class="element element-1">🔒</div>
@@ -275,4 +475,5 @@
       </div>
     </div>
   </section>
+  
 </div>

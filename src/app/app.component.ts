@@ -1,26 +1,29 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { ThemeService } from './core/services/theme.service';
-import { AccessibilityToolbarComponent } from './shared/components/accessibility-toolbar/accessibility-toolbar.component';
-import { NavigationComponent } from './shared/components/navigation/navigation.component';
-import { FooterComponent } from './shared/components/footer/footer.component';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet,
-    AccessibilityToolbarComponent,
-    NavigationComponent,
-    FooterComponent
+    RouterOutlet
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
+  isLoginPage: boolean = false;
   title = 'cyber-academy';
 
-  constructor(private themeService: ThemeService) {}
+  constructor(private themeService: ThemeService, private router: Router) {
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        // Vérifie si on est sur la page login
+        this.isLoginPage = event.urlAfterRedirects.includes('/login');
+      });
+  }
 
   ngOnInit(): void {
     // Initialisation du thème
