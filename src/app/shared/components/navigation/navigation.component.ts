@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-navigation',
@@ -9,10 +10,15 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['./navigation.component.scss']
 })
 export class NavigationComponent {
+  constructor(private authService: AuthService){}
   menuItems = [
     { path: '/home', label: 'Accueil' },
     { path: '/courses', label: 'Cours' },
     { path: '/learning-path', label: 'Parcours d\'Apprentissage' },
     { path: '/resources', label: 'Ressources' }
   ];
+
+  logout() {
+    this.authService.logout();
+  }
 }

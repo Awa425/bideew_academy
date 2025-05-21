@@ -2,8 +2,8 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
-import { RegisterComponent } from './features/auth/register.component';
-import { LoginComponent } from './features/auth/login.component';
+import { RegisterComponent } from './features/auth/pages/register/register.component';
+import { LoginComponent } from './features/auth/pages/login/login.component';
 
 @NgModule({
   declarations: [
