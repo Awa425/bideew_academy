@@ -1,0 +1,62 @@
+<div class="course-start-container" *ngIf="course">
+  <mat-card class="course-card">
+    <div class="header-image">
+      <img mat-card-image [src]="course.imageUrl || 'assets/images/course-placeholder.jpg'" [alt]="getAltText()">
+      <div class="overlay">
+        <h1>{{ getTitle() }}</h1>
+        <p class="subtitle">{{ getSubtitle() }}</p>
+      </div>
+    </div>
+
+    <mat-card-content>
+      <div class="course-meta">
+        <div class="meta-item">
+          <mat-icon>schedule</mat-icon>
+          <span>{{ estimatedDuration }}</span>
+        </div>
+        <div class="meta-item">
+          <mat-icon>menu_book</mat-icon>
+          <span>{{ lessonsCount }} {{ lessonsCount > 1 ? 'leçons' : 'leçon' }}</span>
+        </div>
+        <div class="meta-item">
+          <mat-icon>school</mat-icon>
+          <span>{{ course.level || 'Tous niveaux' }}</span>
+        </div>
+      </div>
+
+      <div class="course-description">
+        <h3>À propos de ce cours</h3>
+        <p>{{ course.description || 'Ce cours vous permettra d\'acquérir des compétences essentielles dans ce domaine passionnant.' }}</p>
+      </div>
+
+      <mat-divider class="divider"></mat-divider>
+
+      <div class="learning-objectives">
+        <h3>Ce que vous allez apprendre</h3>
+        <mat-list dense>
+          <mat-list-item *ngFor="let objective of course.learningObjectives || ['Maîtriser les concepts clés', 'Appliquer les bonnes pratiques', 'Mettre en œuvre vos connaissances']">
+            <mat-icon matListItemIcon>check_circle</mat-icon>
+            <div mat-line>{{ objective }}</div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <div class="prerequisites" *ngIf="course.prerequisites?.length">
+        <h3>Prérequis</h3>
+        <mat-list dense>
+          <mat-list-item *ngFor="let req of course.prerequisites">
+            <mat-icon matListItemIcon>info</mat-icon>
+            <div mat-line>{{ req }}</div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions class="actions">
+      <button mat-raised-button color="primary" (click)="onStartCourse()" class="start-button">
+        <mat-icon>play_arrow</mat-icon>
+        Commencer le cours
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
