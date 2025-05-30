@@ -80,377 +80,102 @@
         </div>
       </div>
 
-      <div
-        class="courses-grid"
-        style="
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 2em;
-          justify-items: center;
-          align-items: stretch;
-        "
-      >
-        <!-- Course 1 -->
-        <article
-          class="course-card animate__animated animate__fadeInUp"
-          style="
+      <div class="row g-4">
+        <!-- Course Cards -->
+        <div *ngFor="let course of courses" class="col-md-6 col-lg-4">
+          <div class="course-card h-100" style="
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
             border-radius: 15px;
             overflow: hidden;
             transition: transform 0.3s;
             background-color: #fff;
             text-align: center;
-            margin-bottom: 2em;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             height: 100%;
-          "
-        >
-          <div class="course-image">
-            <img
-              src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=300&fit=crop"
-              alt="Introduction à la Cybersécurité"
-            />
-            <div class="course-overlay">
-              <button
-                class="start-btn"
+          ">
+            <div class="course-image position-relative" style="height: 200px; overflow: hidden;">
+              <img
+                [src]="course.image"
+                [alt]="course.title"
+                style="width: 100%; height: 100%; object-fit: cover;"
+              />
+              <div class="course-overlay position-absolute w-100 h-100 d-flex align-items-center justify-content-center" 
+                   style="top: 0; left: 0; background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s;">
+                <a
+                  [routerLink]="['/courses', course.id]"
+                  class="btn btn-primary"
+                  style="
+                    background-color: #0056b3;
+                    color: #fff;
+                    padding: 0.5em 1.5em;
+                    border-radius: 5px;
+                    text-decoration: none;
+                    transition: background-color 0.3s;
+                  "
+                  (click)="navigateToCourse(course.id)"
+                >
+                  Commencer
+                </a>
+              </div>
+            </div>
+            <div class="course-content p-4 d-flex flex-column flex-grow-1">
+              <h3 class="h5" style="color: #2c3e50; min-height: 3em;">{{ course.title }}</h3>
+              <p class="text-muted small flex-grow-1" style="min-height: 4em;">{{ course.description }}</p>
+              
+              <div class="d-flex justify-content-between mb-3">
+                <div class="d-flex align-items-center">
+                  <span class="me-1">📅</span>
+                  <span class="small">{{ course.duration }}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="me-1">🎓</span>
+                  <span class="small">{{ course.level }}</span>
+                </div>
+              </div>
+              
+              <div class="rating mb-3">
+                <span class="text-warning">{{ getStars(course.rating) }}</span>
+                <span class="ms-2 fw-bold">{{ course.rating }}</span>
+                <span class="text-muted small ms-1">({{ course.students | number }} étudiants)</span>
+              </div>
+              
+              <a 
+                [routerLink]="['/courses', course.id]"
+                class="btn btn-primary w-100 mt-auto"
                 style="
                   background-color: #0056b3;
                   color: #fff;
                   padding: 0.5em 1em;
                   border-radius: 5px;
+                  text-decoration: none;
                   transition: background-color 0.3s;
                 "
+                (click)="navigateToCourse(course.id)"
               >
-                Commencer
-              </button>
+                Démarrer la formation
+              </a>
             </div>
           </div>
-          <div class="course-content">
-            <h3>Introduction à la Cybersécurité</h3>
-            <div class="course-meta">
-              <div class="meta-item">
-                <i>📅</i>
-                <span>4 semaines</span>
-              </div>
-              <div class="meta-item">
-                <i>🎓</i>
-                <span>Débutant</span>
-              </div>
-              <div class="meta-item">
-                <i>⭐</i>
-                <span>4.8 (124 avis)</span>
-              </div>
-            </div>
-            <div class="course-footer">
-              <div class="price">
-                <i>💰</i> <span>Prix:</span>
-                <span class="price">65,000 CFA</span>
-              </div>
-              <button class="enroll-btn">S'inscrire</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Course 5 -->
-        <article
-          class="course-card animate__animated animate__fadeInUp"
-          style="
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s;
-            background-color: #fff;
-            text-align: center;
-            margin-bottom: 2em;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-          "
-        >
-          <div class="course-image">
-            <img
-              src="https://unsplash.com/photos/FXFz-sW0uwo/download?ixid=M3wxMjA3fDB8MXxzZWFyY2h8Nnx8Y3liZXJzZWN1cml0eXxlbnwwfHx8fDE3NDcwNzQ1NTR8MA&force=true"
-              alt="Sécurité des Applications"
-            />
-            <div class="course-overlay">
-              <button
-                class="start-btn"
-                style="
-                  background-color: #0056b3;
-                  color: #fff;
-                  padding: 0.5em 1em;
-                  border-radius: 5px;
-                  transition: background-color 0.3s;
-                "
-              >
-                Commencer
-              </button>
-            </div>
-          </div>
-          <div class="course-content">
-            <h3>Sécurité des Applications</h3>
-            <div class="course-meta">
-              <div class="meta-item">
-                <i>📅</i>
-                <span>6 semaines</span>
-              </div>
-              <div class="meta-item">
-                <i>🎓</i>
-                <span>Intermédiaire</span>
-              </div>
-              <div class="meta-item">
-                <i>⭐</i>
-                <span>4.7 (98 avis)</span>
-              </div>
-            </div>
-            <div class="course-footer">
-              <div class="price">
-                <i>💰</i> <span>Prix:</span>
-                <span class="price">85,000 CFA</span>
-              </div>
-              <button class="enroll-btn">S'inscrire</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Course 6 -->
-        <article
-          class="course-card animate__animated animate__fadeInUp"
-          style="
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s;
-            background-color: #fff;
-            text-align: center;
-            margin-bottom: 2em;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-          "
-        >
-          <div class="course-image">
-            <img
-              src="https://images.unsplash.com/photo-1593642634367-d91a135587b5?w=600&h=300&fit=crop"
-              alt="Cybersécurité Avancée"
-            />
-            <div class="course-overlay">
-              <button
-                class="start-btn"
-                style="
-                  background-color: #0056b3;
-                  color: #fff;
-                  padding: 0.5em 1em;
-                  border-radius: 5px;
-                  transition: background-color 0.3s;
-                "
-              >
-                Commencer
-              </button>
-            </div>
-          </div>
-          <div class="course-content">
-            <h3>Cybersécurité Avancée</h3>
-            <div class="course-meta">
-              <div class="meta-item">
-                <i>📅</i>
-                <span>8 semaines</span>
-              </div>
-              <div class="meta-item">
-                <i>🎓</i>
-                <span>Avancé</span>
-              </div>
-              <div class="meta-item">
-                <i>⭐</i>
-                <span>4.9 (112 avis)</span>
-              </div>
-            </div>
-            <div class="course-footer">
-              <div class="price">
-                <i>💰</i> <span>Prix:</span>
-                <span class="price">110,000 CFA</span>
-              </div>
-              <button class="enroll-btn">S'inscrire</button>
-            </div>
-          </div>
-        </article>
-        <article class="course-card featured">
-          <div class="course-image">
-            <img
-              src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&h=300&fit=crop"
-              alt="Sécurité des Réseaux"
-            />
-            <div class="course-overlay">
-              <button
-                class="start-btn"
-                style="
-                  background-color: #0056b3;
-                  color: #fff;
-                  padding: 0.5em 1em;
-                  border-radius: 5px;
-                  transition: background-color 0.3s;
-                "
-              >
-                Commencer
-              </button>
-            </div>
-          </div>
-          <div class="course-content">
-            <h3>Sécurité des Réseaux Avancée</h3>
-            <div class="course-meta">
-              <div class="meta-item">
-                <i>📅</i>
-                <span>6 semaines</span>
-              </div>
-              <div class="meta-item">
-                <i>🎓</i>
-                <span>Intermédiaire</span>
-              </div>
-              <div class="meta-item">
-                <i>⭐</i>
-                <span>4.9 (87 avis)</span>
-              </div>
-            </div>
-            <div class="course-footer">
-              <div class="price">
-                <i>💰</i> <span>Prix:</span>
-                <span class="price">79,000 CFA</span>
-              </div>
-              <button class="enroll-btn">S'inscrire</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Course 3 -->
-        <article
-          class="course-card animate__animated animate__fadeInUp"
-          style="
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s;
-            background-color: #fff;
-            text-align: center;
-            margin-bottom: 2em;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-          "
-        >
-          <div class="course-image">
-            <img
-              src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=300&fit=crop"
-              alt="Test d'Intrusion"
-            />
-            <div class="course-overlay">
-              <button
-                class="start-btn"
-                style="
-                  background-color: #0056b3;
-                  color: #fff;
-                  padding: 0.5em 1em;
-                  border-radius: 5px;
-                  transition: background-color 0.3s;
-                "
-              >
-                Commencer
-              </button>
-            </div>
-          </div>
-          <div class="course-content">
-            <h3>Tests d'Intrusion Éthique</h3>
-            <div class="course-meta">
-              <div class="meta-item">
-                <i>📅</i>
-                <span>8 semaines</span>
-              </div>
-              <div class="meta-item">
-                <i>🎓</i>
-                <span>Avancé</span>
-              </div>
-              <div class="meta-item">
-                <i>⭐</i>
-                <span>4.7 (156 avis)</span>
-              </div>
-            </div>
-            <div class="course-footer">
-              <div class="price">
-                <i>💰</i> <span>Prix:</span>
-                <span class="price">98,000 CFA</span>
-              </div>
-              <button class="enroll-btn">S'inscrire</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Course 4 -->
-        <article
-          class="course-card animate__animated animate__fadeInUp"
-          style="
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s;
-            background-color: #fff;
-            text-align: center;
-            margin-bottom: 2em;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-          "
-        >
-          <div class="course-image">
-            <img
-              src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&h=300&fit=crop"
-              alt="Droit et Éthique"
-            />
-            <div class="course-overlay">
-              <button
-                class="start-btn"
-                style="
-                  background-color: #0056b3;
-                  color: #fff;
-                  padding: 0.5em 1em;
-                  border-radius: 5px;
-                  transition: background-color 0.3s;
-                "
-              >
-                Commencer
-              </button>
-            </div>
-          </div>
-          <div class="course-content">
-            <h3>Droit et Éthique en Cybersécurité</h3>
-            <div class="course-meta">
-              <div class="meta-item">
-                <i>📅</i>
-                <span>5 semaines</span>
-              </div>
-              <div class="meta-item">
-                <i>🎓</i>
-                <span>Intermédiaire</span>
-              </div>
-              <div class="meta-item">
-                <i>⭐</i>
-                <span>4.6 (92 avis)</span>
-              </div>
-            </div>
-            <div class="course-footer">
-              <div class="price">
-                <i>💰</i> <span>Prix:</span>
-                <span class="price">72,000 CFA</span>
-              </div>
-              <button class="enroll-btn">S'inscrire</button>
-            </div>
-          </div>
-        </article>
+        </div>
       </div>
+      
+      <style>
+        .course-card {
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .course-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+        }
+        .course-card:hover .course-overlay {
+          opacity: 1 !important;
+        }
+        .btn-primary:hover {
+          background-color: #003d82 !important;
+        }
+      </style>
+
     </main>
   </div>
 
