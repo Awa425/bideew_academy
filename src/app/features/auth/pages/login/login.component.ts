@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -12,7 +12,7 @@ import { NgIf } from '@angular/common';
   ],
   templateUrl: './login.component.html',
 })
-export class LoginComponent {
+export class LoginComponent implements AfterViewInit, OnDestroy {
 
   email = '';
   password = '';
@@ -21,13 +21,38 @@ export class LoginComponent {
 
   }
 
-  login(){
+  ngAfterViewInit() {
+    // Vérifier si l'API Google est déjà chargée
+    if (typeof google !== 'undefined') {
+      this.initializeGoogleSignIn();
+    } else {
+      // Si non, attendre qu'elle soit chargée
+      window.addEventListener('google-loaded', () => {
+        this.initializeGoogleSignIn();
+      });
+    }
+  }
+
+  private initializeGoogleSignIn() {
+    try {
+      this.authService.handleGoogleLogin();
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation de la connexion Google:', error);
+      this.error = 'Impossible de charger la connexion Google. Veuillez réessayer.';
+    }
+  }
+
+  ngOnDestroy() {
+    // Nettoyage si nécessaire
+  }
+
+  login() {
     this.authService.login({email: this.email, password: this.password}).subscribe({
-      next: (res:any) =>{
+      next: (res:any) => {
         localStorage.setItem('token', res.token);
         this.router.navigate(['/home']);
       },
-      error: (err)=>{
+      error: (err) => {
         this.error = 'Email ou mot de passe incorrect';
       }
     });
