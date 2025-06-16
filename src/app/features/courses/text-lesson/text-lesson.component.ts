@@ -7,7 +7,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
-import { Course, Lesson } from '../../../core/models/course.model';
+import { Course, Lessons } from '../../../core/models/course.model';
 
 @Component({
   selector: 'app-text-lesson',
@@ -26,9 +26,10 @@ import { Course, Lesson } from '../../../core/models/course.model';
   styleUrls: ['./text-lesson.component.scss']
 })
 export class TextLessonComponent {
-  @Input() lesson!: Lesson;
+  @Input() lesson!: Lessons;
   @Input() course!: Course;
   @Input() isPreview: boolean = false;
+  
 
   getLessonIcon(type: string): string {
     switch (type) {
@@ -44,6 +45,30 @@ export class TextLessonComponent {
         return 'help';
     }
   }
+slides = [
+  {
+    title: 'Introduction',
+    content: '<p>Voici le contenu de la première slide...</p>'
+  },
+  {
+    title: 'Objectifs',
+    content: '<ul><li>Comprendre</li><li>Appliquer</li></ul>'
+  },
+  {
+    title: 'Conclusion',
+    content: '<p>Merci pour votre attention</p>'
+  }
+];
+
+currentSlideIndex = 0;
+
+nextSlide() {
+  if (this.currentSlideIndex < this.slides.length - 1) this.currentSlideIndex++;
+}
+
+prevSlide() {
+  if (this.currentSlideIndex > 0) this.currentSlideIndex--;
+}
 
   formatDuration(minutes: number): string {
     if (minutes < 60) {

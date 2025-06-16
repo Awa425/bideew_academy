@@ -1,63 +1,15 @@
-<mat-card class="text-lesson-card">
-  <mat-card-header>
-    <div mat-card-avatar class="lesson-icon">
-      <mat-icon [color]="isPreview ? 'primary' : ''">{{ getLessonIcon(lesson.type) }}</mat-icon>
-    </div>
-    <mat-card-title>{{ lesson.title }}</mat-card-title>
-    <mat-card-subtitle>
-      <span class="duration">
-        <mat-icon>schedule</mat-icon>
-        {{ formatDuration(lesson.duration) }}
-      </span>
-      <span class="preview-badge" *ngIf="isPreview">
-        <mat-icon>play_circle</mat-icon>
-        Aperçu disponible
-      </span>
-    </mat-card-subtitle>
-  </mat-card-header>
+<div class="ppt-container">
+  <div class="ppt-slide">
+    <h2>{{ slides[currentSlideIndex].title }}</h2>
+    <div class="ppt-content" [innerHTML]="slides[currentSlideIndex].content"></div>
+  </div>
 
-  <mat-card-content>
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Type de leçon
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-
-      <div class="lesson-type">
-        <mat-icon>{{ getLessonIcon(lesson.type) }}</mat-icon>
-        <span>{{ lesson.type }}</span>
-      </div>
-    </mat-expansion-panel>
-
-    <mat-divider></mat-divider>
-
-    <div class="lesson-content" [innerHTML]="lesson.content"></div>
-
-    <mat-divider></mat-divider>
-
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Ressources
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-
-      <mat-list>
-        <mat-list-item *ngFor="let resource of lesson.resources">
-          <mat-icon matListIcon>{{ getResourceIcon(resource.type) }}</mat-icon>
-          <div mat-line>{{ resource.title }}</div>
-          <div mat-line>{{ resource.url }}</div>
-        </mat-list-item>
-      </mat-list>
-    </mat-expansion-panel>
-  </mat-card-content>
-
-  <mat-card-actions>
-    <button mat-button [matTooltip]="isPreview ? 'Cliquez pour accéder à la leçon' : 'Cette leçon est verrouillée'"
-            [disabled]="!isPreview">
-      <mat-icon>{{ isPreview ? 'arrow_forward' : 'lock' }}</mat-icon>
-      {{ isPreview ? 'Accéder à la leçon' : 'Verrouillé' }}
+  <div class="ppt-controls">
+    <button mat-stroked-button (click)="prevSlide()" [disabled]="currentSlideIndex === 0">
+      ← Précédent
     </button>
-  </mat-card-actions>
-</mat-card>
+    <button mat-raised-button (click)="nextSlide()" [disabled]="currentSlideIndex === slides.length - 1">
+      Suivant →
+    </button>
+  </div>
+</div>

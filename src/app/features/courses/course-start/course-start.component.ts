@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
-import { Course } from '../../../core/models/course.model';
+import { Course, Lessons } from '../../../core/models/course.model';
 
 @Component({
   selector: 'app-course-start',
@@ -22,7 +22,7 @@ import { Course } from '../../../core/models/course.model';
   styleUrls: ['./course-start.component.scss']
 })
 export class CourseStartComponent {
-  @Input() course: Course | null = null;
+  @Input() course: Lessons | null = null;
   @Output() startCourse = new EventEmitter<void>();
 
   getTitle(): string {
@@ -30,7 +30,7 @@ export class CourseStartComponent {
   }
 
   getSubtitle(): string {
-    return this.course?.subtitle || 'Découvrez ce cours passionnant';
+    return this.course?.title || 'Découvrez ce cours passionnant';
   }
 
   getAltText(): string {
@@ -38,9 +38,9 @@ export class CourseStartComponent {
   }
 
   get estimatedDuration(): string {
-    if (!this.course?.lessons?.length) return 'N/A';
+    if (!this.course?.title?.length) return 'N/A';
     
-    const totalMinutes = this.course.lessons.length * 15; // Estimation de 15 minutes par leçon
+    const totalMinutes = this.course.id.length * 15; // Estimation de 15 minutes par leçon
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     
@@ -51,7 +51,7 @@ export class CourseStartComponent {
   }
 
   get lessonsCount(): number {
-    return this.course?.lessons?.length || 0;
+    return this.course?.id?.length || 0;
   }
 
   onStartCourse(): void {

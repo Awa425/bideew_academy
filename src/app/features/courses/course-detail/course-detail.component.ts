@@ -14,7 +14,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
-import { Course, Lesson } from '../../../core/models/course.model'; 
+import { Course, Lessons } from '../../../core/models/course.model';
+import { CourseService } from '../../../core/services/course.service';
 
 // Interface pour la configuration du lecteur vidéo
 interface VideoConfig {
@@ -40,18 +41,19 @@ interface VideoConfig {
     MatChipsModule,
     MatMenuModule,
     MatSliderModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
   templateUrl: './course-detail.component.html',
-  styleUrls: ['./course-detail.component.scss']
+  styleUrls: ['./course-detail.component.scss'],
 })
 export class CourseDetailComponent implements OnInit {
   @ViewChild('videoPlayer') videoPlayer!: ElementRef<HTMLVideoElement>;
-  
-  course: Course | null = null;
+
+  course: any;
+  id: string | null = null;
   selectedTabIndex = 0;
   progress = 45; // Pourcentage de progression
-  
+
   // État du lecteur vidéo
   currentVideo: VideoConfig | null = null;
   isVideoPlaying = false;
@@ -62,86 +64,29 @@ export class CourseDetailComponent implements OnInit {
   isMuted = false;
   isFullscreen = false;
   playbackRate = 1;
-  currentLesson: Lesson | null = null;
+  currentLesson: Lessons[] = [];
   showLessonContent = false;
-  
+
   controlsTimeout: any;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private dialog: MatDialog
-  ) { }
+    private dialog: MatDialog,
+    private courseService: CourseService
+  ) {}
 
   ngOnInit(): void {
+    this.id = this.route.snapshot.paramMap.get('id');
     // TODO: Remplacer par un appel API réel
-    this.loadCourseData();
+    this.loadCourseData(this.id);
   }
 
-  private loadCourseData() {
-    // Données de démonstration
-    this.course = {
-      id: '1',
-      title: 'Cybersécurité Avancée',
-      description: 'Maîtrisez les techniques avancées de cybersécurité et protégez les systèmes contre les menaces modernes.',
-      level: 'advanced',
-      duration: 20,
-      imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-      instructor: 'Dr. Sarah Dupont',
-      rating: 4.8,
-      studentsEnrolled: 1245,
-      createdAt: new Date('2023-01-15'),
-      updatedAt: new Date('2023-05-20'),
-      lessons: [
-        {
-          id: 'l1',
-          title: 'Introduction à la cybersécurité avancée',
-          description: 'Découvrez les concepts fondamentaux de la cybersécurité avancée et préparez-vous à approfondir vos connaissances.',
-          duration: 45,
-          type: 'video',
-          isPreview: true,
-          content: 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-          videoUrl: 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-          thumbnail: 'https://via.placeholder.com/800x450?text=Introduction+à+la+cybersécurité',
-          resources: []
-        },
-        {
-          id: 'l2',
-          title: 'Analyse des menaces avancées',
-          description: 'Apprenez à identifier et analyser les menaces de sécurité avancées dans les environnements informatiques modernes.',
-          duration: 60,
-          type: 'video',
-          isPreview: true,
-          content: 'https://samplelib.com/lib/preview/mp4/sample-10s.mp4',
-          videoUrl: 'https://samplelib.com/lib/preview/mp4/sample-10s.mp4',
-          thumbnail: 'https://via.placeholder.com/800x450?text=Analyse+des+menaces',
-          resources: []
-        },
-        {
-          id: 'l3',
-          title: 'Sécurisation des réseaux',
-          description: 'Maîtrisez les techniques avancées pour sécuriser les infrastructures réseau contre les attaques sophistiquées.',
-          duration: 90,
-          type: 'video',
-          isPreview: false,
-          content: 'https://samplelib.com/lib/preview/mp4/sample-15s.mp4',
-          videoUrl: 'https://samplelib.com/lib/preview/mp4/sample-15s.mp4',
-          thumbnail: 'https://via.placeholder.com/800x450?text=Sécurisation+des+réseaux',
-          resources: []
-        }
-      ],
-      prerequisites: [
-        'Bases de la cybersécurité',
-        'Connaissance des réseaux informatiques',
-        'Notions de programmation'
-      ],
-      learningObjectives: [
-        'Comprendre les menaces de cybersécurité actuelles',
-        'Mettre en place des mesures de protection avancées',
-        'Analyser et répondre aux incidents de sécurité',
-        'Sécuriser les applications et les réseaux'
-      ]
-    };
+  private loadCourseData(id: any) {
+    this.courseService.getCourseById(id).subscribe((data) => {
+      this.course = data;
+      console.log(data);
+    });
   }
 
   getLevelColor(level: string): string {
@@ -190,7 +135,7 @@ export class CourseDetailComponent implements OnInit {
   }
 
   // Affiche le contenu d'une leçon
-  showLesson(lesson: Lesson): void {
+  showLesson(lesson: Lessons[]): void {
     if (!this.isLessonUnlocked(lesson)) {
       return;
     }
@@ -206,16 +151,18 @@ export class CourseDetailComponent implements OnInit {
   }
 
   // Obtient la leçon suivante
-  getNextLesson(): Lesson | null {
+  getNextLesson(): Lessons[] | null {
     if (!this.course || !this.currentLesson) return null;
-    const currentIndex = this.course.lessons.findIndex(l => l.id === this.currentLesson?.id);
-    return currentIndex < this.course.lessons.length - 1 ? this.course.lessons[currentIndex + 1] : null;
+    const currentIndex = this.course.lessons.findIndex();
+    return currentIndex < this.course.lessons.length - 1
+      ? this.course.lessons[currentIndex + 1]
+      : null;
   }
 
   // Obtient la leçon précédente
-  getPreviousLesson(): Lesson | null {
+  getPreviousLesson(): any {
     if (!this.course || !this.currentLesson) return null;
-    const currentIndex = this.course.lessons.findIndex(l => l.id === this.currentLesson?.id);
+    const currentIndex = this.course.lessons.findIndex();
     return currentIndex > 0 ? this.course.lessons[currentIndex - 1] : null;
   }
 
@@ -225,7 +172,7 @@ export class CourseDetailComponent implements OnInit {
       src: lesson.videoUrl,
       title: lesson.title,
       thumbnail: lesson.thumbnail,
-      duration: lesson.duration || 0
+      duration: lesson.duration || 0,
     };
     this.showControls = true;
     setTimeout(() => {
@@ -285,7 +232,7 @@ export class CourseDetailComponent implements OnInit {
 
   toggleFullscreen(): void {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(err => {
+      document.documentElement.requestFullscreen().catch((err) => {
         console.error(`Erreur lors du passage en plein écran: ${err.message}`);
       });
       this.isFullscreen = true;
@@ -333,24 +280,24 @@ export class CourseDetailComponent implements OnInit {
     if (isNaN(timeInSeconds) || !isFinite(timeInSeconds)) {
       return '00:00';
     }
-    
+
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = Math.floor(timeInSeconds % 60);
-    
+
     return [
       minutes.toString().padStart(2, '0'),
-      seconds.toString().padStart(2, '0')
+      seconds.toString().padStart(2, '0'),
     ].join(':');
   }
 
-  ngOnDestroy(): void {
-    if (this.controlsTimeout) {
-      clearTimeout(this.controlsTimeout);
-    }
-    if (this.isFullscreen && document.exitFullscreen) {
-      document.exitFullscreen();
-    }
-  }
+  // ngOnDestroy(): void {
+  //   if (this.controlsTimeout) {
+  //     clearTimeout(this.controlsTimeout);
+  //   }
+  //   if (this.isFullscreen && document.exitFullscreen) {
+  //     document.exitFullscreen();
+  //   }
+  // }
 
   /**
    * Fonction de suivi pour l'optimisation du rendu de la liste des leçons
@@ -358,38 +305,26 @@ export class CourseDetailComponent implements OnInit {
    * @param lesson La leçon courante
    * @returns Un identifiant unique pour la leçon
    */
-  trackByLessonId(index: number, lesson: Lesson): string {
+  trackByLessonId(index: number, lesson: Lessons): string {
     return lesson.id;
   }
 
   /**
    * Démarre le cours en affichant la première leçon disponible
    */
-  startCourse(): void {
-    if (!this.course?.lessons?.length) {
-      console.error('Aucune leçon disponible pour ce cours');
-      return;
-    }
-
-    // Trouver la première leçon non terminée ou la première leçon
-    const firstUncompletedLesson = this.course.lessons.find(lesson => !this.isLessonCompleted(lesson.id)) || this.course.lessons[0];
-    
-    // Si c'est une leçon en prévisualisation, on la lit directement
-    if (firstUncompletedLesson.isPreview) {
-      this.playPreviewVideo(firstUncompletedLesson);
-    } else {
-      // Sinon, on affiche le contenu de la leçon
-      this.showLesson(firstUncompletedLesson);
-    }
-    
-    // Faire défiler vers la section de la leçon
-    setTimeout(() => {
-      const lessonSection = document.getElementById('lesson-content');
-      if (lessonSection) {
-        lessonSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 100);
-  }
+  // startCourse(): void {
+  //   if (!this.course?.lessons?.length) {
+  //     console.error('Aucune leçon disponible pour ce cours');
+  //     return;
+  //   }
+  //   // Faire défiler vers la section de la leçon
+  //   setTimeout(() => {
+  //     const lessonSection = document.getElementById('lesson-content');
+  //     if (lessonSection) {
+  //       lessonSection.scrollIntoView({ behavior: 'smooth' });
+  //     }
+  //   }, 100);
+  // }
 
   /**
    * Redirige vers la page des leçons du cours

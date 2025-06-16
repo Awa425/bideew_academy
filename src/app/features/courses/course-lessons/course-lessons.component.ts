@@ -7,7 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Course, Lesson } from '../../../core/models/course.model';
+import { Course, Lessons } from '../../../core/models/course.model';
+import { CourseService } from '../../../core/services/course.service';
 
 @Component({
   selector: 'app-course-lessons',
@@ -27,7 +28,7 @@ import { Course, Lesson } from '../../../core/models/course.model';
 })
 export class CourseLessonsComponent implements OnInit {
   course: Course | null = null;
-  lessons: (Lesson & { completed?: boolean })[] = [];
+  lessons: any = [];
   courseId: string | null = null;
   progress = 0;
   currentLessonId: string | null = null;
@@ -35,13 +36,29 @@ export class CourseLessonsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private courseService: CourseService
   ) {}
 
   ngOnInit() {
-    this.courseId = this.route.snapshot.paramMap.get('id');
+    this.courseId = this.route.snapshot.paramMap.get('id');    
     this.loadCourseData();
     this.loadProgress();
+    this.loadLessonsDataCourse(this.courseId);
+  }
+
+  private loadLessonsDataCourse(id: any) {
+    this.courseService.getCourseById(id).subscribe((data) => {
+      this.lessons = data;
+      console.log(data);
+    });
+  }
+
+  enrollInCourse(id:number): void {
+    // if (this.course) {
+    //   // Le chemin est relatif au chemin actuel, donc on utilise juste 'lessons'
+    // }
+    this.router.navigate([id], { relativeTo: this.route });
   }
 
   private loadProgress(): string[] {
@@ -67,18 +84,18 @@ export class CourseLessonsComponent implements OnInit {
     if (!this.courseId) return;
     
     const progressData = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '{}');
-    const completedLessons = this.lessons
-      .filter(lesson => lesson.completed)
-      .map(lesson => lesson.id);
+    // const completedLessons = this.lessons
+    //   .filter(lesson => lesson.completed)
+    //   .map(lesson => lesson.id);
     
-    progressData[this.courseId] = {
-      progress: this.progress,
-      currentLessonId: this.currentLessonId,
-      completedLessons,
-      lastUpdated: new Date().toISOString()
-    };
+    // progressData[this.courseId] = {
+    //   progress: this.progress,
+    //   currentLessonId: this.currentLessonId,
+    //   completedLessons,
+    //   lastUpdated: new Date().toISOString()
+    // };
     
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(progressData));
+    // localStorage.setItem(this.STORAGE_KEY, JSON.stringify(progressData));
   }
 
   private loadCourseData() {
@@ -90,8 +107,8 @@ export class CourseLessonsComponent implements OnInit {
       title: 'Cybersécurité Avancée',
       description: 'Maîtrisez les techniques avancées de cybersécurité et protégez les systèmes contre les menaces modernes.',
       level: 'advanced',
-      duration: 20,
-      imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+      duration_minutes: 20,
+      image_path: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
       instructor: 'Dr. Sarah Dupont',
       rating: 4.8,
       studentsEnrolled: 1245,
@@ -103,60 +120,22 @@ export class CourseLessonsComponent implements OnInit {
       ],
       createdAt: new Date('2023-01-15'),
       updatedAt: new Date('2023-05-20'),
-      lessons: [
-        {
-          id: 'l1',
-          title: 'Introduction à la cybersécurité avancée',
-          duration: 45,
-          type: 'video',
-          isPreview: true,
-          content: 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-          resources: []
-        },
-        {
-          id: 'l2',
-          title: 'Analyse des menaces avancées',
-          duration: 60,
-          type: 'video',
-          isPreview: true,
-          content: 'https://samplelib.com/lib/preview/mp4/sample-10s.mp4',
-          resources: []
-        },
-        {
-          id: 'l3',
-          title: 'Sécurisation des réseaux',
-          duration: 90,
-          type: 'text',
-          isPreview: false,
-          content: 'Contenu de la leçon sur la sécurisation des réseaux...',
-          resources: []
-        },
-        {
-          id: 'l4',
-          title: 'Quiz de mi-parcours',
-          duration: 30,
-          type: 'quiz',
-          isPreview: false,
-          content: '',
-          resources: []
-        }
-      ]
     };
     
-    if (this.course) {
-      this.lessons = (this.course.lessons || []).map(lesson => ({
-        ...lesson,
-        completed: completedLessons.includes(lesson.id)
-      }));
+    // if (this.course) {
+    //   this.lessons = (this.course.lessons || []).map(lesson => ({
+    //     ...lesson,
+    //     completed: completedLessons.includes(lesson.id)
+    //   }));
       
-      // Mettre à jour la progression
-      this.updateProgress();
+    //   // Mettre à jour la progression
+    //   this.updateProgress();
       
-      // Si pas de leçon en cours, définir la première comme en cours
-      if (!this.currentLessonId && this.lessons.length > 0) {
-        this.currentLessonId = this.lessons[0].id;
-      }
-    }
+    //   // Si pas de leçon en cours, définir la première comme en cours
+    //   if (!this.currentLessonId && this.lessons.length > 0) {
+    //     this.currentLessonId = this.lessons[0].id;
+    //   }
+    // }
   }
 
   getLessonIcon(type: string): string {
@@ -172,14 +151,14 @@ export class CourseLessonsComponent implements OnInit {
     }
   }
 
-  startLesson(lesson: Lesson) {
+  startLesson(lesson: Lessons) {
     this.currentLessonId = lesson.id;
     this.saveProgress();
     // Faire défiler jusqu'à la leçon sélectionnée
     this.scrollToLesson(lesson.id);
   }
 
-  toggleLessonComplete(lesson: Lesson & { completed?: boolean }, event: Event) {
+  toggleLessonComplete(lesson: Lessons & { completed?: boolean }, event: Event) {
     event.stopPropagation();
     lesson.completed = !lesson.completed;
     this.updateProgress();
@@ -189,21 +168,21 @@ export class CourseLessonsComponent implements OnInit {
   navigateToNextLesson() {
     if (!this.currentLessonId || !this.lessons.length) return;
     
-    const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
-    if (currentIndex < this.lessons.length - 1) {
-      const nextLesson = this.lessons[currentIndex + 1];
-      this.startLesson(nextLesson);
-    }
+    // const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
+    // if (currentIndex < this.lessons.length - 1) {
+    //   const nextLesson = this.lessons[currentIndex + 1];
+    //   this.startLesson(nextLesson);
+    // }
   }
 
   navigateToPreviousLesson() {
     if (!this.currentLessonId || !this.lessons.length) return;
     
-    const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
-    if (currentIndex > 0) {
-      const previousLesson = this.lessons[currentIndex - 1];
-      this.startLesson(previousLesson);
-    }
+    //const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
+    // if (currentIndex > 0) {
+    //   const previousLesson = this.lessons[currentIndex - 1];
+    //   this.startLesson(previousLesson);
+    // }
   }
 
   private updateProgress() {
@@ -212,8 +191,8 @@ export class CourseLessonsComponent implements OnInit {
       return;
     }
     
-    const completedCount = this.lessons.filter(lesson => lesson.completed).length;
-    this.progress = Math.round((completedCount / this.lessons.length) * 100);
+    // const completedCount = this.lessons.filter(lesson => lesson.completed).length;
+    // this.progress = Math.round((completedCount / this.lessons.length) * 100);
   }
 
   private scrollToLesson(lessonId: string) {
@@ -232,16 +211,16 @@ export class CourseLessonsComponent implements OnInit {
     return this.currentLessonId === lessonId;
   }
 
-  canNavigateToPrevious(): boolean {
-    if (!this.currentLessonId || !this.lessons.length) return false;
-    const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
-    return currentIndex > 0;
+  canNavigateToPrevious() {
+    // if (!this.currentLessonId || !this.lessons.length) return false;
+    // const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
+    // return currentIndex > 0;
   }
 
-  canNavigateToNext(): boolean {
-    if (!this.currentLessonId || !this.lessons.length) return false;
-    const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
-    return currentIndex < this.lessons.length - 1;
+  canNavigateToNext() {
+    // if (!this.currentLessonId || !this.lessons.length) return false;
+    // const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
+    // return currentIndex < this.lessons.length - 1;
   }
 
   getLessonTypeLabel(type: string): string {
@@ -254,13 +233,13 @@ export class CourseLessonsComponent implements OnInit {
     }
   }
 
-  getProgressWidth(lessonIndex: number): number {
-    if (!this.lessons.length) return 0;
+  getProgressWidth(lessonIndex: number) {
+  //   if (!this.lessons.length) return 0;
     
-    const completedCount = this.lessons
-      .slice(0, lessonIndex + 1)
-      .filter(lesson => lesson.completed).length;
+  //   const completedCount = this.lessons
+  //     .slice(0, lessonIndex + 1)
+  //     .filter(lesson => lesson.completed).length;
       
-    return (completedCount / this.lessons.length) * 100;
+  //   return (completedCount / this.lessons.length) * 100;
   }
 }

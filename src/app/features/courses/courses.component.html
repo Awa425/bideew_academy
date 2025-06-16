@@ -3,202 +3,147 @@
   href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
 />
 <link
-  href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
   rel="stylesheet"
+  integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+  crossorigin="anonymous"
 />
 <div class="courses-container container py-5">
   <!-- Hero Section -->
   <section class="hero-section animate__animated animate__fadeInDown">
     <div class="hero-content text-center mb-5">
       <h1>Explorez nos formations en Cybersécurité</h1>
-      <p>
+      <p class="lead">
         Développez des compétences recherchées grâce à nos cours complets et
         pratiques
       </p>
-      <div class="search-bar input-group mb-3">
-        <i class="search-icon" aria-hidden="true">🔍</i>
+      <div class="search-bar input-group mb-3 w-75 mx-auto">
         <input
           type="text"
           class="form-control"
           placeholder="Rechercher un cours..."
           aria-label="Rechercher un cours"
+          [(ngModel)]="searchQuery"
         />
-        <div class="input-group-append">
-          <button
-            class="btn btn-outline-secondary"
-            type="button"
-            aria-label="Rechercher"
-          >
-            Rechercher
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="hero-illustration">
-      <div class="floating-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-        <div class="shape shape-3"></div>
+        <button class="btn btn-primary" type="button" [disabled]="isLoading">
+          <span *ngIf="!isLoading">🔍 Rechercher</span>
+          <span
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
+        </button>
       </div>
     </div>
   </section>
 
-  <div class="courses-content" style="display: flex; gap: 2em">
-    <!-- Filters Section -->
-    <aside
-      class="filters-sidebar animate__animated animate__fadeInLeft"
-    ></aside>
-
-    <!-- Main Courses Grid -->
-    <main class="courses-main">
-      <div class="courses-header" style="text-align: center">
-        <h2>Nos Cours Populaires</h2>
-        <div
-          class="sort-options"
-          style="
-            display: inline-block;
-            margin: 10px 0;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f5f5f5;
-          "
-        >
-          <span>Trier par :</span>
-          <select
-            style="
-              border: none;
-              background-color: transparent;
-              font-weight: bold;
-            "
-          >
-            <option>Pertinence</option>
-            <option>Nouveautés</option>
-            <option>Note la plus haute</option>
-            <option>Durée croissante</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="row g-4">
-        <!-- Course Cards -->
-        <div *ngFor="let course of courses" class="col-md-6 col-lg-4">
-          <div class="course-card h-100" style="
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s;
-            background-color: #fff;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-          ">
-            <div class="course-image position-relative" style="height: 200px; overflow: hidden;">
-              <img
-                [src]="course.image"
-                [alt]="course.title"
-                style="width: 100%; height: 100%; object-fit: cover;"
-              />
-              <div class="course-overlay position-absolute w-100 h-100 d-flex align-items-center justify-content-center" 
-                   style="top: 0; left: 0; background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s;">
-                <a
-                  [routerLink]="['/courses', course.id]"
-                  class="btn btn-primary"
-                  style="
-                    background-color: #0056b3;
-                    color: #fff;
-                    padding: 0.5em 1.5em;
-                    border-radius: 5px;
-                    text-decoration: none;
-                    transition: background-color 0.3s;
-                  "
-                  (click)="navigateToCourse(course.id)"
-                >
-                  Commencer
-                </a>
-              </div>
-            </div>
-            <div class="course-content p-4 d-flex flex-column flex-grow-1">
-              <h3 class="h5" style="color: #2c3e50; min-height: 3em;">{{ course.title }}</h3>
-              <p class="text-muted small flex-grow-1" style="min-height: 4em;">{{ course.description }}</p>
-              
-              <div class="d-flex justify-content-between mb-3">
-                <div class="d-flex align-items-center">
-                  <span class="me-1">📅</span>
-                  <span class="small">{{ course.duration }}</span>
-                </div>
-                <div class="d-flex align-items-center">
-                  <span class="me-1">🎓</span>
-                  <span class="small">{{ course.level }}</span>
-                </div>
-              </div>
-              
-              <div class="rating mb-3">
-                <span class="text-warning">{{ getStars(course.rating) }}</span>
-                <span class="ms-2 fw-bold">{{ course.rating }}</span>
-                <span class="text-muted small ms-1">({{ course.students | number }} étudiants)</span>
-              </div>
-              
-              <a 
-                [routerLink]="['/courses', course.id]"
-                class="btn btn-primary w-100 mt-auto"
-                style="
-                  background-color: #0056b3;
-                  color: #fff;
-                  padding: 0.5em 1em;
-                  border-radius: 5px;
-                  text-decoration: none;
-                  transition: background-color 0.3s;
-                "
-                (click)="navigateToCourse(course.id)"
-              >
-                Démarrer la formation
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <style>
-        .course-card {
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .course-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
-        }
-        .course-card:hover .course-overlay {
-          opacity: 1 !important;
-        }
-        .btn-primary:hover {
-          background-color: #003d82 !important;
-        }
-      </style>
-
-    </main>
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p class="mt-2">Chargement des cours en cours...</p>
   </div>
 
-  <!-- CTA Section -->
-  <section class="cta-section">
-    <div class="cta-content">
-      <div class="cta-text">
-        <h2>Prêt à démarrer votre parcours en cybersécurité ?</h2>
-        <p>Rejoignez plus de 50 000 apprenants qui développent déjà leurs compétences avec nos formations certifiantes.</p>
-      </div>
-      <div class="cta-buttons">
-        <button class="btn primary-btn">Explorer les formations</button>
-        <button class="btn secondary-btn">Nous contacter</button>
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+
+  <!-- Courses Grid -->
+  <div *ngIf="!isLoading && !error" class="row g-4">
+    <!-- No Results -->
+    <div *ngIf="courses.length === 0" class="col-12 text-center my-5">
+      <h3>Aucun cours trouvé</h3>
+      <p>Essayez de modifier vos critères de recherche</p>
+    </div>
+
+    <!-- Course Cards -->
+    <div *ngFor="let course of courses" class="col-md-6 col-lg-3">
+      <div
+        class="course-card h-100"
+        style="
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+          border-radius: 15px;
+          overflow: hidden;
+          transition: transform 0.3s;
+          background-color: #fff;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        "
+      >
+        <div
+          class="course-image position-relative"
+          style="height: 200px; overflow: hidden"
+        >
+          <img
+            [src]="course.image_path"
+            [alt]="course.title"
+            style="width: 100%; height: 100%; object-fit: cover"
+          />
+        </div>
+        <div class="course-content p-4 d-flex flex-column flex-grow-1">
+          <h4 class="h5" style="color: #2c3e50; min-height: 3em">
+            {{ course.title }}
+          </h4>
+          <p class="text-muted small flex-grow-1" style="margin-top: -8%">
+            {{ course.description }}
+          </p>
+
+          <div class="d-flex justify-content-between mb-3">
+            <div class="d-flex align-items-center">
+              <span class="me-1">📅</span>
+              <span class="small">{{ course.duration_minutes }}</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <span class="me-1">🎓</span>
+              <span class="small">{{ course.level }}</span>
+            </div>
+          </div>
+          <a
+            [routerLink]="['/courses', course.id]"
+            class="btn btn-primary w-100 mt-auto"
+            style="
+              background-color: #0056b3;
+              color: #fff;
+              padding: 0.5em 1em;
+              border-radius: 5px;
+              text-decoration: none;
+              transition: background-color 0.3s;
+            "
+          >
+            Démarrer la formation
+          </a>
+        </div>
       </div>
     </div>
-    
-    <div class="cta-illustration">
-      <div class="floating-elements">
-        <div class="element element-1">🔒</div>
-        <div class="element element-2">💻</div>
-        <div class="element element-3">🛡️</div>
+  </div>
+
+  <!-- Call to Action Section -->
+  <section class="cta-section mt-5 py-5 bg-light rounded-3">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-7">
+          <h2 class="mb-3">
+            Prêt à démarrer votre parcours en cybersécurité ?
+          </h2>
+          <p class="lead mb-4">
+            Rejoignez notre communauté d'apprenants et développez des
+            compétences recherchées sur le marché.
+          </p>
+          <button class="btn btn-primary btn-lg">Commencer maintenant</button>
+        </div>
+        <div class="col-md-5 d-none d-md-block">
+          <img
+            src="assets/images/cta-illustration.svg"
+            alt="Étudiant en cybersécurité"
+            class="img-fluid"
+          />
+        </div>
       </div>
     </div>
   </section>
-  
 </div>

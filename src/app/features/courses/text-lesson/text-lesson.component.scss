@@ -1,8 +1,43 @@
+.ppt-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: center;
+  margin-top: 8%;
+}
+
+.ppt-slide {
+  background: white;
+  border: 2px solid #ccc;
+  border-radius: 16px;
+  padding: 40px;
+  margin-top: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  min-height: 400px;
+  transition: all 0.5s ease;
+}
+
+.ppt-content {
+  text-align: left;
+  margin-top: 20px;
+  font-size: 1.1em;
+}
+
+.ppt-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+
+
+
 .text-lesson-card {
   margin-bottom: 20px;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-top: 6%;
 
   .lesson-icon {
     font-size: 22px;

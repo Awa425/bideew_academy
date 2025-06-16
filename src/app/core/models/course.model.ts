@@ -5,12 +5,11 @@ export interface Course {
   description: string;
   longDescription?: string;
   level: 'beginner' | 'intermediate' | 'advanced';
-  duration: number; // in hours
-  imageUrl: string;
+  duration_minutes: number; // in hours
+  image_path: string;
   instructor: string;
   rating: number;
   studentsEnrolled: number;
-  lessons: Lesson[];
   prerequisites: string[];
   learningObjectives: string[];
   resources?: Resource[];
@@ -21,18 +20,22 @@ export interface Course {
   tags?: string[];
 }
 
-export interface Lesson {
+export interface Lessons {
   id: string;
   title: string;
   description?: string; // Description détaillée de la leçon
-  duration: number; // in minutes
+  duration_minutes: number; // in minutes
+  order: number; // in minutes
   type: 'video' | 'text' | 'quiz' | 'assignment';
   content?: string; // URL or text content
   isPreview: boolean;
+  course_id : Course[];
   resources: Resource[];
   quiz?: Quiz;
-  thumbnail?: string; // URL de la miniature pour la vidéo
-  videoUrl?: string; // URL de la vidéo pour les leçons de type vidéo
+  is_published?: string; // URL de la miniature pour la vidéo
+  created_at?: string; // URL de la vidéo pour les leçons de type vidéo
+  updated_at?: string; // URL de la vidéo pour les leçons de type vidéo
+  is_locked?: string; // URL de la vidéo pour les leçons de type vidéo
 }
 
 export interface Resource {
