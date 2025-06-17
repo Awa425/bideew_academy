@@ -259,10 +259,10 @@
                 class="learning-objectives"
                 aria-labelledby="learning-objectives-heading"
               >
-                <!-- <li *ngFor="let objective of course.learningObjectives"> -->
-                <li>
+                <li *ngFor="let objective of course.objectifList">
+                <!-- <li> -->
                   <mat-icon aria-hidden="true">check_circle</mat-icon>
-                  <span>{{ course.description }}</span>
+                  <span>{{ objective }}</span>
                 </li>
               </ul>
 
@@ -272,10 +272,14 @@
                 class="prerequisites"
                 aria-labelledby="prerequisites-heading"
               >
-                <mat-chip-listbox>
-                  <!-- <mat-chip *ngFor="let prereq of course.prerequisites"> -->
-                  <mat-chip>
+                <!-- <mat-chip-listbox>
+                  <mat-chip *ngFor="let prereq of course.prerequisites">
                     {{ course.prerequis }}
+                  </mat-chip>
+                </mat-chip-listbox> -->
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let prereq of course.prerequisList">
+                    {{ prereq }}
                   </mat-chip>
                 </mat-chip-listbox>
               </div>
@@ -284,7 +288,7 @@
         </mat-tab>
 
         <!-- Onglet Programme -->
-        <mat-tab label="Programme">
+        <!-- <mat-tab label="Programme">
           <div class="tab-content">
             <div class="lessons-container" role="list">
               <div
@@ -322,10 +326,6 @@
                       >{{ lesson.title }}
                     </h3>
                     <div class="lesson-meta">
-                      <!-- <span class="duration">
-                        <mat-icon aria-hidden="true">schedule</mat-icon>
-                        {{ lesson.duration_minutes }} min
-                      </span> -->
                       <span class="preview-badge" *ngIf="lesson.isPreview">
                         <mat-icon aria-hidden="true">play_circle</mat-icon>
                         Aperçu
@@ -339,47 +339,11 @@
                       </span>
                     </div>
                   </div>
-                  <!-- <div class="lesson-actions">
-                    <button
-                      mat-icon-button
-                      *ngIf="!lesson.isPreview"
-                      [disabled]="!isLessonUnlocked(lesson)"
-                      (click)="$event.stopPropagation()"
-                    >
-                      <mat-icon
-                        *ngIf="!isLessonCompleted(lesson.id)"
-                        aria-hidden="true"
-                        >lock</mat-icon
-                      >
-                      <mat-icon
-                        *ngIf="isLessonCompleted(lesson.id)"
-                        color="primary"
-                        aria-hidden="true"
-                        >check_circle</mat-icon
-                      >
-                    </button>
-                    <button
-                      mat-icon-button
-                      *ngIf="lesson.isPreview"
-                      (click)="
-                        $event.stopPropagation(); playPreviewVideo(lesson)
-                      "
-                      aria-label="Lire l'aperçu"
-                    >
-                      <mat-icon aria-hidden="true">play_arrow</mat-icon>
-                    </button>
-                  </div> -->
                 </div>
-                <!-- <div class="lesson-progress" *ngIf="!lesson.isPreview">
-                  <mat-progress-bar
-                    mode="determinate"
-                    [value]="getLessonProgress(lesson.id)"
-                  ></mat-progress-bar>
-                </div> -->
               </div>
             </div>
           </div>
-        </mat-tab>
+        </mat-tab> -->
       </mat-tab-group>
     </div>
 

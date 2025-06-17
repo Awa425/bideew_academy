@@ -85,7 +85,23 @@ export class CourseDetailComponent implements OnInit {
   private loadCourseData(id: any) {
     this.courseService.getCourseById(id).subscribe((data) => {
       this.course = data;
-      console.log(data);
+
+      //PREREQUIS
+      if (this.course.prerequis) {
+        this.course.prerequisList = this.course.prerequis
+          .split(',')
+          .map((p:any) => p.trim());
+      } else {
+        this.course.prerequisList = [];
+      }
+      //OBJECTIF
+      if (this.course.objectif) {
+        this.course.objectifList = this.course.objectif
+          .split(',')
+          .map((p:any) => p.trim());
+      } else {
+        this.course.objectifList = [];
+      }
     });
   }
 

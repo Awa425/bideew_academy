@@ -113,6 +113,7 @@
                 class="action-button"
                 [class.active]="isCurrentLesson(lesson.id)"
                 (click)="startLesson(lesson)"
+                title="Commencer"
               >
                 <mat-icon (click)="enrollInCourse(lesson.id)">{{
                   isCurrentLesson(lesson.id)
