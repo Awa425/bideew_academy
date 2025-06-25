@@ -1,0 +1,15 @@
+<div class="ppt-container">
+  <div class="ppt-slide">
+    <h2>{{ slides[currentSlideIndex].title }}</h2>
+    <div class="ppt-content" [innerHTML]="slides[currentSlideIndex].content"></div>
+  </div>
+
+  <div class="ppt-controls">
+    <button mat-stroked-button (click)="prevSlide()" [disabled]="currentSlideIndex === 0">
+      ← Précédent
+    </button>
+    <button mat-raised-button (click)="nextSlide()" [disabled]="currentSlideIndex === slides.length - 1">
+      Suivant →
+    </button>
+  </div>
+</div>

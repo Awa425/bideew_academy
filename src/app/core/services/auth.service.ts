@@ -1,82 +1,160 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { User } from '../models/user.model';
+import { Observable, from, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+
+declare const google: any;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-  private router = inject(Router);
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
-  private readonly TOKEN_KEY = 'auth_token';
+  private apiUrl = 'http://localhost:8000/api';
 
-  constructor() {
-    // Check for existing user in localStorage
-    const user = localStorage.getItem('currentUser');
-    if (user) {
-      this.currentUserSubject.next(JSON.parse(user));
-    }
+  constructor(
+    private http: HttpClient, 
+    private router: Router,
+    private ngZone: NgZone
+  ) {
+    this.loadGoogleAuthSdk();
   }
 
-  login(email: string, password: string): Observable<boolean> {
-    // In a real app, this would be an HTTP call to your backend
-    // This is a mock implementation
-    if (email === 'test@example.com' && password === 'password') {
-      const user: User = {
-        id: '1',
-        email,
-        name: 'Test User',
-        role: 'student',
-        completedCourses: [],
-        progress: {}
-      };
-      
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      this.currentUserSubject.next(user);
-      return of(true);
+  private loadGoogleAuthSdk() {
+    // Vérifier si le script est déjà chargé
+    if (document.querySelector('script[src^="https://accounts.google.com/gsi/client"]')) {
+      // Déclencher l'événement personnalisé si l'API est déjà chargée
+      if (typeof google !== 'undefined') {
+        window.dispatchEvent(new Event('google-loaded'));
+      }
+      return;
     }
-    return of(false);
-  }
 
-  register(userData: Omit<User, 'id' | 'completedCourses' | 'progress'>): Observable<boolean> {
-    // Mock implementation
-    const newUser: User = {
-      ...userData,
-      id: Math.random().toString(36).substr(2, 9),
-      completedCourses: [],
-      progress: {}
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      // Déclencher un événement personnalisé lorsque l'API est chargée
+      window.dispatchEvent(new Event('google-loaded'));
     };
-    
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
-    this.currentUserSubject.next(newUser);
-    return of(true);
+    script.onerror = (error) => {
+      console.error('Erreur lors du chargement du SDK Google:', error);
+    };
+    document.head.appendChild(script);
+  }
+
+
+  login(credentials: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+      tap((response) => {
+        localStorage.setItem('access_token', response.token); 
+      })
+    );
+  }
+
+  register(userData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, userData);
   }
 
   logout(): void {
-    localStorage.removeItem('currentUser');
-    this.currentUserSubject.next(null);
-    this.router.navigate(['/auth/login']);
+    localStorage.removeItem('access_token'); 
+    this.router.navigate(['/login']);
   }
 
-  get isLoggedIn$(): Observable<boolean> {
-    return this.currentUser$.pipe(map(user => !!user));
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('access_token');
   }
 
-  get currentUserValue(): User | null {
-    return this.currentUserSubject.value;
+loginWithGoogle(idToken: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/auth/google`, { id_token: idToken }).pipe(
+    tap((response: any) => {
+      console.log("loginWithGoogle", response);
+      if (response.success) {
+        localStorage.setItem('access_token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+      } else {
+        throw new Error(response.message || 'Erreur lors de la connexion avec Google');
+      }
+    }),
+    catchError(error => {
+      console.error('Erreur lors de la connexion avec Google:', error);
+      let errorMessage = 'Une erreur est survenue lors de la connexion avec Google';
+      
+      if (error.error?.message) {
+        errorMessage = error.error.message;
+      } else if (error.status === 0) {
+        errorMessage = 'Impossible de se connecter au serveur. Vérifiez votre connexion Internet.';
+      } else if (error.status === 401) {
+        errorMessage = 'Identifiants invalides. Veuillez réessayer.';
+      }
+      
+      throw new Error(errorMessage);
+    })
+  );
+}
+
+
+
+  handleGoogleLogin(): void {
+    
+    try {
+      // Vérifier si l'API Google est disponible
+      if (typeof google === 'undefined') {
+        console.error('Google API not loaded');
+        return;
+      }
+
+      // Initialiser l'API Google Identity
+      google.accounts.id.initialize({
+        client_id: '544702559305-0pj57qlosquuhhe7rh3otjdfdj3k7p1t.apps.googleusercontent.com', // À remplacer par votre ID client Google
+        callback: (response: any) => this.handleGoogleSignIn(response)
+      });
+
+      // Rendre le bouton de connexion Google
+      const button = document.getElementById('google-signin-button');
+      if (button) {
+        google.accounts.id.renderButton(button, {
+          type: 'standard',
+          theme: 'outline',
+          size: 'large',
+          text: 'continue_with',
+          shape: 'rectangular',
+          width: 300,
+          logo_alignment: 'left'
+        });
+      }
+    } catch (error) {
+      console.error('Error initializing Google Sign-In:', error);
+    }
   }
 
-  updateUser(user: User): void {
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    this.currentUserSubject.next(user);
-  }
 
-  // In a real app, this would be handled by your backend
-  requestPasswordReset(email: string): Observable<boolean> {
-    console.log(`Password reset requested for ${email}`);
-    return of(true);
+  private handleGoogleSignIn(response: any): void {
+    console.log(response);
+    
+    
+    this.loginWithGoogle(response.credential).subscribe({
+      next: (res: any) => {
+        if (res.success && res.token) {
+          localStorage.setItem('access_token', res.token);
+          localStorage.setItem('user', JSON.stringify(res.user));
+          
+          this.ngZone.run(() => {
+            this.router.navigate(['/home']);
+          });
+        } else {
+          console.error('Erreur lors de la connexion avec Google:', res.message);
+          // Afficher un message d'erreur à l'utilisateur
+        }
+      },
+      error: (err) => {
+        console.error('Erreur lors de la connexion avec Google', err);
+        // Afficher un message d'erreur à l'utilisateur
+        if (err.error && err.error.message) {
+          console.error('Message d\'erreur:', err.error.message);
+        }
+      }
+    });
   }
 }

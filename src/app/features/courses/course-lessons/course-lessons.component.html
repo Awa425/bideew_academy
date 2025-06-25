@@ -1,0 +1,143 @@
+<div class="course-lessons-container" style="margin-top: 5%">
+  <!-- En-tête du cours -->
+  <mat-card class="course-header elevated-card">
+    <div class="header-content">
+      <div class="course-info">
+        <h1>{{ course?.title || "Chargement..." }}</h1>
+        <p class="instructor">
+          <mat-icon>person</mat-icon>
+          {{ course?.instructor || "Chargement..." }}
+        </p>
+      </div>
+      <div class="progress-container">
+        <div class="progress-info">
+          <span>Progression globale</span>
+          <span>{{ progress }}%</span>
+        </div>
+        <mat-progress-bar
+          mode="determinate"
+          [value]="progress"
+        ></mat-progress-bar>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Contrôles de navigation -->
+  <div class="navigation-controls" *ngIf="currentLessonId">
+    <button mat-stroked-button color="primary">
+      <mat-icon>arrow_back_ios</mat-icon>
+      Précédent
+    </button>
+
+    <button mat-raised-button color="primary" class="next-button">
+      Suivant
+      <mat-icon>arrow_forward_ios</mat-icon>
+    </button>
+  </div>
+
+  <!-- Liste des leçons -->
+  <mat-card class="lessons-card elevated-card">
+    <mat-card-header>
+      <mat-card-title>Leçons du cours</mat-card-title>
+      <mat-card-subtitle
+        >Suivez les leçons dans l'ordre recommandé</mat-card-subtitle
+      >
+    </mat-card-header>
+    <!-- <pre>{{ lessons | json }}</pre> -->
+    <mat-card-content>
+      <mat-list class="lessons-list">
+        <ng-container *ngFor="let lesson of lessons.lessons; let i = index">
+          <mat-divider *ngIf="i > 0"></mat-divider>
+          <mat-list-item
+            [id]="'lesson-' + lesson.id"
+            class="lesson-item elevated-item"
+            [class.current]="isCurrentLesson(lesson.id)"
+            [class.completed]="lesson.completed"
+            (click)="startLesson(lesson)"
+            style="height: 155px"
+          >
+            <div matListItemIcon class="lesson-icon">
+              <mat-icon
+                [class.preview]="lesson.isPreview"
+                [class.completed]="lesson.completed"
+              >
+                {{ getLessonIcon(lesson.title) }}
+              </mat-icon>
+              <span class="preview-badge" *ngIf="lesson.isPreview"
+                >Gratuit</span
+              >
+            </div>
+
+            <div matListItemTitle class="lesson-title">
+              <span class="title-text">{{ lesson.title }}</span>
+              <div class="lesson-meta">
+                <span class="lesson-duration">
+                  <mat-icon>schedule</mat-icon>
+                  {{ lesson.duration_minutes }} min
+                </span>
+                <span class="lesson-type" [class]="lesson.type">
+                  {{ getLessonTypeLabel(lesson.type) }}
+                </span>
+              </div>
+            </div>
+
+            <div matListItemLine class="lesson-progress">
+              <mat-progress-bar
+                mode="determinate"
+                [value]="getProgressWidth(i + 1)"
+                class="progress-bar"
+              >
+              </mat-progress-bar>
+            </div>
+
+            <div class="lesson-actions">
+              <button
+                mat-icon-button
+                class="action-button"
+                (click)="
+                  $event.stopPropagation(); toggleLessonComplete(lesson, $event)
+                "
+                [matTooltip]="
+                  lesson.completed
+                    ? 'Marquer comme non terminée'
+                    : 'Marquer comme terminée'
+                "
+              >
+                <mat-icon>{{
+                  lesson.completed ? "check_circle" : "radio_button_unchecked"
+                }}</mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                class="action-button"
+                [class.active]="isCurrentLesson(lesson.id)"
+                (click)="startLesson(lesson)"
+                title="Commencer"
+              >
+                <mat-icon (click)="enrollInCourse(lesson.id)">{{
+                  isCurrentLesson(lesson.id)
+                    ? "play_circle_filled"
+                    : "play_circle_outline"
+                }}</mat-icon>
+              </button>
+            </div>
+          </mat-list-item>
+        </ng-container>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Boutons de navigation en bas -->
+  <div class="bottom-navigation" *ngIf="currentLessonId">
+    <button mat-stroked-button color="primary">
+      <mat-icon>arrow_back_ios</mat-icon>
+      Leçon précédente
+    </button>
+
+    <button mat-raised-button color="primary" class="next-button">
+      Leçon suivante
+      <mat-icon>arrow_forward_ios</mat-icon>
+    </button>
+  </div>
+</div>

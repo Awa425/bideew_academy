@@ -1,0 +1,426 @@
+<!-- Lecteur vidéo modal amélioré -->
+<div class="video-modal" *ngIf="currentVideo" [@fadeInOut]>
+  <div class="video-backdrop" (click)="closeVideo()"></div>
+  <div
+    class="video-container"
+    (mousemove)="showVideoControls()"
+    (mouseleave)="onMouseLeaveVideo()"
+    [class.playing]="isVideoPlaying"
+  >
+    <button
+      class="close-button"
+      matRipple
+      (click)="closeVideo()"
+      matTooltip="Fermer"
+    >
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+
+    <div class="video-wrapper">
+      <video
+        #videoPlayer
+        class="video-player"
+        (timeupdate)="onTimeUpdate()"
+        (ended)="onVideoEnded()"
+        (click)="togglePlayPause()"
+        preload="metadata"
+        [muted]="isMuted"
+        [poster]="currentVideo.thumbnail"
+      >
+        <source [src]="currentVideo.src" type="video/mp4" />
+        Votre navigateur ne supporte pas la lecture de vidéos HTML5.
+      </video>
+
+      <!-- Overlay de lecture -->
+      <div
+        class="video-overlay"
+        *ngIf="!isVideoPlaying"
+        (click)="togglePlayPause()"
+      >
+        <button
+          class="play-button"
+          mat-fab
+          color="primary"
+          aria-label="Lire la vidéo"
+        >
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+      </div>
+
+      <!-- Contrôles du lecteur vidéo -->
+      <div
+        class="video-controls"
+        [class.hidden]="!showControls && isVideoPlaying"
+      >
+        <div class="progress-bar-container">
+          <div class="progress-bar" (click)="onProgressBarClick($event)">
+            <div
+              class="progress"
+              [style.width.%]="(currentTime / duration) * 100 || 0"
+            >
+              <div class="progress-handle"></div>
+            </div>
+          </div>
+          <div class="time-display">
+            <span>{{ formatTime(currentTime) }}</span> /
+            <span>{{ formatTime(duration) }}</span>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <div class="left-controls">
+            <button
+              mat-icon-button
+              (click)="togglePlayPause()"
+              matTooltip="{{ isVideoPlaying ? 'Mettre en pause' : 'Lire' }}"
+            >
+              <mat-icon>{{ isVideoPlaying ? "pause" : "play_arrow" }}</mat-icon>
+            </button>
+
+            <div class="volume-control">
+              <button
+                mat-icon-button
+                (click)="toggleMute()"
+                matTooltip="{{
+                  isMuted ? 'Activer le son' : 'Désactiver le son'
+                }}"
+              >
+                <mat-icon>{{
+                  isMuted || volume === 0
+                    ? "volume_off"
+                    : volume > 0.5
+                    ? "volume_up"
+                    : "volume_down"
+                }}</mat-icon>
+              </button>
+              <div class="volume-slider-container">
+                <mat-slider
+                  class="volume-slider"
+                  [(ngModel)]="volume"
+                  (ngModelChange)="onVolumeChange($event)"
+                  [displayWith]="formatVolume"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                >
+                </mat-slider>
+              </div>
+            </div>
+
+            <div class="time-elapsed">
+              {{ formatTime(currentTime) }} / {{ formatTime(duration) }}
+            </div>
+          </div>
+
+          <div class="right-controls">
+            <div class="playback-rate" matTooltip="Vitesse de lecture">
+              <button
+                mat-button
+                [matMenuTriggerFor]="playbackMenu"
+                class="playback-button"
+              >
+                {{ playbackRate }}x
+                <mat-icon>arrow_drop_down</mat-icon>
+              </button>
+              <mat-menu #playbackMenu="matMenu" class="playback-menu">
+                <button
+                  mat-menu-item
+                  (click)="setPlaybackRate(0.5)"
+                  [class.active]="playbackRate === 0.5"
+                >
+                  0.5x
+                </button>
+                <button
+                  mat-menu-item
+                  (click)="setPlaybackRate(1)"
+                  [class.active]="playbackRate === 1"
+                >
+                  1x (Normal)
+                </button>
+                <button
+                  mat-menu-item
+                  (click)="setPlaybackRate(1.25)"
+                  [class.active]="playbackRate === 1.25"
+                >
+                  1.25x
+                </button>
+                <button
+                  mat-menu-item
+                  (click)="setPlaybackRate(1.5)"
+                  [class.active]="playbackRate === 1.5"
+                >
+                  1.5x
+                </button>
+                <button
+                  mat-menu-item
+                  (click)="setPlaybackRate(2)"
+                  [class.active]="playbackRate === 2"
+                >
+                  2x
+                </button>
+              </mat-menu>
+            </div>
+
+            <button
+              mat-icon-button
+              (click)="toggleFullscreen()"
+              matTooltip="Plein écran"
+            >
+              <mat-icon>{{
+                isFullscreen ? "fullscreen_exit" : "fullscreen"
+              }}</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contenu principal du cours -->
+<!-- ===========================================
+     PAGE DE DÉTAIL DU COURS
+     =========================================== -->
+<main class="course-detail-container" *ngIf="course">
+  <!-- En-tête avec image de couverture et informations principales -->
+  <!-- En-tête avec image de couverture -->
+  <header class="course-header">
+    <div
+      class="course-cover"
+      [style.backgroundImage]="'url(' + course.image_path + ')'"
+    >
+      <div class="course-overlay"></div>
+      <div class="course-header-content" role="banner">
+        <div
+          class="course-badge"
+          [class]="getLevelColor(course.level)"
+          [attr.aria-label]="'Niveau du cours : ' + course.level"
+        >
+          {{ course.level | titlecase }}
+        </div>
+        <h1 class="course-title">{{ course.title }}</h1>
+        <!-- <p class="course-instructor">
+          <mat-icon aria-hidden="true">person</mat-icon>
+          {{ course.user.name }}
+        </p> -->
+        <div
+          class="course-meta"
+          role="contentinfo"
+          aria-label="Informations du cours"
+        >
+          <span class="meta-item">
+            <mat-icon>schedule</mat-icon>
+            {{ course.duration_minutes }} heures
+          </span>
+          <span class="meta-item">
+            <!-- <mat-icon aria-hidden="true">star</mat-icon>
+            <span>{{ course.rating }}</span> -->
+            <mat-icon aria-hidden="true">person</mat-icon>
+            Dr. {{ course.user.name }}
+          </span>
+          <!-- <span class="meta-item">
+            <mat-icon aria-hidden="true">people</mat-icon>
+            <span>{{ course.studentsEnrolled | number }} étudiants</span>
+          </span> -->
+        </div>
+        <button
+          mat-raised-button
+          color="accent"
+          class="start-course-button"
+          (click)="enrollInCourse()"
+          aria-label="Commencer le cours"
+        >
+          <mat-icon aria-hidden="true">play_circle</mat-icon>
+          Commencer le cours
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="course-content" role="main">
+    <!-- Contenu principal -->
+    <div class="main-content">
+      <h2 class="visually-hidden">Contenu principal du cours</h2>
+      <mat-tab-group
+        [(selectedIndex)]="selectedTabIndex"
+        animationDuration="0ms"
+        aria-label="Navigation des sections du cours"
+      >
+        <!-- Onglet Aperçu -->
+        <mat-tab label="Aperçu">
+          <div class="tab-content">
+            <section aria-labelledby="about-course-heading">
+              <h2 id="about-course-heading">À propos de ce cours</h2>
+              <p class="course-description">{{ course.description }}</p>
+
+              <h3 id="learning-objectives-heading">Ce que vous apprendrez</h3>
+              <mat-divider></mat-divider>
+              <ul
+                class="learning-objectives"
+                aria-labelledby="learning-objectives-heading"
+              >
+                <li *ngFor="let objective of course.objectifList">
+                <!-- <li> -->
+                  <mat-icon aria-hidden="true">check_circle</mat-icon>
+                  <span>{{ objective }}</span>
+                </li>
+              </ul>
+
+              <h3 id="prerequisites-heading">Prérequis</h3>
+              <mat-divider></mat-divider>
+              <div
+                class="prerequisites"
+                aria-labelledby="prerequisites-heading"
+              >
+                <!-- <mat-chip-listbox>
+                  <mat-chip *ngFor="let prereq of course.prerequisites">
+                    {{ course.prerequis }}
+                  </mat-chip>
+                </mat-chip-listbox> -->
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let prereq of course.prerequisList">
+                    {{ prereq }}
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
+            </section>
+          </div>
+        </mat-tab>
+
+        <!-- Onglet Programme -->
+        <!-- <mat-tab label="Programme">
+          <div class="tab-content">
+            <div class="lessons-container" role="list">
+              <div
+                *ngFor="let lesson of course.lessons; trackBy: trackByLessonId"
+                class="lesson-card"
+                role="listitem"
+                [attr.aria-label]="
+                  'Leçon : ' +
+                  lesson.title +
+                  (lesson.isPreview ? ' (Aperçu)' : '') +
+                  (isLessonCompleted(lesson.id) ? ' - Terminée' : '')
+                "
+                tabindex="0"
+                [class.preview]="lesson.isPreview"
+                (click)="
+                  lesson.isPreview
+                    ? playPreviewVideo(lesson)
+                    : showLesson(lesson)
+                "
+                matRipple
+              >
+                <div class="lesson-header">
+                  <div
+                    class="lesson-icon"
+                    [class.preview]="lesson.isPreview"
+                    aria-hidden="true"
+                  ></div>
+
+                  <div class="lesson-title-wrapper">
+                    <h3 class="lesson-title">
+                      <mat-icon
+                        [color]="lesson.isPreview ? 'primary' : 'accent'"
+                      >
+                        {{ getLessonIcon(lesson.title) }} </mat-icon
+                      >{{ lesson.title }}
+                    </h3>
+                    <div class="lesson-meta">
+                      <span class="preview-badge" *ngIf="lesson.isPreview">
+                        <mat-icon aria-hidden="true">play_circle</mat-icon>
+                        Aperçu
+                      </span>
+                      <span
+                        class="completed-badge"
+                        *ngIf="isLessonCompleted(lesson.id)"
+                      >
+                        <mat-icon aria-hidden="true">check_circle</mat-icon>
+                        Terminé
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab> -->
+      </mat-tab-group>
+    </div>
+
+    <!-- Barre latérale -->
+    <aside class="sidebar">
+      <mat-card class="enroll-card">
+        <mat-card-header>
+          <mat-card-title>Commencer le cours</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="progress-container">
+            <div class="progress-info">
+              <span>Progression</span>
+              <span>{{ course.progression }}%</span>
+            </div>
+            <mat-progress-bar
+              mode="determinate"
+              [value]="course.progression"
+              aria-label="Progression du cours"
+            ></mat-progress-bar>
+          </div>
+          <!-- <button
+            mat-raised-button
+            color="primary"
+            class="enroll-button"
+            (click)="enrollInCourse()"
+            aria-label="S'inscrire au cours"
+          >
+            <mat-icon aria-hidden="true">school</mat-icon>
+            S'inscrire maintenant
+          </button> -->
+          <div class="course-features">
+            <div class="feature">
+              <mat-icon aria-hidden="true">check</mat-icon>
+              <span>Accès à vie</span>
+            </div>
+            <div class="feature">
+              <mat-icon aria-hidden="true">check</mat-icon>
+              <span>Certificat de réussite</span>
+            </div>
+            <div class="feature">
+              <mat-icon aria-hidden="true">check</mat-icon>
+              <span>Accès mobile et TV</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="instructor-card">
+        <mat-card-header>
+          <div mat-card-avatar class="instructor-avatar">
+            <mat-icon aria-hidden="true">account_circle</mat-icon>
+          </div>
+          <mat-card-title>Votre instructeur</mat-card-title>
+          <mat-card-subtitle>{{ course.instructor }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>
+            Expert en cybersécurité avec plus de 10 ans d'expérience dans le
+            domaine.
+          </p>
+          <div class="instructor-stats">
+            <div class="stat">
+              <span class="stat-value">4.9</span>
+              <span class="stat-label">Note</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">24,567</span>
+              <span class="stat-label">Étudiants</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">15</span>
+              <span class="stat-label">Cours</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </aside>
+  </div>
+</main>

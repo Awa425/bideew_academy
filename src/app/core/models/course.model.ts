@@ -1,29 +1,41 @@
 export interface Course {
   id: string;
   title: string;
+  subtitle?: string;
   description: string;
+  longDescription?: string;
   level: 'beginner' | 'intermediate' | 'advanced';
-  duration: number; // in hours
-  imageUrl: string;
+  duration_minutes: number; // in hours
+  image_path: string;
   instructor: string;
   rating: number;
   studentsEnrolled: number;
-  lessons: Lesson[];
   prerequisites: string[];
   learningObjectives: string[];
+  resources?: Resource[];
   createdAt: Date;
   updatedAt: Date;
+  category?: string;
+  language?: string;
+  tags?: string[];
 }
 
-export interface Lesson {
+export interface Lessons {
   id: string;
   title: string;
-  duration: number; // in minutes
+  description?: string; // Description détaillée de la leçon
+  duration_minutes: number; // in minutes
+  order: number; // in minutes
   type: 'video' | 'text' | 'quiz' | 'assignment';
   content?: string; // URL or text content
   isPreview: boolean;
+  course_id : Course[];
   resources: Resource[];
   quiz?: Quiz;
+  is_published?: string; // URL de la miniature pour la vidéo
+  created_at?: string; // URL de la vidéo pour les leçons de type vidéo
+  updated_at?: string; // URL de la vidéo pour les leçons de type vidéo
+  is_locked?: string; // URL de la vidéo pour les leçons de type vidéo
 }
 
 export interface Resource {
@@ -33,6 +45,10 @@ export interface Resource {
 }
 
 export interface Quiz {
+  id?: string;
+  courseId?: string;
+  title?: string;
+  description?: string;
   questions: Question[];
   passingScore: number;
   timeLimit?: number; // in minutes
