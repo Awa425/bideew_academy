@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,7 +17,6 @@ import { FormsModule } from '@angular/forms';
 import { Course, Lessons } from '../../../core/models/course.model';
 import { CourseService } from '../../../core/services/course.service';
 
-// Interface pour la configuration du lecteur vidéo
 interface VideoConfig {
   src: string;
   title: string;
@@ -42,6 +41,7 @@ interface VideoConfig {
     MatMenuModule,
     MatSliderModule,
     MatTooltipModule,
+    RouterLink
   ],
   templateUrl: './course-detail.component.html',
   styleUrls: ['./course-detail.component.scss'],
@@ -52,9 +52,6 @@ export class CourseDetailComponent implements OnInit {
   course: any;
   id: string | null = null;
   selectedTabIndex = 0;
-  progress = 45; // Pourcentage de progression
-
-  // État du lecteur vidéo
   currentVideo: VideoConfig | null = null;
   isVideoPlaying = false;
   showControls = true;

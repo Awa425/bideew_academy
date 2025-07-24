@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Observable, from, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { envVars } from 'environments/environments';
 
 declare const google: any;
 
@@ -10,8 +11,7 @@ declare const google: any;
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8000/api';
-
+  
   constructor(
     private http: HttpClient, 
     private router: Router,
@@ -46,7 +46,7 @@ export class AuthService {
 
 
   login(credentials: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post<any>(`${envVars.apiBaseUrl}/login`, credentials).pipe(
       tap((response) => {
         localStorage.setItem('access_token', response.token); 
       })
@@ -54,7 +54,7 @@ export class AuthService {
   }
 
   register(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData);
+    return this.http.post(`${envVars.apiBaseUrl}/register`, userData);
   }
 
   logout(): void {
@@ -67,7 +67,7 @@ export class AuthService {
   }
 
 loginWithGoogle(idToken: string): Observable<any> {
-  return this.http.post(`${this.apiUrl}/auth/google`, { id_token: idToken }).pipe(
+  return this.http.post(`${envVars.apiBaseUrl}/auth/google`, { id_token: idToken }).pipe(
     tap((response: any) => {
       console.log("loginWithGoogle", response);
       if (response.success) {

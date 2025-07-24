@@ -8,7 +8,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
 import { Course, Lessons } from '../../../core/models/course.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CourseService } from '../../../core/services/course.service';
 
 @Component({
@@ -23,6 +23,7 @@ import { CourseService } from '../../../core/services/course.service';
     MatExpansionModule,
     MatListModule,
     MatDividerModule,
+    RouterLink
   ],
   templateUrl: './text-lesson.component.html',
   styleUrls: ['./text-lesson.component.scss'],
@@ -32,21 +33,23 @@ export class TextLessonComponent {
   @Input() course!: Course;
   @Input() isPreview: boolean = false;
   lessons: any = [];
-  lessonId: string | null = null;
+  lessonId: number | null = null;
+  coursId: number | null = null;
   slides: { title: string; content: string }[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private lessonService: CourseService
   ) {}
-  ngOnInit() {
-    this.lessonId = this.route.snapshot.paramMap.get('id');
-    console.log(this.lessonId);
-    this.loadLessonData(1, 1);
+
+  ngOnInit() {    
+    this.loadLessonData();
   }
 
-  private loadLessonData(idCour: any, idLesson: any) {
-    this.lessonService.getLessonsByIdLesson(idCour, idLesson).subscribe({
+  private loadLessonData() {
+    const coursId = Number(this.route.snapshot.paramMap.get('id'));
+    const lessonId = Number(this.route.snapshot.paramMap.get('idLesson'));
+    this.lessonService.getLessonsByIdLesson(coursId, lessonId).subscribe({
       next: (lesson: any) => {
         const fullContent = lesson.contents?.[0]?.data || '';
         const rawParagraphs: string[] = fullContent

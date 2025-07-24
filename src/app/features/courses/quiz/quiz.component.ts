@@ -1,86 +1,201 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatIconModule } from '@angular/material/icon';
-import { Quiz, QuizQuestion } from '../../../core/models/quiz.model';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { CourseService } from '../../../core/services/course.service';
+import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Observable } from 'rxjs';
+
+// Définition de l'interface Question
+interface Question {
+  id: number;
+  text: string;
+  type: 'multiple_choice' | 'text';
+  options?: string[];
+  selected?: number;
+  selectedText?: string;
+  correctAnswer?: string;
+  answers?: { id: number; text: string; is_correct: number }[]; // Ajout de cette ligne
+}
+
+interface QuizData {
+  course_id: number;
+  description: string;
+  id: number;
+  questions: Question[];
+  created_at?: string;
+}
 
 @Component({
   selector: 'app-quiz',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatRadioModule,
-    MatProgressBarModule,
-    MatIconModule
-  ],
   templateUrl: './quiz.component.html',
-  styleUrls: ['./quiz.component.scss']
+  styleUrls: ['./quiz.component.scss'],
+  imports: [
+    CommonModule, // contient NgIf, NgFor, etc.
+    NgIf,
+    NgFor,
+    NgClass,
+    FormsModule, // nécessaire pour [(ngModel)]
+  ],
 })
-export class QuizComponent {
-  @Input() quiz!: Quiz;
-  @Output() quizCompleted = new EventEmitter<{score: number, passed: boolean}>();
+export class QuizComponent implements OnInit {
+  questions: Question[] = [];
+  currentIndex = 0;
+  showResults = false;
+  isLoading = true;
+  errorMessage: string = '';
+  quizTitle: string = '';
+  issa:any;
 
-  currentQuestionIndex = 0;
-  selectedAnswer: number | null = null;
-  showResult = false;
-  isCorrect = false;
-  score = 0;
-  quizFinished = false;
+  constructor(
+    public route: ActivatedRoute,
+    private courseService: CourseService
+  ) {}
 
-  get currentQuestion(): QuizQuestion {
-    return this.quiz.questions[this.currentQuestionIndex];
-  }
-
-  get progress(): number {
-    return ((this.currentQuestionIndex + 1) / this.quiz.questions.length) * 100;
-  }
-
-  selectAnswer(index: number): void {
-    this.selectedAnswer = index;
-  }
-
-  checkAnswer(): void {
-    if (this.selectedAnswer === null) return;
-    
-    this.showResult = true;
-    this.isCorrect = this.selectedAnswer === this.currentQuestion.correctAnswer;
-    
-    if (this.isCorrect) {
-      this.score++;
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.loadQuizData(+id);
+    } else {
+      this.errorMessage = 'Aucun ID de cours fourni.';
+      this.isLoading = false;
     }
-    
-    // Passe à la question suivante après un court délai
-    setTimeout(() => {
-      this.nextQuestion();
-    }, 1500);
+  }
+
+  get currentQuestion(): Question {
+    return this.questions[this.currentIndex];
+  }
+
+  loadQuizData(courseId: number): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    (
+      this.courseService.getQuizzByLesson(courseId) as Observable<any[]>
+    ).subscribe({
+      next: (apiData: any[]) => {
+        const quiz = apiData.find((q) => q.course_id === courseId);
+
+        // console.log('Quiz sélectionné:', quiz);
+
+        if (!quiz?.questions?.length) {
+          console.warn(
+            'Ce quiz ne contient aucune question. Utilisation des données par défaut.'
+          );
+          this.loadDefaultData();
+          return;
+        }
+
+        this.quizTitle = quiz.description;
+        this.questions = quiz.questions.map((q: any) => {
+          // S'assurer que chaque question a ses answers
+          q.answers = q.answers || [];
+          return this.transformQuestion(q);
+        });
+        this.currentIndex = 0;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement du quiz :', error);
+        this.errorMessage = error.message || 'Erreur de chargement du quiz';
+        this.isLoading = false;
+        this.loadDefaultData();
+      },
+    });
+  }
+
+  transformQuestion(q: any): Question {
+    // Pour les questions à choix multiples, générer les options à partir des answers
+    const options =
+      q.type === 'multiple_choice' && q.answers
+        ? q.answers.map((a: any) => a.text)
+        : q.options || [];
+
+    // Trouver la réponse correcte (où is_correct === 1)
+    const correctAnswer =
+      q.answers?.find((a: any) => a.is_correct === 1)?.text ||
+      q.correctAnswer ||
+      '';
+
+    return {
+      id: q.id,
+      text: q.text || '',
+      type: q.type || 'multiple_choice',
+      options: options,
+      selected: undefined,
+      selectedText: '',
+      correctAnswer: correctAnswer,
+      answers: q.answers || [], // Conserver les réponses originales si besoin
+    };
+  }
+
+  selectOption(index: number): void {
+    if (this.currentQuestion.type === 'multiple_choice') {
+      this.currentQuestion.selected = index;
+    }
   }
 
   nextQuestion(): void {
-    this.showResult = false;
-    this.selectedAnswer = null;
-    
-    if (this.currentQuestionIndex < this.quiz.questions.length - 1) {
-      this.currentQuestionIndex++;
+    if (this.currentIndex < this.questions.length - 1) {
+      this.currentIndex++;
     } else {
-      this.finishQuiz();
+      this.showResults = true;
     }
   }
 
-  finishQuiz(): void {
-    const finalScore = (this.score / this.quiz.questions.length) * 100;
-    const passed = finalScore >= this.quiz.passingScore;
-    this.quizFinished = true;
-    this.quizCompleted.emit({ score: finalScore, passed });
+  getScore(): number {
+    // this.submit();
+    return this.questions.reduce((score, q) => {
+      if (q.type === 'multiple_choice') {
+        const selectedText = q.options?.[q.selected ?? -1] ?? '';
+        return q.correctAnswer &&
+          selectedText.toLowerCase() === q.correctAnswer.toLowerCase()
+          ? score + 1
+          : score;
+      } else if (q.type === 'text') {
+        return q.correctAnswer &&
+          q.selectedText?.toLowerCase().trim() ===
+            q.correctAnswer.toLowerCase().trim()
+          ? score + 1
+          : score;
+      }
+      return score;
+    }, 0);
   }
 
-  getScoreColor(score: number): string {
-    if (score < 50) return 'warn';
-    if (score < 80) return 'accent';
-    return 'primary';
+  restart(): void {
+    this.questions = this.questions.map((q) => this.transformQuestion(q));
+    this.currentIndex = 0;
+    this.showResults = false;
+  }
+
+  loadDefaultData(): void {
+    this.questions = [
+      {
+        id: 1,
+        text: 'Quelle est la capitale du Sénégal ?',
+        type: 'multiple_choice',
+        options: ['Dakar', 'Bamako', 'Accra'],
+        selected: undefined,
+        selectedText: '',
+        correctAnswer: 'Dakar',
+      },
+      {
+        id: 2,
+        text: 'Quel est le langage utilisé pour créer Angular ?',
+        type: 'text',
+        selectedText: '',
+        correctAnswer: 'TypeScript',
+      },
+    ];
+    this.quizTitle = 'Quiz de secours';
+    this.isLoading = false;
+    this.errorMessage = '';
+  }
+
+  submit() {
+    this.courseService.calculateScore(1).subscribe((data) => {
+      this.issa=data;
+      console.log(data);
+    });
   }
 }

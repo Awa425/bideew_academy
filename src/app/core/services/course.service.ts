@@ -7,14 +7,12 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Course, Lessons, Quiz } from '../models/course.model';
+import { envVars } from 'environments/environments';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CourseService {
-  // L'URL de base de l'API - utilise le proxy en développement
-  private apiUrl = 'http://localhost:8000/api';
-
   constructor(private http: HttpClient) {}
 
   private logRequest(
@@ -69,21 +67,80 @@ export class CourseService {
 
   getAllCourses(): Observable<Course[]> {
     return this.http
-      .get(`http://localhost:8000/api/courses`)
+      .get(`${envVars.apiBaseUrl}/courses`)
       .pipe(map((response) => Object.values(response)[1]));
   }
 
-  getCourseById(id: number) {
+  addProgress(lesson_id: number): any {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    // const body = {
+    //   lesson_id: lesson_id,
+    //   // progress_percent: progress_percent, // ou un autre champ selon ton API
+    // };
+    return this.http.patch(
+      `${envVars.apiBaseUrl}/lessons/${lesson_id}/progress`,
+      {},
+      {
+        headers,
+      }
+    );
+  }
+
+  getProgress(courseId: number): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.get(`${envVars.apiBaseUrl}/courses/${courseId}/progress`, {
+      headers,
+    });
+  }
+  getInfoUser(userID: number): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.get(`${envVars.apiBaseUrl}/users/${userID}/details`, {
+      headers,
+    });
+  }
+
+  CourseStart(courseId: number): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.post(
+      `${envVars.apiBaseUrl}/courses/${courseId}/start`,
+      {},
+      {
+        headers,
+      }
+    );
+  }
+
+  calculateScore(courseId: number): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.post(
+      `${envVars.apiBaseUrl}/courses/${courseId}/quizzes/submit`,
+      {},
+      {
+        headers,
+      }
+    );
+  }
+
+  getCourseById(id: any) {
     const token = localStorage.getItem('access_token'); // Get stored token
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get(`http://localhost:8000/api/courses/${id}`, {
+    return this.http.get(`${envVars.apiBaseUrl}/courses/${id}`, {
       headers,
     });
   }
   getLessonsByIdCourse(id: number) {
     const token = localStorage.getItem('access_token'); // Get stored token
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get(`http://localhost:8000/api/courses/${id}\lessons`, {
+    return this.http.get(`${envVars.apiBaseUrl}/courses/${id}\lessons`, {
       headers,
     });
   }
@@ -91,17 +148,24 @@ export class CourseService {
     const token = localStorage.getItem('access_token'); // Get stored token
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(
-      `http://localhost:8000/api/courses/${idCour}\/lessons/${idLesson}`,
+      `${envVars.apiBaseUrl}/courses/${idCour}\/lessons/${idLesson}`,
       {
         headers,
       }
     );
   }
+  getQuizzByLesson(idCour: any) {
+    const token = localStorage.getItem('access_token'); // Get stored token
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get(`${envVars.apiBaseUrl}/courses/${idCour}\/quizzes`, {
+      headers,
+    });
+  }
 
   getPopularCourses(limit: number = 3): Observable<Course[]> {
     return this.http
       .get<Course[]>(
-        `${this.apiUrl}/courses?sort=rating&order=desc&limit=${limit}`
+        `${envVars.apiBaseUrl}/courses?sort=rating&order=desc&limit=${limit}`
       )
       .pipe(catchError(this.handleError));
   }
@@ -110,20 +174,20 @@ export class CourseService {
     level: 'beginner' | 'intermediate' | 'advanced'
   ): Observable<Course[]> {
     return this.http
-      .get<Course[]>(`${this.apiUrl}/courses?level=${level}`)
+      .get<Course[]>(`${envVars.apiBaseUrl}/courses?level=${level}`)
       .pipe(catchError(this.handleError));
   }
 
   searchCourses(query: string): Observable<Course[]> {
     return this.http
       .get<Course[]>(
-        `${this.apiUrl}/courses?search=${encodeURIComponent(query)}`
+        `${envVars.apiBaseUrl}/courses?search=${encodeURIComponent(query)}`
       )
       .pipe(catchError(this.handleError));
   }
 
   getCourseLessons(courseId: string): Observable<Lessons[]> {
-    const url = `${this.apiUrl}/courses/${courseId}/lessons`;
+    const url = `${envVars.apiBaseUrl}/courses/${courseId}/lessons`;
     this.logRequest(url, 'GET');
 
     return this.http
@@ -147,8 +211,8 @@ export class CourseService {
       );
   }
 
-  getCourseQuiz(courseId: string): Observable<Quiz> {
-    const url = `${this.apiUrl}/courses/${courseId}/quiz`;
+  getCourseQuiz(courseId: number): Observable<Quiz> {
+    const url = `${envVars.apiBaseUrl}/courses/${courseId}/quizzes`;
     this.logRequest(url, 'GET');
 
     return this.http

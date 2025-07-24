@@ -3,8 +3,9 @@
     <h2>{{ slides[currentSlideIndex].title }}</h2>
     <div class="ppt-content" [innerHTML]="slides[currentSlideIndex].content"></div>
   </div>
-
+  
   <div class="ppt-controls">
+    <a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR"><img src="../../../../assets/left-long-solid.svg" alt="" width="30"></a>
     <button mat-stroked-button (click)="prevSlide()" [disabled]="currentSlideIndex === 0">
       ← Précédent
     </button>

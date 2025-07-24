@@ -1,0 +1,14 @@
+<div class="pdf-container">
+  <div class="title-bar">
+    <a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR"
+      ><img src="../../../../assets/left-long-solid.svg" alt="" width="30"
+    /></a>
+    <h2>{{ lessons.title }}</h2>
+    <div class="controls">
+      <button (click)="downloadPDF()">Télécharger</button>
+    </div>
+  </div>
+
+  <pdf-viewer src="{{ pdf}} "></pdf-viewer>
+</div>
+

@@ -176,7 +176,6 @@
     </div>
   </div>
 </div>
-
 <!-- Contenu principal du cours -->
 <!-- ===========================================
      PAGE DE DÉTAIL DU COURS
@@ -241,6 +240,9 @@
     <!-- Contenu principal -->
     <div class="main-content">
       <h2 class="visually-hidden">Contenu principal du cours</h2>
+      <a [routerLink]="['../']" class="btn-btn-info" title="RETOUR"
+        ><img src="../../../../assets/left-long-solid.svg" alt="" width="30"
+      /></a>
       <mat-tab-group
         [(selectedIndex)]="selectedTabIndex"
         animationDuration="0ms"
@@ -260,7 +262,7 @@
                 aria-labelledby="learning-objectives-heading"
               >
                 <li *ngFor="let objective of course.objectifList">
-                <!-- <li> -->
+                  <!-- <li> -->
                   <mat-icon aria-hidden="true">check_circle</mat-icon>
                   <span>{{ objective }}</span>
                 </li>

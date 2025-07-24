@@ -1,92 +1,120 @@
-<div class="quiz-container" *ngIf="!quizFinished">
-  <mat-card class="quiz-card">
-    <mat-card-header>
-      <mat-card-title>{{ quiz.title }}</mat-card-title>
-      <mat-card-subtitle>Question {{ currentQuestionIndex + 1 }} sur {{ quiz.questions.length }}</mat-card-subtitle>
-    </mat-card-header>
-    
-    <mat-card-content>
-      <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
-      
-      <div class="question-container">
-        <h3 class="question-text">{{ currentQuestion.question }}</h3>
-        
-        <div class="options-container">
-          <mat-radio-group
-            *ngFor="let option of currentQuestion.options; let i = index"
-            [value]="i"
-            (change)="selectAnswer(i)"
-            [disabled]="showResult"
-            class="option">
-            <mat-radio-button [value]="i" [checked]="selectedAnswer === i">
-              {{ option }}
-            </mat-radio-button>
-          </mat-radio-group>
-        </div>
-        
-        <div *ngIf="showResult" class="result-feedback" [class.correct]="isCorrect" [class.incorrect]="!isCorrect">
-          <mat-icon>{{ isCorrect ? 'check_circle' : 'cancel' }}</mat-icon>
-          <span *ngIf="isCorrect">Bonne réponse !</span>
-          <span *ngIf="!isCorrect">
-            Mauvaise réponse. La bonne réponse est : {{ currentQuestion.options[currentQuestion.correctAnswer] }}
-          </span>
-          <p *ngIf="currentQuestion.explanation" class="explanation">
-            <em>{{ currentQuestion.explanation }}</em>
-          </p>
-        </div>
-      </div>
-    </mat-card-content>
-    
-    <mat-card-actions align="end">
-      <button mat-button (click)="checkAnswer()" [disabled]="selectedAnswer === null || showResult">
-        {{ currentQuestionIndex < quiz.questions.length - 1 ? 'Question suivante' : 'Terminer le quiz' }}
-      </button>
-    </mat-card-actions>
-  </mat-card>
-</div>
+<div class="quiz-container animate-fade-in">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loader"></div>
+    <p>Chargement du quiz...</p>
+  </div>
 
-<div *ngIf="quizFinished" class="quiz-result">
-  <mat-card class="result-card">
-    <mat-card-header>
-      <mat-card-title>Résultats du quiz</mat-card-title>
-      <mat-card-subtitle>{{ quiz.title }}</mat-card-subtitle>
-    </mat-card-header>
-    
-    <mat-card-content>
-      <div class="score-display" [class.passed]="(score / quiz.questions.length * 100) >= quiz.passingScore"
-           [class.failed]="(score / quiz.questions.length * 100) < quiz.passingScore">
-        <div class="score-circle">
-          <span class="score-value">{{ score }}/{{ quiz.questions.length }}</span>
-          <span class="score-percent">{{ score / quiz.questions.length * 100 | number:'1.0-0' }}%</span>
-        </div>
-        <h3>{{ (score / quiz.questions.length * 100) >= quiz.passingScore ? 'Félicitations !' : 'Quiz échoué' }}</h3>
-        <p *ngIf="(score / quiz.questions.length * 100) >= quiz.passingScore">
-          Vous avez réussi le quiz avec succès !
-        </p>
-        <p *ngIf="(score / quiz.questions.length * 100) < quiz.passingScore">
-          Le score minimum pour réussir est de {{ quiz.passingScore }}%. Essayez à nouveau !
-        </p>
-      </div>
-      
-      <div class="quiz-summary">
-        <h4>Résumé des réponses :</h4>
-        <div *ngFor="let question of quiz.questions; let i = index" class="question-summary">
-          <p class="question-text">{{ i + 1 }}. {{ question.question }}</p>
-          <p class="correct-answer">
-            <mat-icon>check_circle</mat-icon>
-            Réponse correcte : {{ question.options[question.correctAnswer] }}
-          </p>
-          <p *ngIf="question.explanation" class="explanation">
-            <em>{{ question.explanation }}</em>
-          </p>
-        </div>
-      </div>
-    </mat-card-content>
-    
-    <mat-card-actions align="end">
-      <button mat-button (click)="quizCompleted.emit({score: score / quiz.questions.length * 100, passed: (score / quiz.questions.length * 100) >= quiz.passingScore})">
-        Retour au cours
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="error-state">
+    <div class="error-content">
+      <div class="error-icon">!</div>
+      <h3>Erreur</h3>
+      <p>{{ errorMessage }}</p>
+      <button
+        *ngIf="route.snapshot.paramMap.get('id')"
+        (click)="loadQuizData(+route.snapshot.paramMap.get('id')!)"
+      >
+        Réessayer
       </button>
-    </mat-card-actions>
-  </mat-card>
+    </div>
+  </div>
+
+  <!-- Quiz Content -->
+  <div *ngIf="!isLoading && !errorMessage">
+    <div class="quiz-header">
+      <h2>{{ quizTitle }}</h2>
+    </div>
+
+    <!-- Quiz Questions -->
+    <div *ngIf="!showResults" class="quiz-content">
+      <div class="question-header">
+        <span class="question-counter">
+          Question {{ currentIndex + 1 }}/{{ questions.length }}
+        </span>
+        <span class="question-type" [ngClass]="currentQuestion.type">
+          {{
+            currentQuestion.type === "multiple_choice" ? "QCM" : "Réponse Libre"
+          }}
+        </span>
+      </div>
+
+      <h3 class="question-text">{{ currentQuestion.text }}</h3>
+
+      <!-- Multiple Choice -->
+      <div
+        *ngIf="currentQuestion.type === 'multiple_choice'"
+        class="options-grid"
+      >
+        <div
+          *ngFor="let option of currentQuestion.options; let i = index"
+          class="option-card"
+          [ngClass]="{ selected: currentQuestion.selected === i }"
+          (click)="selectOption(i)"
+        >
+          <div class="option-selector">
+            <div
+              class="selector-circle"
+              [ngClass]="{ active: currentQuestion.selected === i }"
+            ></div>
+          </div>
+          <div class="option-text">{{ option }}</div>
+        </div>
+      </div>
+
+      <!-- Text Answer -->
+      <div
+        *ngIf="currentQuestion.type === 'text'"
+        class="text-answer-container"
+      >
+        <textarea
+          [(ngModel)]="currentQuestion.selectedText"
+          placeholder="Écrivez votre réponse ici..."
+          rows="3"
+        ></textarea>
+      </div>
+
+      <button
+        class="next-button"
+        (click)="nextQuestion()"
+        [disabled]="
+          currentQuestion.type === 'multiple_choice' &&
+          currentQuestion.selected === undefined
+        "
+      >
+        {{
+          currentIndex === questions.length
+            ? "Voir les résultats"
+            : "Suivant"
+        }}
+        <svg class="arrow-icon" viewBox="0 0 24 24">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Results -->
+    <div
+      *ngIf="showResults"
+      #resultContainer
+      class="result-container animate-fade-in"
+    >
+      <div class="result-badge">
+        <div class="badge-circle">✓</div>
+      </div>
+
+      <h3>Résultats du Quiz</h3>
+      <div class="score-display">
+        <div class="score-value">{{ getScore() }}/{{ questions.length }}</div>
+        <div class="score-bar">
+          <div
+            class="score-progress"
+            [style.width.%]="(getScore() / questions.length) * 100"
+          ></div>
+        </div>
+      </div>
+
+      <button class="restart-button" (click)="restart()">Recommencer</button>
+    </div>
+  </div>
 </div>

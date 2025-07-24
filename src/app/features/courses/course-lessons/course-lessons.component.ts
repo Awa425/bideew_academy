@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,30 +9,46 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Course, Lessons } from '../../../core/models/course.model';
 import { CourseService } from '../../../core/services/course.service';
+import { MatRadioModule } from '@angular/material/radio';
+import { FormsModule } from '@angular/forms';
+
+interface LessonProgress {
+  id: number;
+  is_locked: boolean;
+  progress: number;
+}
 
 @Component({
   selector: 'app-course-lessons',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     RouterModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatListModule,
     MatProgressBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatRadioModule,
+    RouterLink,
   ],
   templateUrl: './course-lessons.component.html',
-  styleUrls: ['./course-lessons.component.scss']
+  styleUrls: ['./course-lessons.component.scss'],
 })
 export class CourseLessonsComponent implements OnInit {
-  course: Course | null = null;
   lessons: any = [];
-  courseId: string | null = null;
+  lessonsLocked: any = [];
+  lessonsProgress: any[] = [];
+  loading = true;
+  courseId: any;
+  lessonsId: any;
   progress = 0;
-  currentLessonId: string | null = null;
-  private readonly STORAGE_KEY = 'course_progress';
+  progressCompleted: number[] = [];
+  loadingLessonId: number | null = null;
+  currentLessonId: any;
+  unlockedLessons: number[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -41,186 +57,145 @@ export class CourseLessonsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.courseId = this.route.snapshot.paramMap.get('id');    
-    this.loadCourseData();
-    this.loadProgress();
+    this.courseId = this.route.snapshot.paramMap.get('id');
+    this.courseService.CourseStart(this.courseId).subscribe();
+
     this.loadLessonsDataCourse(this.courseId);
+    this.loadProgress();
+    this.loadUserProgress();
   }
 
-  private loadLessonsDataCourse(id: any) {
-    this.courseService.getCourseById(id).subscribe((data) => {
-      this.lessons = data;
-      console.log(data);
+  private loadUserProgress() {
+    this.courseService.getInfoUser(2).subscribe({
+      next: (data) => {
+        this.lessonsProgress = data.lessons_progress || [];
+        this.updateUnlockedLessons();
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Erreur:', error);
+        this.loading = false;
+      },
     });
   }
 
-  enrollInCourse(id:number): void {
-    // if (this.course) {
-    //   // Le chemin est relatif au chemin actuel, donc on utilise juste 'lessons'
-    // }
-    this.router.navigate([id], { relativeTo: this.route });
+  private loadProgress() {
+    this.courseService.getProgress(this.courseId).subscribe((data) => {
+      this.currentLessonId = data.current_lesson_id;
+      this.progress = data.progress_percent;
+      this.progressCompleted = Array.isArray(data.completed_lessons)
+        ? data.completed_lessons
+        : [data.completed_lessons];
+      this.updateUnlockedLessons();
+    });
   }
 
-  private loadProgress(): string[] {
-    if (!this.courseId) return [];
-    
-    const progressData = localStorage.getItem(this.STORAGE_KEY);
-    if (progressData) {
-      try {
-        const progress = JSON.parse(progressData);
-        if (progress[this.courseId!]) {
-          this.progress = progress[this.courseId!].progress || 0;
-          this.currentLessonId = progress[this.courseId!].currentLessonId || null;
-          return progress[this.courseId!].completedLessons || [];
-        }
-      } catch (e) {
-        console.error('Erreur lors du chargement de la progression', e);
-      }
+  private updateUnlockedLessons() {
+    if (!this.lessons?.lessons?.length) return;
+
+    // Première leçon toujours déverrouillée
+    const firstLessonId = this.lessons.lessons[0].id;
+    this.unlockedLessons = [firstLessonId];
+
+    // Ajoute les leçons complétées
+    if (this.progressCompleted?.length) {
+      this.unlockedLessons = [...new Set([...this.unlockedLessons, ...this.progressCompleted])];
     }
-    return [];
+
+    // Ajoute la leçon actuelle
+    if (this.currentLessonId) {
+      this.unlockedLessons = [...new Set([...this.unlockedLessons, this.currentLessonId])];
+    }
+
+    // Pour le quiz s'il existe
+    if (this.lessons.quizzes && this.progressCompleted.length === this.lessons.lessons.length) {
+      this.unlockedLessons.push(this.lessons.quizzes.id);
+    }
   }
 
-  private saveProgress(): void {
-    if (!this.courseId) return;
-    
-    const progressData = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '{}');
-    // const completedLessons = this.lessons
-    //   .filter(lesson => lesson.completed)
-    //   .map(lesson => lesson.id);
-    
-    // progressData[this.courseId] = {
-    //   progress: this.progress,
-    //   currentLessonId: this.currentLessonId,
-    //   completedLessons,
-    //   lastUpdated: new Date().toISOString()
-    // };
-    
-    // localStorage.setItem(this.STORAGE_KEY, JSON.stringify(progressData));
+  isLessonUnlocked(lessonId: number): boolean {
+    return this.unlockedLessons.includes(lessonId);
   }
 
-  private loadCourseData() {
-    const completedLessons = this.loadProgress();
-    // TODO: Remplacer par un appel API réel avec this.courseId
-    // Pour l'instant, on simule des données
-    this.course = {
-      id: this.courseId || '1',
-      title: 'Cybersécurité Avancée',
-      description: 'Maîtrisez les techniques avancées de cybersécurité et protégez les systèmes contre les menaces modernes.',
-      level: 'advanced',
-      duration_minutes: 20,
-      image_path: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-      instructor: 'Dr. Sarah Dupont',
-      rating: 4.8,
-      studentsEnrolled: 1245,
-      prerequisites: ['Bases de la cybersécurité', 'Réseaux informatiques'],
-      learningObjectives: [
-        'Comprendre les menaces de cybersécurité avancées',
-        'Mettre en place des mesures de protection efficaces',
-        'Analyser et répondre aux incidents de sécurité'
-      ],
-      createdAt: new Date('2023-01-15'),
-      updatedAt: new Date('2023-05-20'),
-    };
-    
-    // if (this.course) {
-    //   this.lessons = (this.course.lessons || []).map(lesson => ({
-    //     ...lesson,
-    //     completed: completedLessons.includes(lesson.id)
-    //   }));
-      
-    //   // Mettre à jour la progression
-    //   this.updateProgress();
-      
-    //   // Si pas de leçon en cours, définir la première comme en cours
-    //   if (!this.currentLessonId && this.lessons.length > 0) {
-    //     this.currentLessonId = this.lessons[0].id;
-    //   }
-    // }
+  private loadLessonsDataCourse(courseId: any) {
+    this.courseService.getCourseById(courseId).subscribe((data) => {
+      this.lessons = data;
+      this.updateUnlockedLessons();
+    });
+  }
+
+  redirect(lessonId: any): void {
+    if (!this.isLessonUnlocked(lessonId)) {
+      alert('Veuillez compléter les leçons précédentes pour déverrouiller cette leçon');
+      return;
+    }
+
+    this.courseService.getLessonsByIdLesson(this.courseId, lessonId).subscribe({
+      next: (lesson: any) => {
+        const full_Content_lessons = lesson.contents?.[0]?.type || '';
+        const var_type_lessons: string = full_Content_lessons;
+        if (var_type_lessons == 'text') {
+          this.router.navigate(['texte', lessonId], { relativeTo: this.route });
+        } else if (var_type_lessons == 'video') {
+          this.router.navigate(['video', lessonId], { relativeTo: this.route });
+        } else if (var_type_lessons == 'pdf') {
+          this.router.navigate(['pdf', lessonId], { relativeTo: this.route });
+        }
+      },
+    });
+  }
+
+  redirect_quizz(): void {
+    if (!this.isLessonUnlocked(this.lessons.quizzes.id)) {
+      alert('Veuillez compléter toutes les leçons pour accéder au quiz');
+      return;
+    }
+    this.router.navigate(['quizz', this.courseId], { relativeTo: this.route });
   }
 
   getLessonIcon(type: string): string {
     switch (type) {
-      case 'video':
-        return 'play_circle';
-      case 'quiz':
-        return 'quiz';
-      case 'text':
-        return 'article';
-      default:
-        return 'school';
+      case 'video': return 'play_circle';
+      case 'quiz': return 'quiz';
+      case 'text': return 'article';
+      default: return 'school';
     }
   }
 
-  startLesson(lesson: Lessons) {
-    this.currentLessonId = lesson.id;
-    this.saveProgress();
-    // Faire défiler jusqu'à la leçon sélectionnée
-    this.scrollToLesson(lesson.id);
-  }
-
-  toggleLessonComplete(lesson: Lessons & { completed?: boolean }, event: Event) {
-    event.stopPropagation();
-    lesson.completed = !lesson.completed;
-    this.updateProgress();
-    this.saveProgress();
-  }
-
-  navigateToNextLesson() {
-    if (!this.currentLessonId || !this.lessons.length) return;
-    
-    // const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
-    // if (currentIndex < this.lessons.length - 1) {
-    //   const nextLesson = this.lessons[currentIndex + 1];
-    //   this.startLesson(nextLesson);
-    // }
-  }
-
-  navigateToPreviousLesson() {
-    if (!this.currentLessonId || !this.lessons.length) return;
-    
-    //const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
-    // if (currentIndex > 0) {
-    //   const previousLesson = this.lessons[currentIndex - 1];
-    //   this.startLesson(previousLesson);
-    // }
-  }
-
-  private updateProgress() {
-    if (!this.lessons.length) {
+  updateProgress(lessonId: number): void {
+    this.loadingLessonId = lessonId;
+    const total = this.lessons?.lessons?.length || 0;
+    if (total === 0) {
       this.progress = 0;
       return;
     }
-    
-    // const completedCount = this.lessons.filter(lesson => lesson.completed).length;
-    // this.progress = Math.round((completedCount / this.lessons.length) * 100);
+
+    this.courseService.addProgress(lessonId).subscribe({
+      next: (res: any) => {
+        location.reload();
+      },
+      error: (err: any) => {
+        console.error('Erreur :', err);
+      },
+    });
   }
 
-  private scrollToLesson(lessonId: string) {
-    setTimeout(() => {
-      const element = document.getElementById(`lesson-${lessonId}`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Ajouter une classe pour le surlignage
-        element.classList.add('highlight');
-        setTimeout(() => element.classList.remove('highlight'), 2000);
-      }
-    }, 100);
+  toggleProgress(lessonId: number): void {
+    const lesson = this.lessons.lessons.find((l: any) => l.id === lessonId);
+    if (!lesson) return;
+    const index = this.progressCompleted.indexOf(lessonId);
+    if (index > -1) {
+      this.progressCompleted.splice(index, 1);
+      lesson.completed = false;
+    } else {
+      this.progressCompleted.push(lessonId);
+      lesson.completed = true;
+    }
+    this.updateProgress(lessonId);
   }
 
   isCurrentLesson(lessonId: string): boolean {
     return this.currentLessonId === lessonId;
-  }
-
-  canNavigateToPrevious() {
-    // if (!this.currentLessonId || !this.lessons.length) return false;
-    // const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
-    // return currentIndex > 0;
-  }
-
-  canNavigateToNext() {
-    // if (!this.currentLessonId || !this.lessons.length) return false;
-    // const currentIndex = this.lessons.findIndex(l => l.id === this.currentLessonId);
-    // return currentIndex < this.lessons.length - 1;
   }
 
   getLessonTypeLabel(type: string): string {
@@ -233,13 +208,19 @@ export class CourseLessonsComponent implements OnInit {
     }
   }
 
-  getProgressWidth(lessonIndex: number) {
-  //   if (!this.lessons.length) return 0;
-    
-  //   const completedCount = this.lessons
-  //     .slice(0, lessonIndex + 1)
-  //     .filter(lesson => lesson.completed).length;
-      
-  //   return (completedCount / this.lessons.length) * 100;
+  startLesson(lesson: any) {
+    if (lesson.questions) {
+      this.redirect_quizz();
+    } else {
+      this.redirect(lesson.id);
+    }
+  }
+
+   showConfirmation = false;
+
+  confirmAction() {
+    console.log("Action confirmée !");
+    // Logique à exécuter après confirmation
+    this.showConfirmation = false; // Ferme la popup
   }
 }

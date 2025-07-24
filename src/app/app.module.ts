@@ -27,13 +27,14 @@ import { RegisterComponent } from './features/auth/pages/register/register.compo
 import { LoginComponent } from './features/auth/pages/login/login.component';
 import { CoursesComponent } from './features/courses/courses.component';
 import { CourseDetailComponent } from './features/courses/course-detail/course-detail.component';
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 
 @NgModule({
   declarations: [
     RegisterComponent,
     LoginComponent,
     CoursesComponent,
-    CourseDetailComponent
+    CourseDetailComponent,
   ],
   imports: [
     BrowserModule,
@@ -55,7 +56,8 @@ import { CourseDetailComponent } from './features/courses/course-detail/course-d
     MatMenuModule,
     MatSliderModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    PdfViewerModule
   ],
   providers: [
     {

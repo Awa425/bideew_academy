@@ -1,1 +1,27 @@
-<p>video-lesson works!</p>
+<div class="youtube-style-player" *ngIf="video">
+  <div class="video-wrapper">
+    <video #targetPlayer controls [src]="video_teste"></video>
+  </div>
+
+  <div class="video-details">
+    <h1 class="video-title">{{ lessons.title }}</h1>
+    <p class="video-description">
+      {{ lessons.content }}
+    </p>
+  </div>
+</div>
+
+<!-- <a
+  href="{{ video_teste }}"
+  target="_blank"
+>
+  Pim Pim
+</a> -->
+
+<div class="video-wrapper">
+  <video #targetPlayer controls [src]="video_teste"></video>
+</div>
+
+<a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR"
+  ><img src="../../../../assets/left-long-solid.svg" alt="" width="30"
+/></a>

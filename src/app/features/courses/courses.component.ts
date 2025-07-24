@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CourseService } from '../../core/services/course.service';
 import { Course } from '../../core/models/course.model';
 @Component({
   selector: 'app-courses',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, RouterLink, NgIf,],
   templateUrl: './courses.component.html',
   styleUrls: ['./courses.component.scss'],
 })
@@ -15,7 +15,8 @@ export class CoursesComponent implements OnInit {
   courses: Course[] = [];
   isLoading = false;
   error: string | null = null;
-  searchQuery = '';
+  filteredCourses: Course[] = [];
+  searchQuery: string = '';
 
   constructor(private courseService: CourseService, private router: Router) {}
 
@@ -26,7 +27,23 @@ export class CoursesComponent implements OnInit {
   loadCourses(): void {
     this.courseService.getAllCourses().subscribe((data) => {
       this.courses = data;
+      this.filteredCourses = data;
+      this.isLoading = false;
     });
+  }
+
+  // Filtrage dynamique
+  ngOnChanges() {
+    this.filterCourses();
+  }
+
+  filterCourses(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    this.filteredCourses = this.courses.filter(
+      (course) =>
+        course.title.toLowerCase().includes(query) ||
+        course.description.toLowerCase().includes(query)
+    );
   }
 
   getLevelLabel(level: string | undefined): string {
@@ -42,5 +59,8 @@ export class CoursesComponent implements OnInit {
       default:
         return level;
     }
+  }
+  redirect(): void {
+    this.router.navigate(['home']);
   }
 }
