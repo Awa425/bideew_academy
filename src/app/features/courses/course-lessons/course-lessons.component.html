@@ -6,11 +6,15 @@
         <h1>{{ lessons?.title || "Chargement..." }}</h1>
         <p>
           <mat-icon>person</mat-icon>
-          {{ lessons?.user?.name || "Chargement..." }}
+          {{ users?.user?.name || "Chargement..." }}
+        </p>
+        <p>
+          <mat-icon>person</mat-icon>
+          {{ users?.user?.role || "Chargement..." }}
         </p>
         <p>
           <mat-icon>email</mat-icon>
-          {{ lessons?.user?.email || "Chargement..." }}
+          {{ users?.user?.email || "Chargement..." }}
         </p>
       </div>
       <div class="progress-container">
@@ -34,12 +38,22 @@
 
   <!-- Liste des leçons -->
   <mat-card class="lessons-card">
-    <mat-card-header>
-      <mat-card-title>Leçons du cours</mat-card-title>
-      <mat-card-subtitle
-        >Suivez les leçons dans l'ordre recommandé</mat-card-subtitle
-      >
-    </mat-card-header>
+    <div class="row g-0">
+      <!-- g-0 supprime les gutters -->
+      <div class="col-md-4">
+        <mat-card-header>
+          <mat-card-title>Leçons du cours</mat-card-title>
+          <mat-card-subtitle
+            >Suivez les leçons dans l'ordre recommandé</mat-card-subtitle
+          >
+        </mat-card-header>
+      </div>
+      <div class="col-md-8 pe-3 text-md-end">
+        <button class="btn btn-primary" >
+          <i class="fas fa-plus me-2"></i> NOUVEAU LESSON
+        </button>
+      </div>
+    </div>
 
     <mat-card-content>
       <mat-list>
@@ -93,7 +107,7 @@
                 *ngIf="isLessonUnlocked(lesson.id)"
                 class="badge badge-success"
               >
-                Derrouillé
+                Dévérrouillé
               </span>
               <div class="lesson-meta" *ngIf="!loading">
                 <span class="lesson-duration">
@@ -133,31 +147,24 @@
           </mat-list-item>
         </ng-container>
 
+        <!-- <button class="btn-delete" (click)="showConfirmation = true">Supprimer</button> -->
 
+        <!-- Popup de confirmation -->
+        <div class="confirmation-popup" *ngIf="showConfirmation">
+          <div class="popup-content">
+            <h3>Confirmer l'action</h3>
+            <p>Êtes-vous sûr de vouloir effectuer cette action ?</p>
+            <div class="popup-actions">
+              <button class="btn-cancel" (click)="showConfirmation = false">
+                Annuler
+              </button>
+              <button class="btn-confirm" (click)="confirmAction()">
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
 
-
-
-
-<!-- <button class="btn-delete" (click)="showConfirmation = true">Supprimer</button> -->
-
-<!-- Popup de confirmation -->
-<div class="confirmation-popup" *ngIf="showConfirmation">
-  <div class="popup-content">
-    <h3>Confirmer l'action</h3>
-    <p>Êtes-vous sûr de vouloir effectuer cette action ?</p>
-    <div class="popup-actions">
-      <button class="btn-cancel" (click)="showConfirmation = false">Annuler</button>
-      <button class="btn-confirm" (click)="confirmAction()">Confirmer</button>
-    </div>
-  </div>
-</div>
-
-
-
-
-
-
-        
         <ng-container
           *ngIf="lessons.quizzes && isLessonUnlocked(lessons.quizzes.id)"
         >

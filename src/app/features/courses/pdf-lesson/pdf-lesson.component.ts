@@ -2,17 +2,18 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CourseService } from '../../../core/services/course.service';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-pdf-lesson',
-  imports: [PdfViewerModule, RouterLink],
+  imports: [CommonModule, PdfViewerModule, RouterLink],
   templateUrl: './pdf-lesson.component.html',
   styleUrl: './pdf-lesson.component.scss',
 })
 export class PdfLessonComponent {
   lessons: any = [];
   lessonId: string | null = null;
-  pdf: string = '';
+  pdf: string | '' = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -29,9 +30,10 @@ export class PdfLessonComponent {
       next: (lesson: any) => {
         const fullContent = lesson.contents?.[0]?.file_path || '';
         const rawParagraphs: string = fullContent;
-        this.pdf = '../../../../assets/pdf/tdr_recrutement_devs.pdf';
+        // this.pdf = '../../../../assets/pdf/tdr_recrutement_devs.pdf';
+        this.pdf = 'http://localhost:8000/storage/' + rawParagraphs;
         this.lessons = lesson;
-        // console.log(rawParagraphs);
+        // console.log('http://localhost:8000/storage/' + rawParagraphs);
       },
       error: (err) => {
         console.error('Erreur chargement PDF:', err);

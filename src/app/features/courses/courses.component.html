@@ -33,7 +33,19 @@
       </div>
     </div>
   </section>
-  <a [routerLink]="['../home']" class="btn-btn-info" title="RETOUR"><img src="../../../assets/left-long-solid.svg" alt="" width="30"></a>
+  <div class="row g-0">
+    <!-- g-0 supprime les gutters -->
+    <div class="col-md-4">
+      <a [routerLink]="['../home']" class="btn-btn-info" title="RETOUR"
+        ><img src="../../../assets/left-long-solid.svg" alt="" width="30"
+      /></a>
+    </div>
+    <div class="col-md-8 pe-3 text-md-end">
+      <a class="btn btn-primary" [routerLink]="['/course-new']">
+        <i class="fas fa-plus me-2"></i> NOUVEAU COURSE
+      </a>
+    </div>
+  </div>
 
   <!-- Loading State -->
   <div *ngIf="isLoading" class="text-center my-5">
@@ -126,6 +138,31 @@
       Aucun cours ne correspond à votre recherche.
     </div>
   </div>
+
+  <!-- Pagination -->
+  <nav *ngIf="lastPage > 1" class="mt-4 d-flex justify-content-center">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="goToPage(currentPage - 1)">
+          Précédent
+        </button>
+      </li>
+
+      <li
+        class="page-item"
+        *ngFor="let page of [].constructor(lastPage); let i = index"
+        [class.active]="currentPage === i + 1"
+      >
+        <button class="page-link" (click)="goToPage(i + 1)">{{ i + 1 }}</button>
+      </li>
+
+      <li class="page-item" [class.disabled]="currentPage === lastPage">
+        <button class="page-link" (click)="goToPage(currentPage + 1)">
+          Suivant
+        </button>
+      </li>
+    </ul>
+  </nav>
 
   <!-- Call to Action Section -->
   <section class="cta-section mt-5 py-5 bg-light rounded-3">

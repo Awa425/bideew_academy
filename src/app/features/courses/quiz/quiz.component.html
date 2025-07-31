@@ -21,41 +21,68 @@
   </div>
 
   <!-- Quiz Content -->
-  <div *ngIf="!isLoading && !errorMessage">
+  <div *ngIf="!isLoading && !errorMessage && currentQuestion">
     <div class="quiz-header">
       <h2>{{ quizTitle }}</h2>
     </div>
 
     <!-- Quiz Questions -->
     <div *ngIf="!showResults" class="quiz-content">
+      <a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR">
+        <img
+          src="../../../../assets/left-long-solid.svg"
+          alt=""
+          width="50"
+          height="50"
+        />
+      </a>
       <div class="question-header">
         <span class="question-counter">
           Question {{ currentIndex + 1 }}/{{ questions.length }}
         </span>
         <span class="question-type" [ngClass]="currentQuestion.type">
           {{
-            currentQuestion.type === "multiple_choice" ? "QCM" : "Réponse Libre"
+            currentQuestion.type === "multiple_choice"
+              ? "QCM"
+              : currentQuestion.type === "single_choice"
+              ? "Choix Unique"
+              : "Réponse Libre"
           }}
         </span>
       </div>
 
       <h3 class="question-text">{{ currentQuestion.text }}</h3>
 
-      <!-- Multiple Choice -->
+      <!-- Single or Multiple Choice -->
       <div
-        *ngIf="currentQuestion.type === 'multiple_choice'"
+        *ngIf="
+          currentQuestion.type === 'multiple_choice' ||
+          currentQuestion.type === 'single_choice'
+        "
         class="options-grid"
       >
         <div
           *ngFor="let option of currentQuestion.options; let i = index"
           class="option-card"
-          [ngClass]="{ selected: currentQuestion.selected === i }"
+          [ngClass]="{
+            selected:
+              (currentQuestion.type === 'single_choice' &&
+                currentQuestion.selected === i) ||
+              (currentQuestion.type === 'multiple_choice' &&
+                currentQuestion.selected?.includes(i))
+          }"
           (click)="selectOption(i)"
         >
           <div class="option-selector">
             <div
               class="selector-circle"
-              [ngClass]="{ active: currentQuestion.selected === i }"
+              [ngClass]="{
+                active:
+                  (currentQuestion.type === 'single_choice' &&
+                    currentQuestion.selected === i) ||
+                  (currentQuestion.type === 'multiple_choice' &&
+                    currentQuestion.selected?.includes(i))
+              }"
             ></div>
           </div>
           <div class="option-text">{{ option }}</div>
@@ -74,16 +101,20 @@
         ></textarea>
       </div>
 
+      <!-- Bouton suivant -->
       <button
         class="next-button"
         (click)="nextQuestion()"
         [disabled]="
-          currentQuestion.type === 'multiple_choice' &&
-          currentQuestion.selected === undefined
+          (currentQuestion.type === 'multiple_choice' &&
+            (!currentQuestion.selected ||
+              currentQuestion.selected.length === 0)) ||
+          (currentQuestion.type === 'single_choice' &&
+            currentQuestion.selected === undefined)
         "
       >
         {{
-          currentIndex === questions.length
+          currentIndex === questions.length - 1
             ? "Voir les résultats"
             : "Suivant"
         }}
@@ -93,7 +124,7 @@
       </button>
     </div>
 
-    <!-- Results -->
+    <!-- Résultats -->
     <div
       *ngIf="showResults"
       #resultContainer

@@ -5,6 +5,7 @@ import { ResourcesComponent } from './features/resources/resources.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { AuthGuard } from './core/guards/auth.guard';
+import { CourseFormComponent } from './features/courses/course-form/course-form.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/auth', pathMatch: 'full' },
@@ -23,6 +24,10 @@ export const routes: Routes = [
           import('./features/courses/courses.routes').then(
             (m) => m.COURSES_ROUTES
           ),
+      },
+      {
+        path: 'course-new',
+        component: CourseFormComponent,
       },
       {
         path: 'learning-path',

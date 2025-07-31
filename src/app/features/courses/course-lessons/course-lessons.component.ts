@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink, RouterModule } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+  RouterLink,
+  RouterModule,
+} from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,6 +16,7 @@ import { Course, Lessons } from '../../../core/models/course.model';
 import { CourseService } from '../../../core/services/course.service';
 import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface LessonProgress {
   id: number;
@@ -39,6 +45,7 @@ interface LessonProgress {
 })
 export class CourseLessonsComponent implements OnInit {
   lessons: any = [];
+  users: any = [];
   lessonsLocked: any = [];
   lessonsProgress: any[] = [];
   loading = true;
@@ -49,14 +56,22 @@ export class CourseLessonsComponent implements OnInit {
   loadingLessonId: number | null = null;
   currentLessonId: any;
   unlockedLessons: number[] = [];
+  token: string | null = '';
+  userId: string | null = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.userId = localStorage.getItem('user_id'); // Récupération directe
+    this.authService.getUserById(this.userId).subscribe((data) => {
+      this.users = data;
+    });
+
     this.courseId = this.route.snapshot.paramMap.get('id');
     this.courseService.CourseStart(this.courseId).subscribe();
 
@@ -99,16 +114,23 @@ export class CourseLessonsComponent implements OnInit {
 
     // Ajoute les leçons complétées
     if (this.progressCompleted?.length) {
-      this.unlockedLessons = [...new Set([...this.unlockedLessons, ...this.progressCompleted])];
+      this.unlockedLessons = [
+        ...new Set([...this.unlockedLessons, ...this.progressCompleted]),
+      ];
     }
 
     // Ajoute la leçon actuelle
     if (this.currentLessonId) {
-      this.unlockedLessons = [...new Set([...this.unlockedLessons, this.currentLessonId])];
+      this.unlockedLessons = [
+        ...new Set([...this.unlockedLessons, this.currentLessonId]),
+      ];
     }
 
     // Pour le quiz s'il existe
-    if (this.lessons.quizzes && this.progressCompleted.length === this.lessons.lessons.length) {
+    if (
+      this.lessons.quizzes &&
+      this.progressCompleted.length === this.lessons.lessons.length
+    ) {
       this.unlockedLessons.push(this.lessons.quizzes.id);
     }
   }
@@ -126,7 +148,9 @@ export class CourseLessonsComponent implements OnInit {
 
   redirect(lessonId: any): void {
     if (!this.isLessonUnlocked(lessonId)) {
-      alert('Veuillez compléter les leçons précédentes pour déverrouiller cette leçon');
+      alert(
+        'Veuillez compléter les leçons précédentes pour déverrouiller cette leçon'
+      );
       return;
     }
 
@@ -155,10 +179,14 @@ export class CourseLessonsComponent implements OnInit {
 
   getLessonIcon(type: string): string {
     switch (type) {
-      case 'video': return 'play_circle';
-      case 'quiz': return 'quiz';
-      case 'text': return 'article';
-      default: return 'school';
+      case 'video':
+        return 'play_circle';
+      case 'quiz':
+        return 'quiz';
+      case 'text':
+        return 'article';
+      default:
+        return 'school';
     }
   }
 
@@ -200,11 +228,16 @@ export class CourseLessonsComponent implements OnInit {
 
   getLessonTypeLabel(type: string): string {
     switch (type) {
-      case 'video': return 'Vidéo';
-      case 'quiz': return 'Quiz';
-      case 'text': return 'Texte';
-      case 'assignment': return 'Devoir';
-      default: return type;
+      case 'video':
+        return 'Vidéo';
+      case 'quiz':
+        return 'Quiz';
+      case 'text':
+        return 'Texte';
+      case 'assignment':
+        return 'Devoir';
+      default:
+        return type;
     }
   }
 
@@ -216,10 +249,10 @@ export class CourseLessonsComponent implements OnInit {
     }
   }
 
-   showConfirmation = false;
+  showConfirmation = false;
 
   confirmAction() {
-    console.log("Action confirmée !");
+    console.log('Action confirmée !');
     // Logique à exécuter après confirmation
     this.showConfirmation = false; // Ferme la popup
   }

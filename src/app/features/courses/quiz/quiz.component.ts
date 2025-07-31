@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CourseService } from '../../../core/services/course.service';
 import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,12 +9,22 @@ import { Observable } from 'rxjs';
 interface Question {
   id: number;
   text: string;
-  type: 'multiple_choice' | 'text';
+  type: 'multiple_choice' | 'single_choice' | 'text'; // Ajout de 'single_choice'
   options?: string[];
-  selected?: number;
+  selected?: number | number[]; // Peut être un nombre ou un tableau de nombres
   selectedText?: string;
-  correctAnswer?: string;
-  answers?: { id: number; text: string; is_correct: number }[]; // Ajout de cette ligne
+  correctAnswer?: string | number | number[]; // Doit correspondre au type de réponse attendue
+  answers?: { id: number; text: string; is_correct: number }[];
+}
+
+// Dans votre service (ex: course.service.ts)
+// Interface corrigée (dans votre service ou composant)
+interface QuizSubmission {
+  quiz_id: number; // Notez l'underscore _
+  answers: {
+    question_id: number; // Notez l'underscore _
+    answer_ids: number[]; // Notez l'underscore _
+  }[];
 }
 
 interface QuizData {
@@ -34,24 +44,25 @@ interface QuizData {
     NgIf,
     NgFor,
     NgClass,
-    FormsModule, // nécessaire pour [(ngModel)]
+    FormsModule, 
+    RouterLink
   ],
 })
 export class QuizComponent implements OnInit {
-  questions: Question[] = [];
+  questions: any[] = [];
   currentIndex = 0;
   showResults = false;
-  isLoading = true;
-  errorMessage: string = '';
-  quizTitle: string = '';
-  issa:any;
+  isLoading = false;
+  errorMessage = '';
+  quizTitle = 'Quiz interactif';
+  quizId: number | null = null; // Déclarez la propriété
 
   constructor(
     public route: ActivatedRoute,
     private courseService: CourseService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadQuizData(+id);
@@ -61,8 +72,105 @@ export class QuizComponent implements OnInit {
     }
   }
 
-  get currentQuestion(): Question {
-    return this.questions[this.currentIndex];
+  get currentQuestion() {
+    return this.questions[this.currentIndex] || null;
+  }
+
+  // selectOption(index: number): void {
+  //   if (!this.currentQuestion) return;
+
+  //   if (this.currentQuestion.type === 'single_choice') {
+  //     this.currentQuestion.selected = index;
+  //   } else if (this.currentQuestion.type === 'multiple_choice') {
+  //     if (!Array.isArray(this.currentQuestion.selected)) {
+  //       this.currentQuestion.selected = [];
+  //     }
+
+  //     const selectedIndex = this.currentQuestion.selected.indexOf(index);
+  //     if (selectedIndex === -1) {
+  //       this.currentQuestion.selected.push(index);
+  //     } else {
+  //       this.currentQuestion.selected.splice(selectedIndex, 1);
+  //     }
+  //   }
+  // }
+  selectOption(index: number): void {
+    if (!this.currentQuestion) return;
+
+    if (this.currentQuestion.type === 'single_choice') {
+      // Pour un choix unique, on remplace simplement la sélection
+      this.currentQuestion.selected = index;
+    } else if (this.currentQuestion.type === 'multiple_choice') {
+      // Pour un choix multiple, on gère un tableau de sélections
+      if (!Array.isArray(this.currentQuestion.selected)) {
+        this.currentQuestion.selected = [];
+      }
+
+      const selectedIndex = this.currentQuestion.selected.indexOf(index);
+      if (selectedIndex === -1) {
+        this.currentQuestion.selected.push(index);
+      } else {
+        this.currentQuestion.selected.splice(selectedIndex, 1);
+      }
+    }
+  }
+
+  nextQuestion(): void {
+    if (this.currentIndex < this.questions.length - 1) {
+      this.currentIndex++;
+    } else {
+      this.showResults = true;
+      this.submitQuiz();
+    }
+  }
+
+  restart(): void {
+    this.currentIndex = 0;
+    this.showResults = false;
+    this.questions.forEach((q) => {
+      q.selected = undefined;
+      q.selectedText = '';
+    });
+  }
+
+  getScore(): number {
+    return this.questions.filter((q) => {
+      if (q.type === 'text') return true; // accepter toutes les réponses libres
+      return JSON.stringify(q.selected) === JSON.stringify(q.correctAnswer);
+    }).length;
+  }
+
+  private getSelectedAnswerIds(question: any): number[] {
+    if (question.selected === undefined) return [];
+
+    // Cas question à choix multiple
+    if (Array.isArray(question.selected)) {
+      return question.selected.map(
+        (index: number) => question.answers[index].id
+      );
+    }
+
+    // Cas question à choix unique
+    return [question.answers[question.selected].id];
+  }
+
+  submitQuiz() {
+    const submissionData: any = {
+      quiz_id: 1,
+      answers: this.questions
+        .filter((q) => q.selected !== undefined)
+        .map((q) => ({
+          question_id: q.id,
+          answer_ids: this.getSelectedAnswerIds(q),
+        })),
+    };
+
+    console.log('Submission Data:', submissionData);
+
+    this.courseService.calculateScore(1, submissionData).subscribe({
+      next: (res) => console.log('Success', res),
+      error: (err) => console.error('API Error:', err.error.errors),
+    });
   }
 
   loadQuizData(courseId: number): void {
@@ -103,71 +211,6 @@ export class QuizComponent implements OnInit {
     });
   }
 
-  transformQuestion(q: any): Question {
-    // Pour les questions à choix multiples, générer les options à partir des answers
-    const options =
-      q.type === 'multiple_choice' && q.answers
-        ? q.answers.map((a: any) => a.text)
-        : q.options || [];
-
-    // Trouver la réponse correcte (où is_correct === 1)
-    const correctAnswer =
-      q.answers?.find((a: any) => a.is_correct === 1)?.text ||
-      q.correctAnswer ||
-      '';
-
-    return {
-      id: q.id,
-      text: q.text || '',
-      type: q.type || 'multiple_choice',
-      options: options,
-      selected: undefined,
-      selectedText: '',
-      correctAnswer: correctAnswer,
-      answers: q.answers || [], // Conserver les réponses originales si besoin
-    };
-  }
-
-  selectOption(index: number): void {
-    if (this.currentQuestion.type === 'multiple_choice') {
-      this.currentQuestion.selected = index;
-    }
-  }
-
-  nextQuestion(): void {
-    if (this.currentIndex < this.questions.length - 1) {
-      this.currentIndex++;
-    } else {
-      this.showResults = true;
-    }
-  }
-
-  getScore(): number {
-    // this.submit();
-    return this.questions.reduce((score, q) => {
-      if (q.type === 'multiple_choice') {
-        const selectedText = q.options?.[q.selected ?? -1] ?? '';
-        return q.correctAnswer &&
-          selectedText.toLowerCase() === q.correctAnswer.toLowerCase()
-          ? score + 1
-          : score;
-      } else if (q.type === 'text') {
-        return q.correctAnswer &&
-          q.selectedText?.toLowerCase().trim() ===
-            q.correctAnswer.toLowerCase().trim()
-          ? score + 1
-          : score;
-      }
-      return score;
-    }, 0);
-  }
-
-  restart(): void {
-    this.questions = this.questions.map((q) => this.transformQuestion(q));
-    this.currentIndex = 0;
-    this.showResults = false;
-  }
-
   loadDefaultData(): void {
     this.questions = [
       {
@@ -192,10 +235,34 @@ export class QuizComponent implements OnInit {
     this.errorMessage = '';
   }
 
-  submit() {
-    this.courseService.calculateScore(1).subscribe((data) => {
-      this.issa=data;
-      console.log(data);
-    });
+  transformQuestion(q: any): Question {
+    const options =
+      (q.type === 'multiple_choice' || q.type === 'single_choice') && q.answers
+        ? q.answers.map((a: any) => a.text)
+        : q.options || [];
+
+    // Pour les questions à choix unique, correctAnswer est l'index de la bonne réponse
+    // Pour les questions à choix multiples, c'est un tableau d'index
+    let correctAnswer;
+    if (q.type === 'single_choice') {
+      correctAnswer = q.answers?.findIndex((a: any) => a.is_correct === 1);
+    } else if (q.type === 'multiple_choice') {
+      correctAnswer = q.answers
+        ?.map((a: any, index: number) => (a.is_correct === 1 ? index : -1))
+        .filter((i: number) => i !== -1);
+    } else {
+      correctAnswer = q.correctAnswer || '';
+    }
+
+    return {
+      id: q.id,
+      text: q.text || '',
+      type: q.type || 'multiple_choice',
+      options: options,
+      selected: undefined,
+      selectedText: '',
+      correctAnswer: correctAnswer,
+      answers: q.answers || [],
+    };
   }
 }

@@ -9,6 +9,14 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { Course, Lessons, Quiz } from '../models/course.model';
 import { envVars } from 'environments/environments';
 
+interface QuizSubmission {
+  quiz_id: number;
+  answers: {
+    question_id: number;
+    answer_ids: number[];
+  }[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -65,10 +73,8 @@ export class CourseService {
     return throwError(() => new Error(errorMessage));
   }
 
-  getAllCourses(): Observable<Course[]> {
-    return this.http
-      .get(`${envVars.apiBaseUrl}/courses`)
-      .pipe(map((response) => Object.values(response)[1]));
+  getAllCourses(page: number = 1): Observable<any> {
+    return this.http.get(`${envVars.apiBaseUrl}/courses?page=${page}`);
   }
 
   addProgress(lesson_id: number): any {
@@ -95,6 +101,7 @@ export class CourseService {
       headers,
     });
   }
+
   getInfoUser(userID: number): Observable<any> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -117,17 +124,34 @@ export class CourseService {
     );
   }
 
-  calculateScore(courseId: number): Observable<any> {
+  createCourse(data: any): Observable<any> {
+    console.log(data);
+
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
-    return this.http.post(
-      `${envVars.apiBaseUrl}/courses/${courseId}/quizzes/submit`,
-      {},
-      {
+    return this.http.post(`${envVars.apiBaseUrl}/courses`, data, {
+      headers,
+    });
+  }
+
+  calculateScore(courseId: number, data: any): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+
+    return this.http
+      .post(`${envVars.apiBaseUrl}/courses/${courseId}/quizzes/submit`, data, {
         headers,
-      }
-    );
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('Error submitting quiz:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
   getCourseById(id: any) {
@@ -137,6 +161,7 @@ export class CourseService {
       headers,
     });
   }
+
   getLessonsByIdCourse(id: number) {
     const token = localStorage.getItem('access_token'); // Get stored token
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -144,6 +169,7 @@ export class CourseService {
       headers,
     });
   }
+
   getLessonsByIdLesson(idCour: number, idLesson: number) {
     const token = localStorage.getItem('access_token'); // Get stored token
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -154,6 +180,7 @@ export class CourseService {
       }
     );
   }
+
   getQuizzByLesson(idCour: any) {
     const token = localStorage.getItem('access_token'); // Get stored token
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
