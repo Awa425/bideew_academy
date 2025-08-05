@@ -13,6 +13,7 @@ export class PdfLessonComponent {
   lessons: any = [];
   lessonId: string | null = null;
   pdf: string = '';
+  src: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -27,11 +28,15 @@ export class PdfLessonComponent {
     const lessonId = Number(this.route.snapshot.paramMap.get('idLesson'));
     this.lessonService.getLessonsByIdLesson(coursId, lessonId).subscribe({
       next: (lesson: any) => {
-        const fullContent = lesson.contents?.[0]?.file_path || '';
+        const fullContent = lesson.contents[0].file_path ;
         const rawParagraphs: string = fullContent;
-        this.pdf = '../../../../assets/pdf/tdr_recrutement_devs.pdf';
+        console.log(rawParagraphs);
+        
+        // this.src = 'http://localhost:8000/api/lessons/files/KC2XvbyP4uQVkCoDL3E2cAmOSKf6Q7UNsPBUdKXT.pdf'
+       
+        this.pdf = rawParagraphs;
+        // this.pdf = '../../../../assets/pdf/tdr_recrutement_devs.pdf';
         this.lessons = lesson;
-        // console.log(rawParagraphs);
       },
       error: (err) => {
         console.error('Erreur chargement PDF:', err);
