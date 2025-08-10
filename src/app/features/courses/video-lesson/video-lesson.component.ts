@@ -32,9 +32,10 @@ export class VideoLessonComponent {
         const fullContent = lesson.contents?.[0]?.file_path || '';
         const rawParagraphs: string = fullContent;
         
-        this.video_teste= rawParagraphs;
-        this.video_teste= "../../../../assets/video/Casa.de.Papel.S05E10 FINAL.Shar.Club.mp4";
-        console.log(this.video_teste);
+        this.video_teste= 'http://localhost:8000/api/' + rawParagraphs;
+        // this.pdf = 'http://localhost:8000/api/' + rawParagraphs;
+        // this.video_teste= "../../../../assets/video/Casa.de.Papel.S05E10 FINAL.Shar.Club.mp4";
+        console.log(lesson);
         this.lessons=lesson;
       }});
     }

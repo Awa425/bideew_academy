@@ -1,52 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CourseService } from '../../../core/services/course.service';
 import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-// Définition de l'interface Question
 interface Question {
   id: number;
   text: string;
-  type: 'multiple_choice' | 'single_choice' | 'text'; // Ajout de 'single_choice'
+  type: 'multiple_choice' | 'single_choice' | 'text';
   options?: string[];
-  selected?: number | number[]; // Peut être un nombre ou un tableau de nombres
+  selected?: number | number[];
   selectedText?: string;
-  correctAnswer?: string | number | number[]; // Doit correspondre au type de réponse attendue
+  correctAnswer?: string | number | number[];
   answers?: { id: number; text: string; is_correct: number }[];
-}
-
-// Dans votre service (ex: course.service.ts)
-// Interface corrigée (dans votre service ou composant)
-interface QuizSubmission {
-  quiz_id: number; // Notez l'underscore _
-  answers: {
-    question_id: number; // Notez l'underscore _
-    answer_ids: number[]; // Notez l'underscore _
-  }[];
-}
-
-interface QuizData {
-  course_id: number;
-  description: string;
-  id: number;
-  questions: Question[];
-  created_at?: string;
 }
 
 @Component({
   selector: 'app-quiz',
   templateUrl: './quiz.component.html',
   styleUrls: ['./quiz.component.scss'],
-  imports: [
-    CommonModule, // contient NgIf, NgFor, etc.
-    NgIf,
-    NgFor,
-    NgClass,
-    FormsModule, 
-    RouterLink
-  ],
+  imports: [CommonModule, NgIf, NgFor, NgClass, FormsModule, RouterLink],
 })
 export class QuizComponent implements OnInit {
   questions: any[] = [];
@@ -55,17 +29,20 @@ export class QuizComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   quizTitle = 'Quiz interactif';
-  quizId: number | null = null; // Déclarez la propriété
+  quizId: number | null = null;
+  resultat?: any;
+  course_id: any;
 
   constructor(
     public route: ActivatedRoute,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private router: Router
   ) {}
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.loadQuizData(+id);
+    this.course_id = this.route.snapshot.paramMap.get('id');
+    if (this.course_id) {
+      this.loadQuizData(+this.course_id);
     } else {
       this.errorMessage = 'Aucun ID de cours fourni.';
       this.isLoading = false;
@@ -76,24 +53,6 @@ export class QuizComponent implements OnInit {
     return this.questions[this.currentIndex] || null;
   }
 
-  // selectOption(index: number): void {
-  //   if (!this.currentQuestion) return;
-
-  //   if (this.currentQuestion.type === 'single_choice') {
-  //     this.currentQuestion.selected = index;
-  //   } else if (this.currentQuestion.type === 'multiple_choice') {
-  //     if (!Array.isArray(this.currentQuestion.selected)) {
-  //       this.currentQuestion.selected = [];
-  //     }
-
-  //     const selectedIndex = this.currentQuestion.selected.indexOf(index);
-  //     if (selectedIndex === -1) {
-  //       this.currentQuestion.selected.push(index);
-  //     } else {
-  //       this.currentQuestion.selected.splice(selectedIndex, 1);
-  //     }
-  //   }
-  // }
   selectOption(index: number): void {
     if (!this.currentQuestion) return;
 
@@ -124,14 +83,17 @@ export class QuizComponent implements OnInit {
     }
   }
 
-  restart(): void {
-    this.currentIndex = 0;
-    this.showResults = false;
-    this.questions.forEach((q) => {
-      q.selected = undefined;
-      q.selectedText = '';
-    });
-  }
+  // restart(): void {
+  //   this.currentIndex = 0;
+  //   this.showResults = false;
+  //   this.questions.forEach((q) => {
+  //     q.selected = undefined;
+  //     q.selectedText = '';
+  //   });
+  // }
+  // redirect(): void {
+  //   this.router.navigate(['../../lessons'], { relativeTo: this.route });
+  // }
 
   getScore(): number {
     return this.questions.filter((q) => {
@@ -165,10 +127,11 @@ export class QuizComponent implements OnInit {
         })),
     };
 
-    console.log('Submission Data:', submissionData);
-
     this.courseService.calculateScore(1, submissionData).subscribe({
-      next: (res) => console.log('Success', res),
+      next: (res) => {
+        console.log('Success', res);
+        this.resultat = res;
+      },
       error: (err) => console.error('API Error:', err.error.errors),
     });
   }

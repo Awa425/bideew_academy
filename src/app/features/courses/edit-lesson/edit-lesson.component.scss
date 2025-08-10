@@ -1,0 +1,222 @@
+.lesson-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  background: #f7f9fc;
+  min-height: 100vh;
+
+  // HEADER
+  .form-header {
+    background: linear-gradient(135deg, #3f51b5, #5c6bc0);
+    border-radius: 12px;
+    color: #fff;
+    padding: 2rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      .header-icon {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 1rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        mat-icon {
+          font-size: 2rem;
+        }
+      }
+
+      .header-text {
+        h1 {
+          margin: 0;
+          font-size: 1.8rem;
+          font-weight: bold;
+        }
+        p {
+          margin: 0;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+
+  // FORM WRAPPER
+  .form-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  // CARD SECTIONS
+  .form-section {
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+
+    .section-header {
+      background: #f5f5f5;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .section-icon {
+        background: #e0e0e0;
+        padding: 0.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        mat-icon {
+          color: #3f51b5;
+        }
+      }
+    }
+
+    .section-content {
+      padding: 1.5rem;
+    }
+  }
+
+  // FORM ROWS
+  .form-row {
+    display: flex;
+    gap: 1.5rem;
+
+    &.two-columns {
+      flex-wrap: wrap;
+
+      mat-form-field {
+        flex: 1 1 calc(50% - 0.75rem);
+      }
+    }
+  }
+
+  // CONTENT ITEMS
+  .content-item {
+    margin-bottom: 1.5rem;
+
+    .content-card {
+      border-radius: 10px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      }
+
+      .content-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+
+        .content-number {
+          background: #3f51b5;
+          color: #fff;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+        }
+
+        .delete-btn {
+          color: #f44336;
+
+          &:hover {
+            background: rgba(244, 67, 54, 0.1);
+          }
+        }
+      }
+    }
+  }
+
+  // UPLOAD SECTION
+  .upload-section {
+    .upload-area {
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+
+      &:hover {
+        border-color: #3f51b5;
+        background-color: rgba(63, 81, 181, 0.05);
+      }
+
+      .upload-icon {
+        font-size: 2.5rem;
+        color: #3f51b5;
+      }
+      p {
+        margin: 0.5rem 0;
+      }
+      small {
+        color: #777;
+      }
+    }
+  }
+
+  // ACTION BUTTONS
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1rem;
+
+    .actions-container {
+      display: flex;
+      gap: 1rem;
+
+      .cancel-btn {
+        color: #555;
+        &:hover {
+          background: #eee;
+        }
+      }
+
+      .submit-btn {
+        font-weight: bold;
+        padding: 0 1.5rem;
+      }
+    }
+  }
+
+  // ANIMATIONS
+  .animate-card {
+    animation: fadeInUp 0.4s ease;
+  }
+  .animate-item {
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

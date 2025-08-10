@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { Course, Lessons } from '../../../core/models/course.model';
 import { CourseService } from '../../../core/services/course.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface VideoConfig {
   src: string;
@@ -41,7 +42,7 @@ interface VideoConfig {
     MatMenuModule,
     MatSliderModule,
     MatTooltipModule,
-    RouterLink
+    RouterLink,
   ],
   templateUrl: './course-detail.component.html',
   styleUrls: ['./course-detail.component.scss'],
@@ -50,7 +51,7 @@ export class CourseDetailComponent implements OnInit {
   @ViewChild('videoPlayer') videoPlayer!: ElementRef<HTMLVideoElement>;
 
   course: any;
-  id: string | null = null;
+  courId: string | null = null;
   selectedTabIndex = 0;
   currentVideo: VideoConfig | null = null;
   isVideoPlaying = false;
@@ -63,6 +64,8 @@ export class CourseDetailComponent implements OnInit {
   playbackRate = 1;
   currentLesson: Lessons[] = [];
   showLessonContent = false;
+  userId: string | null = '';
+  users: any = [];
 
   controlsTimeout: any;
 
@@ -70,24 +73,28 @@ export class CourseDetailComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private dialog: MatDialog,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.id = this.route.snapshot.paramMap.get('id');
-    // TODO: Remplacer par un appel API réel
-    this.loadCourseData(this.id);
+    this.courId = this.route.snapshot.paramMap.get('id');
+    this.loadCourseData(this.courId);
+
+    this.userId = localStorage.getItem('user_id');
+    this.authService.getUserById(this.userId).subscribe((data) => {
+      this.users = data;      
+    });
   }
 
   private loadCourseData(id: any) {
     this.courseService.getCourseById(id).subscribe((data) => {
       this.course = data;
-
       //PREREQUIS
       if (this.course.prerequis) {
         this.course.prerequisList = this.course.prerequis
           .split(',')
-          .map((p:any) => p.trim());
+          .map((p: any) => p.trim());
       } else {
         this.course.prerequisList = [];
       }
@@ -95,7 +102,7 @@ export class CourseDetailComponent implements OnInit {
       if (this.course.objectif) {
         this.course.objectifList = this.course.objectif
           .split(',')
-          .map((p:any) => p.trim());
+          .map((p: any) => p.trim());
       } else {
         this.course.objectifList = [];
       }

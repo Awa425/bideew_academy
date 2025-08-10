@@ -34,14 +34,14 @@
       margin-right: auto;
     }
   }
-
   .hero-section {
     position: relative;
     background: linear-gradient(
         to right,
-        rgba(131, 58, 180, 0.6),
-        rgba(253, 29, 29, 0.6),
-        rgba(252, 176, 69, 0.6)
+        rgba(10, 50, 150, 0.7) 0%,
+        /* Bleu royal intense */ rgba(0, 100, 200, 0.8) 30%,
+        /* Bleu électrique */ rgba(200, 230, 255, 0.5) 70%,
+        /* Blanc bleuté léger */ rgba(0, 0, 0, 0.3) 100% /* Noir subtil */
       ),
       url("/assets/images/background-pattern-dark.png") center/cover no-repeat;
     text-align: center;

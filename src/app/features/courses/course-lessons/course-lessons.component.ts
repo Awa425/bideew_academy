@@ -67,7 +67,7 @@ export class CourseLessonsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.userId = localStorage.getItem('user_id'); // Récupération directe
+    this.userId = localStorage.getItem('user_id');
     this.authService.getUserById(this.userId).subscribe((data) => {
       this.users = data;
     });
@@ -77,11 +77,11 @@ export class CourseLessonsComponent implements OnInit {
 
     this.loadLessonsDataCourse(this.courseId);
     this.loadProgress();
-    this.loadUserProgress();
+    this.loadUserProgress(this.userId);
   }
 
-  private loadUserProgress() {
-    this.courseService.getInfoUser(2).subscribe({
+  private loadUserProgress(userID: any) {
+    this.courseService.getInfoUser(userID).subscribe({
       next: (data) => {
         this.lessonsProgress = data.lessons_progress || [];
         this.updateUnlockedLessons();
@@ -107,25 +107,21 @@ export class CourseLessonsComponent implements OnInit {
 
   private updateUnlockedLessons() {
     if (!this.lessons?.lessons?.length) return;
-
     // Première leçon toujours déverrouillée
     const firstLessonId = this.lessons.lessons[0].id;
     this.unlockedLessons = [firstLessonId];
-
     // Ajoute les leçons complétées
     if (this.progressCompleted?.length) {
       this.unlockedLessons = [
         ...new Set([...this.unlockedLessons, ...this.progressCompleted]),
       ];
     }
-
     // Ajoute la leçon actuelle
     if (this.currentLessonId) {
       this.unlockedLessons = [
         ...new Set([...this.unlockedLessons, this.currentLessonId]),
       ];
     }
-
     // Pour le quiz s'il existe
     if (
       this.lessons.quizzes &&
@@ -147,11 +143,13 @@ export class CourseLessonsComponent implements OnInit {
   }
 
   redirect(lessonId: any): void {
-    if (!this.isLessonUnlocked(lessonId)) {
-      alert(
-        'Veuillez compléter les leçons précédentes pour déverrouiller cette leçon'
-      );
-      return;
+    if (this.users.user.role == 'apprenant') {
+      if (!this.isLessonUnlocked(lessonId)) {
+        alert(
+          'Veuillez compléter les leçons précédentes pour déverrouiller cette leçon'
+        );
+        return;
+      }
     }
 
     this.courseService.getLessonsByIdLesson(this.courseId, lessonId).subscribe({
@@ -175,6 +173,14 @@ export class CourseLessonsComponent implements OnInit {
       return;
     }
     this.router.navigate(['quizz', this.courseId], { relativeTo: this.route });
+  }
+
+  redirect_formateur(): void {
+    if (this.courseId) {
+      this.router.navigate(['courses', this.courseId, 'addlessons']);
+    } else {
+      console.error('ID du cours non disponible');
+    }
   }
 
   getLessonIcon(type: string): string {
@@ -253,7 +259,14 @@ export class CourseLessonsComponent implements OnInit {
 
   confirmAction() {
     console.log('Action confirmée !');
-    // Logique à exécuter après confirmation
-    this.showConfirmation = false; // Ferme la popup
+    this.showConfirmation = false;
+  }
+  redirect_edit_lesson(lessonId: number): void {
+    if (this.courseId) {
+      this.router.navigate(
+        ['courses', this.courseId, 'lessons', 'edit-lesson', lessonId],
+        { relativeTo: this.route.parent?.parent } // Adaptation au routage actuel
+      );
+    }
   }
 }

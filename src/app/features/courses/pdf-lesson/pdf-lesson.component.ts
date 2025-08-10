@@ -31,9 +31,9 @@ export class PdfLessonComponent {
         const fullContent = lesson.contents?.[0]?.file_path || '';
         const rawParagraphs: string = fullContent;
         // this.pdf = '../../../../assets/pdf/tdr_recrutement_devs.pdf';
-        this.pdf = 'http://localhost:8000/storage/' + rawParagraphs;
+        this.pdf = 'http://localhost:8000/api/' + rawParagraphs;
         this.lessons = lesson;
-        // console.log('http://localhost:8000/storage/' + rawParagraphs);
+        console.log(this.pdf);
       },
       error: (err) => {
         console.error('Erreur chargement PDF:', err);

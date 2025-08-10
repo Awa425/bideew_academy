@@ -54,7 +54,58 @@
       <h3 class="question-text">{{ currentQuestion.text }}</h3>
 
       <!-- Single or Multiple Choice -->
+      <!-- Single or Multiple Choice -->
       <div
+        *ngIf="
+          currentQuestion.type === 'multiple_choice' ||
+          currentQuestion.type === 'single_choice'
+        "
+        class="options-grid"
+      >
+        <label
+          *ngFor="let option of currentQuestion.options; let i = index"
+          class="option-card"
+          [ngClass]="{
+            selected:
+              (currentQuestion.type === 'single_choice' &&
+                currentQuestion.selected === i) ||
+              (currentQuestion.type === 'multiple_choice' &&
+                currentQuestion.selected?.includes(i))
+          }"
+        >
+          <!-- Checkbox pour multiple_choice -->
+          <div
+            *ngIf="currentQuestion.type === 'multiple_choice'"
+            class="option-selector"
+          >
+            <input
+              type="checkbox"
+              [checked]="currentQuestion.selected?.includes(i)"
+              (change)="selectOption(i)"
+              [id]="'option-' + currentIndex + '-' + i"
+            />
+            <span class="checkbox-custom"></span>
+          </div>
+
+          <!-- Radio pour single_choice -->
+          <div
+            *ngIf="currentQuestion.type === 'single_choice'"
+            class="option-selector"
+          >
+            <input
+              type="radio"
+              [checked]="currentQuestion.selected === i"
+              (change)="selectOption(i)"
+              [name]="'question-' + currentIndex"
+              [id]="'option-' + currentIndex + '-' + i"
+            />
+            <span class="radio-custom"></span>
+          </div>
+
+          <div class="option-text">{{ option }}</div>
+        </label>
+      </div>
+      <!-- <div
         *ngIf="
           currentQuestion.type === 'multiple_choice' ||
           currentQuestion.type === 'single_choice'
@@ -87,7 +138,7 @@
           </div>
           <div class="option-text">{{ option }}</div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Text Answer -->
       <div
@@ -130,13 +181,17 @@
       #resultContainer
       class="result-container animate-fade-in"
     >
-      <div class="result-badge">
+      <div class="result-badge" *ngIf="resultat?.percentage > 60">
         <div class="badge-circle">✓</div>
+      </div>
+      <div class="result-badge" *ngIf="resultat?.percentage < 60">
+        <div class="badge-circle" style="background-color: #f44336">X</div>
       </div>
 
       <h3>Résultats du Quiz</h3>
       <div class="score-display">
-        <div class="score-value">{{ getScore() }}/{{ questions.length }}</div>
+        <div class="score-value">Score : {{ resultat?.score }} Pts</div>
+        <div class="score-value">Pourcentage : {{ resultat?.percentage }}%</div>
         <div class="score-bar">
           <div
             class="score-progress"
@@ -144,8 +199,23 @@
           ></div>
         </div>
       </div>
-
-      <button class="restart-button" (click)="restart()">Recommencer</button>
+      <div class="div" *ngIf="resultat?.percentage <= 60">
+        <span style="color: red; font-size: 22px; display: block"
+          >Vous n'avez pas reussi le teste</span
+        >
+        <button class="restart-button" [routerLink]="['../../']">Retour</button>
+      </div>
+      <div class="div" *ngIf="resultat?.percentage > 60">
+        <span style="color: green; font-size: 22px; display: block"
+          >Félicitation vous avez reussi le teste</span
+        >
+        <button
+          class="restart-button"
+          [routerLink]="['../../../certificat/{{course_id}}']"
+        >
+          Voir certificat
+        </button>
+      </div>
     </div>
   </div>
 </div>

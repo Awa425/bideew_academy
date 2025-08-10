@@ -4,20 +4,20 @@
     <div class="header-content">
       <div class="course-info">
         <h1>{{ lessons?.title || "Chargement..." }}</h1>
-        <p>
+        <span>
           <mat-icon>person</mat-icon>
           {{ users?.user?.name || "Chargement..." }}
-        </p>
-        <p>
-          <mat-icon>person</mat-icon>
+        </span>
+        <span>
+          <mat-icon>school</mat-icon>
           {{ users?.user?.role || "Chargement..." }}
-        </p>
-        <p>
+        </span>
+        <span>
           <mat-icon>email</mat-icon>
           {{ users?.user?.email || "Chargement..." }}
-        </p>
+        </span>
       </div>
-      <div class="progress-container">
+      <div class="progress-container" *ngIf="users?.user?.role === 'apprenant'">
         <div class="progress-info">
           <span>Progression globale</span>
           <span>{{ progress }}%</span>
@@ -48,15 +48,18 @@
           >
         </mat-card-header>
       </div>
-      <div class="col-md-8 pe-3 text-md-end">
-        <button class="btn btn-primary" >
-          <i class="fas fa-plus me-2"></i> NOUVEAU LESSON
+      <div
+        class="col-md-8 pe-3 text-md-end"
+        *ngIf="users.user?.role != 'apprenant'"
+      >
+        <button class="btn btn-primary" (click)="redirect_formateur()">
+          <i class="fas fa-plus me-2"></i> NOUVEAU LECONS
         </button>
       </div>
     </div>
 
     <mat-card-content>
-      <mat-list>
+      <mat-list *ngIf="users.user?.role == 'apprenant'">
         <ng-container *ngFor="let lesson of lessons.lessons; let i = index">
           <mat-list-item
             class="lesson-item"
@@ -71,21 +74,6 @@
               >
                 {{ getLessonIcon(lesson.title) }}
               </mat-icon>
-              <!-- <span *ngIf="!isLessonUnlocked(lesson.id)" class="badge badge-locked">
-                Verrouillé
-              </span> -->
-              <!-- <span
-                *ngIf="lesson.isPreview && isLessonUnlocked(lesson.id)"
-                class="badge badge-success"
-              >
-                Gratuit
-              </span> -->
-              <!-- <span
-                *ngIf="isLessonUnlocked(lesson.id)"
-                class="badge badge-success"
-              >
-                Derrouillé
-              </span> -->
             </div>
 
             <div matListItemTitle class="lesson-title">
@@ -149,6 +137,140 @@
 
         <!-- <button class="btn-delete" (click)="showConfirmation = true">Supprimer</button> -->
 
+        <!-- Popup de confirmation -->
+        <!-- <div class="confirmation-popup" *ngIf="showConfirmation">
+          <div class="popup-content">
+            <h3>Confirmer l'action</h3>
+            <p>Êtes-vous sûr de vouloir effectuer cette action ?</p>
+            <div class="popup-actions">
+              <button class="btn-cancel" (click)="showConfirmation = false">
+                Annuler
+              </button>
+              <button class="btn-confirm" (click)="confirmAction()">
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </div> -->
+
+        <ng-container
+          *ngIf="(users?.courses_progress?.[0]?.progress_percent || 0) > 80 && lessons.quizzes && isLessonUnlocked(lessons.quizzes.id)"
+        >
+          <mat-list-item
+            class="lesson-item"
+            [class.current]="isCurrentLesson(lessons.quizzes.id)"
+            (click)="startLesson(lessons.quizzes)"
+          >
+            <div matListItemIcon class="lesson-icon">
+              <mat-icon>
+                {{ getLessonIcon(lessons.quizzes.title) }}
+              </mat-icon>
+            </div>
+
+            <div matListItemTitle class="lesson-title">
+              <span
+                role="button"
+                tabindex="0"
+                (click)="redirect_quizz()"
+                (keydown.enter)="redirect(lessons.quizzes.id)"
+              >
+                {{ lessons.quizzes.title }}
+              </span>
+              <mat-card-content>
+                <p>{{ lessons.quizzes.description }}</p>
+                <p>
+                  <strong>Date :</strong>
+                  {{ lessons.quizzes.created_at | date : "medium" }}
+                </p>
+              </mat-card-content>
+            </div>
+          </mat-list-item>
+        </ng-container>
+      </mat-list>
+      <mat-list *ngIf="users.user?.role != 'apprenant'">
+        <ng-container *ngFor="let lesson of lessons.lessons; let i = index">
+          <mat-list-item
+            class="lesson-item"
+            [class.current]="isCurrentLesson(lesson.id)"
+          >
+            <div matListItemIcon class="lesson-icon">
+              <mat-icon [class.preview]="lesson.isPreview">
+                {{ getLessonIcon(lesson.title) }}
+              </mat-icon>
+            </div>
+
+            <div matListItemTitle class="lesson-title">
+              <span
+                role="button"
+                tabindex="0"
+                (click)="startLesson(lesson)"
+                (keydown.enter)="redirect(lesson.id)"
+              >
+                {{ lesson.title }}
+              </span>
+              <!-- <span
+                class="badge badge-locked"
+              >
+                Verrouillé
+              </span> -->
+              <!-- <span
+                *ngIf="isLessonUnlocked(lesson.id)"
+                class="badge badge-success"
+              >
+                Dévérrouillé
+              </span> -->
+              <div class="lesson-meta" *ngIf="!loading">
+                <span class="lesson-duration">
+                  <mat-icon inline>schedule</mat-icon>
+                  {{ lesson.duration_minutes }} min
+                </span>
+
+                <!-- <div class="lesson-checkbox">
+                  <input
+                    type="checkbox"
+                    [checked]="progressCompleted.includes(lesson.id)"
+                    [disabled]="
+                      !isLessonUnlocked(lesson.id) ||
+                      progressCompleted.includes(lesson.id)
+                    "
+                    (click)="toggleProgress(lesson.id)"
+                  />
+                  <span (click)="showConfirmation = true">
+                    {{
+                      progressCompleted.includes(lesson.id)
+                        ? "Terminé"
+                        : "Marquer comme terminé"
+                    }}
+                  </span>
+                </div> -->
+
+                <!-- <span
+                  *ngIf="loadingLessonId === lesson.id"
+                  class="spinner-border spinner-border-sm text-primary"
+                  role="status"
+                ></span> -->
+              </div>
+              <div
+                class="col-md-8 pe-3 text-md-end"
+                *ngIf="users.user?.role != 'apprenant'"
+              >
+                <!-- <button
+                  class="btn btn-primary me-2"
+                  (click)="redirect_formateur()"
+                >
+                  <i class="fas fa-plus me-2"></i> NOUVEAU LECON
+                </button> -->
+                <button
+                  mat-icon-button
+                  (click)="redirect_edit_lesson(lesson.id)"
+                  matTooltip="Modifier cette leçon"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </div>
+            </div>
+          </mat-list-item>
+        </ng-container>
         <!-- Popup de confirmation -->
         <div class="confirmation-popup" *ngIf="showConfirmation">
           <div class="popup-content">

@@ -47,16 +47,14 @@
   &.locked {
     opacity: 0.7;
     // background-color: #f8f9fa;
-    background-color:darkgray
-    
-    .lesson-title {
+    background-color:darkgray .lesson-title {
       color: #6c757d;
     }
   }
 
   &.locked:hover {
     // background-color: #f1f1f1;
-    background-color:cornflowerblue;
+    background-color: cornflowerblue;
   }
 
   &.current {
@@ -133,12 +131,6 @@
   margin-left: 0.5rem;
 }
 
-
-
-
-
-
-
 /* Style du bouton de suppression */
 .btn-delete {
   background-color: #ff4444;
@@ -198,7 +190,8 @@
   gap: 10px;
 }
 
-.btn-cancel, .btn-confirm {
+.btn-cancel,
+.btn-confirm {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
@@ -217,10 +210,34 @@
 }
 
 .btn-confirm {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
 }
 
 .btn-confirm:hover {
   background-color: #3e8e41;
+}
+
+.add-lessons-button {
+  margin-left: 10px;
+  background-color: #4caf50; // Couleur verte
+
+  &:hover {
+    background-color: darken(#4caf50, 10%);
+  }
+}
+
+.lesson-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+
+  button {
+    opacity: 0.7;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }

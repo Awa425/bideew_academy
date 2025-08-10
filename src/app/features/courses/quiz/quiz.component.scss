@@ -316,3 +316,106 @@
     transform: translateY(-1px);
   }
 }
+
+
+/* Option Card as Label */
+.option-card {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 0; /* Reset margin for label */
+
+  &:hover {
+    border-color: #a3bffa;
+    background: #f0f4ff;
+  }
+
+  &.selected {
+    border-color: #667eea;
+    background: #ebf4ff;
+  }
+}
+
+/* Custom Checkbox and Radio Styles */
+.option-selector {
+  position: relative;
+  margin-right: 1rem;
+  
+  input[type="checkbox"],
+  input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    
+    & + span {
+      position: relative;
+      cursor: pointer;
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      
+      &:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #cbd5e0;
+        background: #fff;
+        transition: all 0.2s;
+      }
+    }
+  }
+  
+  /* Checkbox specific styles */
+  input[type="checkbox"] {
+    & + span:before {
+      border-radius: 4px;
+    }
+    
+    &:checked + span:before {
+      background: #667eea;
+      border-color: #667eea;
+    }
+    
+    &:checked + span:after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+  
+  /* Radio specific styles */
+  input[type="radio"] {
+    & + span:before {
+      border-radius: 50%;
+    }
+    
+    &:checked + span:before {
+      border-color: #667eea;
+    }
+    
+    &:checked + span:after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 5px;
+      width: 10px;
+      height: 10px;
+      background: #667eea;
+      border-radius: 50%;
+    }
+  }
+}
