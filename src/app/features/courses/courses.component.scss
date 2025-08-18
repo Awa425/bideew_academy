@@ -746,3 +746,22 @@
     }
   }
 }
+
+.pagination {
+  .page-item {
+    cursor: pointer;
+
+    &.active .page-link {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    .page-link {
+      color: #0056b3;
+
+      &:hover {
+        background-color: #e9ecef;
+      }
+    }
+  }
+}

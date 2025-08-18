@@ -1,0 +1,138 @@
+<div class="form-container">
+  <div class="form-header">
+    <h2>Ajouter un nouveau cours</h2>
+  </div>
+
+  <div class="form-content">
+    <!-- Titre -->
+    <div class="input-group">
+      <label for="title">Titre du cours</label>
+      <input
+        id="title"
+        type="text"
+        [(ngModel)]="course.title"
+        class="input"
+        placeholder="Introduction à Angular"
+      />
+    </div>
+
+    <!-- Description -->
+    <div class="input-group">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        [(ngModel)]="course.description"
+        class="input"
+        placeholder="Décrivez le contenu du cours..."
+      ></textarea>
+    </div>
+
+    <!-- Catégorie & Niveau -->
+    <div class="grid-cols-2">
+      <div class="input-group">
+        <label for="category">Catégorie</label>
+        <input
+          id="category"
+          type="text"
+          [(ngModel)]="course.category"
+          class="input"
+          placeholder="Développement Web"
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="level">Niveau</label>
+        <select id="level" [(ngModel)]="course.level" class="input">
+          <option value="Beginner">Débutant</option>
+          <option value="Intermediate">Intermédiaire</option>
+          <option value="Advanced">Avancé</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Durée & Image -->
+    <div class="grid-cols-2">
+      <div class="input-group">
+        <label for="duration">Durée (minutes)</label>
+        <input
+          id="duration"
+          type="number"
+          [(ngModel)]="course.duration_minutes"
+          class="input"
+          min="0"
+        />
+      </div>
+
+      <!-- <div class="input-group">
+        <label for="image">URL de l'image</label>
+        <input
+          id="image"
+          type="file"
+          [(ngModel)]="course.image_path"
+          class="input"
+          placeholder="https://example.com/image.jpg"
+        />
+      </div> -->
+      <div class="input-group">
+        <label for="image">Image du cours</label>
+        <input
+          id="image"
+          type="file"
+          (change)="onFileSelected($event)"
+          accept="image/jpeg, image/png, image/jpg, image/gif"
+          class="input"
+        />
+      </div>
+    </div>
+
+    <!-- Prérequis & Objectif -->
+    <div class="grid-cols-2">
+      <div class="input-group">
+        <label for="prerequis">Prérequis</label>
+        <input
+          id="prerequis"
+          type="text"
+          [(ngModel)]="course.prerequis"
+          class="input"
+          placeholder="Connaissances de base en HTML"
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="objectif">Objectif</label>
+        <input
+          id="objectif"
+          type="text"
+          [(ngModel)]="course.objectif"
+          class="input"
+          placeholder="Maîtriser les fondamentaux"
+        />
+      </div>
+    </div>
+
+    <!-- Publication -->
+    <div class="input-group checkbox-group">
+      <input type="checkbox" id="published" [(ngModel)]="course.is_published" />
+      <label for="published">Publier immédiatement</label>
+    </div>
+
+    <!-- Bouton Enregistrer -->
+    <div class="input-group">
+      <button (click)="submitForm()" class="submit-btn">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Enregistrer le cours
+      </button>
+    </div>
+  </div>
+</div>

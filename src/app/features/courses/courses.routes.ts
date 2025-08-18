@@ -6,6 +6,7 @@ import { TextLessonComponent } from './text-lesson/text-lesson.component';
 import { VideoLessonComponent } from './video-lesson/video-lesson.component';
 import { PdfLessonComponent } from './pdf-lesson/pdf-lesson.component';
 import { QuizComponent } from './quiz/quiz.component';
+import { CourseFormComponent } from './course-form/course-form.component';
 
 export const COURSES_ROUTES: Routes = [
   {

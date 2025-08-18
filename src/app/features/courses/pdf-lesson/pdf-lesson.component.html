@@ -1,8 +1,8 @@
 <div class="pdf-container">
   <div class="title-bar">
-    <a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR"
-      ><img src="../../../../assets/left-long-solid.svg" alt="" width="30"
-    /></a>
+    <a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR">
+      <img src="../../../../assets/left-long-solid.svg" alt="" width="30" />
+    </a>
     <h2>{{ lessons.title }}</h2>
     <div class="controls">
       <button (click)="downloadPDF()">Télécharger</button>
@@ -12,7 +12,7 @@
 
 
 
-  <pdf-viewer [src]="'http://localhost:8000/api/lessons/files/KC2XvbyP4uQVkCoDL3E2cAmOSKf6Q7UNsPBUdKXT.pdf'" [render-text]="true" style="display: block;"></pdf-viewer>
+  <pdf-viewer [src]="pdf" [render-text]="true" style="display: block;"></pdf-viewer>
 
   <!-- <pdf-viewer src="{{ pdf}} "></pdf-viewer> -->
 </div>

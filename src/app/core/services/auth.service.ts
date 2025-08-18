@@ -4,16 +4,22 @@ import { Observable, from, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { envVars } from 'environments/environments';
+import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 
 declare const google: any;
 
+interface JwtPayload {
+  sub?: string; // Standard JWT pour l'ID utilisateur
+  userId?: number; // Alternative courante
+  id?: number; // Autre alternative
+  [key: string]: any; // Index signature pour les champs dynamiques
+}
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  
   constructor(
-    private http: HttpClient, 
+    private http: HttpClient,
     private router: Router,
     private ngZone: NgZone
   ) {
@@ -22,7 +28,11 @@ export class AuthService {
 
   private loadGoogleAuthSdk() {
     // Vérifier si le script est déjà chargé
-    if (document.querySelector('script[src^="https://accounts.google.com/gsi/client"]')) {
+    if (
+      document.querySelector(
+        'script[src^="https://accounts.google.com/gsi/client"]'
+      )
+    ) {
       // Déclencher l'événement personnalisé si l'API est déjà chargée
       if (typeof google !== 'undefined') {
         window.dispatchEvent(new Event('google-loaded'));
@@ -44,11 +54,11 @@ export class AuthService {
     document.head.appendChild(script);
   }
 
-
   login(credentials: any): Observable<any> {
     return this.http.post<any>(`${envVars.apiBaseUrl}/login`, credentials).pipe(
       tap((response) => {
-        localStorage.setItem('access_token', response.token); 
+        localStorage.setItem('access_token', response.token);
+        localStorage.setItem('user_id', response.user.id); // Supposant que la réponse contient { token, user: { id } }
       })
     );
   }
@@ -58,7 +68,7 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('access_token'); 
+    localStorage.removeItem('access_token');
     this.router.navigate(['/login']);
   }
 
@@ -66,38 +76,49 @@ export class AuthService {
     return !!localStorage.getItem('access_token');
   }
 
-loginWithGoogle(idToken: string): Observable<any> {
-  return this.http.post(`${envVars.apiBaseUrl}/auth/google`, { id_token: idToken }).pipe(
-    tap((response: any) => {
-      console.log("loginWithGoogle", response);
-      if (response.success) {
-        localStorage.setItem('access_token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-      } else {
-        throw new Error(response.message || 'Erreur lors de la connexion avec Google');
-      }
-    }),
-    catchError(error => {
-      console.error('Erreur lors de la connexion avec Google:', error);
-      let errorMessage = 'Une erreur est survenue lors de la connexion avec Google';
-      
-      if (error.error?.message) {
-        errorMessage = error.error.message;
-      } else if (error.status === 0) {
-        errorMessage = 'Impossible de se connecter au serveur. Vérifiez votre connexion Internet.';
-      } else if (error.status === 401) {
-        errorMessage = 'Identifiants invalides. Veuillez réessayer.';
-      }
-      
-      throw new Error(errorMessage);
-    })
-  );
-}
+  getUserById(id: any) {
+    const token = localStorage.getItem('access_token'); // Get stored token
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get(`${envVars.apiBaseUrl}/users/${id}/details`, {
+      headers,
+    });
+  }
 
+  loginWithGoogle(idToken: string): Observable<any> {
+    return this.http
+      .post(`${envVars.apiBaseUrl}/auth/google`, { id_token: idToken })
+      .pipe(
+        tap((response: any) => {
+          console.log('loginWithGoogle', response);
+          if (response.success) {
+            localStorage.setItem('access_token', response.token);
+            localStorage.setItem('user', JSON.stringify(response.user));
+          } else {
+            throw new Error(
+              response.message || 'Erreur lors de la connexion avec Google'
+            );
+          }
+        }),
+        catchError((error) => {
+          console.error('Erreur lors de la connexion avec Google:', error);
+          let errorMessage =
+            'Une erreur est survenue lors de la connexion avec Google';
 
+          if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.status === 0) {
+            errorMessage =
+              'Impossible de se connecter au serveur. Vérifiez votre connexion Internet.';
+          } else if (error.status === 401) {
+            errorMessage = 'Identifiants invalides. Veuillez réessayer.';
+          }
+
+          throw new Error(errorMessage);
+        })
+      );
+  }
 
   handleGoogleLogin(): void {
-    
     try {
       // Vérifier si l'API Google est disponible
       if (typeof google === 'undefined') {
@@ -107,8 +128,9 @@ loginWithGoogle(idToken: string): Observable<any> {
 
       // Initialiser l'API Google Identity
       google.accounts.id.initialize({
-        client_id: '544702559305-0pj57qlosquuhhe7rh3otjdfdj3k7p1t.apps.googleusercontent.com', // À remplacer par votre ID client Google
-        callback: (response: any) => this.handleGoogleSignIn(response)
+        client_id:
+          '544702559305-0pj57qlosquuhhe7rh3otjdfdj3k7p1t.apps.googleusercontent.com', // À remplacer par votre ID client Google
+        callback: (response: any) => this.handleGoogleSignIn(response),
       });
 
       // Rendre le bouton de connexion Google
@@ -121,7 +143,7 @@ loginWithGoogle(idToken: string): Observable<any> {
           text: 'continue_with',
           shape: 'rectangular',
           width: 300,
-          logo_alignment: 'left'
+          logo_alignment: 'left',
         });
       }
     } catch (error) {
@@ -129,22 +151,23 @@ loginWithGoogle(idToken: string): Observable<any> {
     }
   }
 
-
   private handleGoogleSignIn(response: any): void {
     console.log(response);
-    
-    
+
     this.loginWithGoogle(response.credential).subscribe({
       next: (res: any) => {
         if (res.success && res.token) {
           localStorage.setItem('access_token', res.token);
           localStorage.setItem('user', JSON.stringify(res.user));
-          
+
           this.ngZone.run(() => {
             this.router.navigate(['/home']);
           });
         } else {
-          console.error('Erreur lors de la connexion avec Google:', res.message);
+          console.error(
+            'Erreur lors de la connexion avec Google:',
+            res.message
+          );
           // Afficher un message d'erreur à l'utilisateur
         }
       },
@@ -152,9 +175,9 @@ loginWithGoogle(idToken: string): Observable<any> {
         console.error('Erreur lors de la connexion avec Google', err);
         // Afficher un message d'erreur à l'utilisateur
         if (err.error && err.error.message) {
-          console.error('Message d\'erreur:', err.error.message);
+          console.error("Message d'erreur:", err.error.message);
         }
-      }
+      },
     });
   }
 }
