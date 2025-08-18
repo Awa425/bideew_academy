@@ -11,7 +11,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CourseService } from '../../../core/services/course.service';
 
-
 @Component({
   selector: 'app-edit-lesson',
   standalone: true,
@@ -27,7 +26,6 @@ import { CourseService } from '../../../core/services/course.service';
   ],
   templateUrl: './edit-lesson.component.html',
   styleUrls: ['./edit-lesson.component.scss'],
-  
 })
 export class EditLessonComponent implements OnInit {
   lessonForm: FormGroup;
@@ -45,14 +43,15 @@ export class EditLessonComponent implements OnInit {
     this.lessonForm = this.fb.group({
       title: ['', Validators.required],
       duration_minutes: ['', [Validators.required, Validators.min(1)]],
+      is_published: [false],
+      is_locked: [false],
       contents: this.fb.array([this.createContentFormGroup()]),
     });
   }
 
   ngOnInit(): void {
-    this.courseId = +this.route.snapshot.paramMap.get('courseId')!;
+    this.courseId = +this.route.snapshot.paramMap.get('id')!;
     this.lessonId = +this.route.snapshot.paramMap.get('lessonId')!;
-
     this.loadLessonData();
   }
 
@@ -61,39 +60,43 @@ export class EditLessonComponent implements OnInit {
   }
 
   loadLessonData(): void {
-    this.courseService.getLessonsByIdLesson(this.courseId, this.lessonId).subscribe({
-      next: (lesson: any) => {
-        this.lessonForm.patchValue({
-          title: lesson.title,
-          duration_minutes: lesson.duration_minutes,
-        });
-
-        // Clear existing contents
-        while (this.contents.length) {
-          this.contents.removeAt(0);
-        }
-
-        // Add contents from the lesson
-        if (lesson.contents && lesson.contents.length > 0) {
-          lesson.contents.forEach((content: any) => {
-            const contentGroup = this.createContentFormGroup();
-            contentGroup.patchValue({
-              type: content.type,
-              data: content.data,
-              external_url: content.external_url,
-              // Note: File handling requires special treatment
-            });
-            this.contents.push(contentGroup);
+    this.courseService
+      .getLessonsByIdLesson(this.courseId, this.lessonId)
+      .subscribe({
+        next: (lesson: any) => {
+          this.lessonForm.patchValue({
+            title: lesson.title,
+            duration_minutes: lesson.duration_minutes,
+            is_published: lesson.is_published,
+            is_locked: lesson.is_locked,
           });
-        }
 
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading lesson:', err);
-        this.isLoading = false;
-      },
-    });
+          while (this.contents.length) {
+            this.contents.removeAt(0);
+          }
+
+          if (lesson.contents && lesson.contents.length > 0) {
+            lesson.contents.forEach((content: any) => {
+              const contentGroup = this.createContentFormGroup();
+              contentGroup.patchValue({
+                type: content.type,
+                data: content.data,
+                external_url: content.external_url,
+                file_path: content.file_path,
+              });
+              this.contents.push(contentGroup);
+            });
+          } else {
+            this.contents.push(this.createContentFormGroup());
+          }
+
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading lesson:', err);
+          this.isLoading = false;
+        },
+      });
   }
 
   createContentFormGroup(): FormGroup {
@@ -101,6 +104,7 @@ export class EditLessonComponent implements OnInit {
       type: ['', Validators.required],
       data: [''],
       file: [null],
+      file_path: [''],
       external_url: [''],
     });
   }
@@ -115,62 +119,35 @@ export class EditLessonComponent implements OnInit {
 
   onFileChange(event: any, index: number): void {
     const file = event.target.files[0];
-    this.contents.at(index).get('file')?.setValue(file);
+    if (file) {
+      this.contents.at(index).get('file')?.setValue(file);
+      this.contents.at(index).get('file_path')?.setValue('');
+    }
   }
 
   onSubmit(): void {
     if (this.lessonForm.valid && this.courseId && this.lessonId) {
-      const formValue = this.lessonForm.value;
-      const formData = new FormData();
-
-      formData.append('title', formValue.title || '');
-      formData.append('course_id', this.courseId.toString());
-      formData.append('duration_minutes', (formValue.duration_minutes || 0).toString());
-
-      const contents = formValue.contents || [];
-      if (contents.length > 0) {
-        const content = contents[0];
-
-        if (content && content.type && content.type.trim() !== '') {
-          formData.append('content[type]', content.type);
-
-          switch (content.type) {
-            case 'pdf':
-              if (content.file) {
-                formData.append('content[file]', content.file, content.file.name);
-              }
-              break;
-            case 'video':
-              if (content.external_url && content.external_url.trim() !== '') {
-                formData.append('content[external_url]', content.external_url.trim());
-              }
-              break;
-            case 'text':
-            case 'quiz':
-              if (content.data && content.data.trim() !== '') {
-                formData.append('content[data]', content.data.trim());
-              }
-              break;
-          }
-        }
-      }
-
-      this.courseService.updateLesson(this.lessonId, formData).subscribe({
-        next: (response) => {
-          console.log('Lesson updated successfully:', response);
-          alert('Leçon modifiée avec succès !');
-          this.goBack();
-        },
-        error: (err) => {
-          console.error('Error updating lesson:', err);
-          alert(`Erreur lors de la modification: ${err.error?.message || 'Erreur inconnue'}`);
-        },
-      });
+      this.courseService
+        .updateLesson(this.lessonId, this.lessonForm.value)
+        .subscribe({
+          next: (response) => {
+            alert('Leçon modifiée avec succès !');
+            this.goBack();
+          },
+          error: (err) => {
+            console.error('Error updating lesson:', err);
+            alert(
+              `Erreur lors de la modification: ${
+                err.error?.message || 'Erreur inconnue'
+              }`
+            );
+          },
+        });
     }
   }
 
   goBack(): void {
-    this.router.navigate(['/courses', this.courseId]);
+    this.router.navigate(['/courses', this.courseId, 'lessons']);
   }
 
   getContentIcon(type: string): string {
@@ -195,20 +172,15 @@ export class EditLessonComponent implements OnInit {
 
   canSubmitForm(): boolean {
     const titleValid = this.lessonForm.get('title')?.valid ?? false;
-    const durationValid = this.lessonForm.get('duration_minutes')?.valid ?? false;
+    const durationValid =
+      this.lessonForm.get('duration_minutes')?.valid ?? false;
     const contentsValid = this.contents.controls.every((control) => {
       const typeControl = control.get('type');
       return typeControl?.valid ?? false;
     });
 
-    return titleValid && durationValid && contentsValid && this.contents.length > 0;
+    return (
+      titleValid && durationValid && contentsValid && this.contents.length > 0
+    );
   }
-
-  redirect_edit_lesson(lessonId: number): void {
-  if (this.courseId) {
-    this.router.navigate(['courses', this.courseId, 'edit-lesson', lessonId]);
-  } else {
-    console.error('ID du cours non disponible');
-  }
-}
 }

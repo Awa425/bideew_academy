@@ -1,6 +1,5 @@
 <div class="lesson-form-container">
-  <!-- Header avec gradient et icône -->
-  <div class="form-header">
+  <div class="form-header mt-5">
     <div class="header-content">
       <div class="header-icon">
         <mat-icon>school</mat-icon>
@@ -12,10 +11,8 @@
     </div>
   </div>
 
-  <!-- Formulaire principal -->
   <div class="form-wrapper">
     <form [formGroup]="lessonForm" (ngSubmit)="onSubmit()">
-      <!-- Section 1: Informations de base -->
       <mat-card class="form-section animate-card">
         <mat-card-header class="section-header">
           <div class="section-icon">
@@ -53,16 +50,6 @@
                 placeholder="45"
               />
               <mat-icon matSuffix>schedule</mat-icon>
-              <mat-error
-                *ngIf="lessonForm.get('duration_minutes')?.hasError('required')"
-              >
-                La durée est obligatoire
-              </mat-error>
-              <mat-error
-                *ngIf="lessonForm.get('duration_minutes')?.hasError('min')"
-              >
-                La durée doit être supérieure à 0
-              </mat-error>
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -75,12 +62,12 @@
             <mat-icon>library_books</mat-icon>
           </div>
           <mat-card-title>Contenus de la leçon</mat-card-title>
-          <mat-card-subtitle
-            >Ajoutez différents types de contenus ({{
+          <mat-card-subtitle>
+            Ajoutez différents types de contenus ({{
               contents.length
             }}
-            élément{{ contents.length > 1 ? "s" : "" }})</mat-card-subtitle
-          >
+            élément{{ contents.length > 1 ? "s" : "" }})
+          </mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content class="section-content">
@@ -94,7 +81,7 @@
                 <mat-card-header class="content-header">
                   <div class="content-number">{{ i + 1 }}</div>
                   <mat-card-title>Contenu {{ i + 1 }}</mat-card-title>
-                  <div class="content-actions">
+                  <div class="content-actions mt-3">
                     <button
                       mat-icon-button
                       type="button"
@@ -112,7 +99,11 @@
                   <div class="form-row">
                     <mat-form-field appearance="outline" class="full-width">
                       <mat-label>Type de contenu</mat-label>
-                      <mat-select formControlName="type" required>
+                      <mat-select
+                        formControlName="type"
+                        required
+                        (selectionChange)="onContentTypeChange(i, $event.value)"
+                      >
                         <mat-option
                           *ngFor="let type of contentTypes"
                           [value]="type"
@@ -152,23 +143,92 @@
                       />
                     </div>
 
-                    <!-- Vidéo URL -->
-                    <div *ngSwitchCase="'video'">
-                      <mat-form-field appearance="outline" class="full-width">
-                        <mat-label>URL de la vidéo</mat-label>
-                        <input
-                          matInput
-                          formControlName="external_url"
-                          placeholder="https://www.youtube.com/watch?v=..."
-                        />
-                        <mat-icon matSuffix>video_library</mat-icon>
-                        <mat-hint
-                          >YouTube, Vimeo ou lien direct supportés</mat-hint
+                    <!-- Vidéo URL ou Upload -->
+                    <div *ngSwitchCase="'video'" class="video-section">
+                      <!-- Sélecteur du type d'input vidéo -->
+                      <div class="video-input-selector">
+                        <mat-button-toggle-group
+                          [value]="
+                            contents.at(i).get('video_input_type')?.value ||
+                            'url'
+                          "
+                          (change)="onVideoInputTypeChange(i, $event.value)"
+                          class="video-toggle-group"
                         >
-                      </mat-form-field>
+                          <mat-button-toggle value="url" class="toggle-option">
+                            <mat-icon>link</mat-icon>
+                            URL en ligne
+                          </mat-button-toggle>
+                          <mat-button-toggle
+                            value="upload"
+                            class="toggle-option"
+                          >
+                            <mat-icon>cloud_upload</mat-icon>
+                            Fichier local
+                          </mat-button-toggle>
+                        </mat-button-toggle-group>
+                      </div>
+
+                      <!-- Input selon le type sélectionné -->
+                      <div
+                        class="video-input-content"
+                        [ngSwitch]="
+                          contents.at(i).get('video_input_type')?.value || 'url'
+                        "
+                      >
+                        <!-- URL Video -->
+                        <div *ngSwitchCase="'url'" class="video-url-section">
+                          <mat-form-field
+                            appearance="outline"
+                            class="full-width"
+                          >
+                            <mat-label>URL de la vidéo</mat-label>
+                            <input
+                              matInput
+                              formControlName="external_url"
+                              placeholder="https://www.youtube.com/watch?v=..."
+                            />
+                            <mat-icon matSuffix>video_library</mat-icon>
+                            <mat-hint
+                              >YouTube, Vimeo ou lien direct supportés</mat-hint
+                            >
+                          </mat-form-field>
+                        </div>
+
+                        <!-- Upload Video -->
+                        <div
+                          *ngSwitchCase="'upload'"
+                          class="video-upload-section"
+                        >
+                          <div
+                            class="upload-area"
+                            (click)="videoFileInput.click()"
+                          >
+                            <mat-icon class="upload-icon">videocam</mat-icon>
+                            <p>Cliquez pour sélectionner un fichier vidéo</p>
+                            <small>MP4, AVI, MOV, WMV • Max 100MB</small>
+                            <div
+                              class="selected-file"
+                              *ngIf="contents.at(i).get('file')?.value"
+                            >
+                              <mat-icon>check_circle</mat-icon>
+                              <span>{{
+                                contents.at(i).get("file")?.value?.name
+                              }}</span>
+                            </div>
+                          </div>
+                          <input
+                            #videoFileInput
+                            type="file"
+                            (change)="onFileChange($event, i)"
+                            accept="video/*"
+                            style="display: none"
+                          />
+                        </div>
+                      </div>
                     </div>
 
-                    <!-- Texte ou Quiz -->
+                    <!-- Texte -->
                     <div *ngSwitchCase="'text'">
                       <mat-form-field appearance="outline" class="full-width">
                         <mat-label>Contenu textuel</mat-label>
@@ -182,18 +242,278 @@
                       </mat-form-field>
                     </div>
 
-                    <div *ngSwitchCase="'quiz'">
-                      <mat-form-field appearance="outline" class="full-width">
-                        <mat-label>Questions du quiz</mat-label>
-                        <textarea
-                          matInput
-                          formControlName="data"
-                          rows="6"
-                          placeholder="Ajoutez vos questions de quiz..."
-                        ></textarea>
-                        <mat-icon matSuffix>quiz</mat-icon>
-                        <mat-hint>Format JSON ou texte structuré</mat-hint>
-                      </mat-form-field>
+                    <!-- Quiz - Section complète -->
+                    <div *ngSwitchCase="'quiz'" class="quiz-section">
+                      <!-- Informations générales du quiz -->
+                      <div class="quiz-info-section">
+                        <h3 class="quiz-section-title">
+                          <mat-icon>info</mat-icon>
+                          Informations du quiz
+                        </h3>
+
+                        <div class="form-row two-columns">
+                          <mat-form-field
+                            appearance="outline"
+                            class="full-width"
+                          >
+                            <mat-label>Titre du quiz</mat-label>
+                            <input
+                              matInput
+                              formControlName="quiz_title"
+                              required
+                              placeholder="Ex: Quiz sur les variables JavaScript"
+                            />
+                            <mat-icon matSuffix>quiz</mat-icon>
+                            <mat-error
+                              *ngIf="
+                                contents
+                                  .at(i)
+                                  .get('quiz_title')
+                                  ?.hasError('required')
+                              "
+                            >
+                              Le titre du quiz est obligatoire
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                          <mat-label>Description du quiz</mat-label>
+                          <textarea
+                            matInput
+                            formControlName="quiz_description"
+                            required
+                            rows="3"
+                            placeholder="Décrivez ce que le quiz évalue..."
+                          ></textarea>
+                          <mat-icon matSuffix>description</mat-icon>
+                          <mat-error
+                            *ngIf="
+                              contents
+                                .at(i)
+                                .get('quiz_description')
+                                ?.hasError('required')
+                            "
+                          >
+                            La description est obligatoire
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <!-- Section Questions -->
+                      <div
+                        class="quiz-questions-section"
+                        formArrayName="questions"
+                      >
+                        <div class="quiz-section-header">
+                          <h3 class="quiz-section-title">
+                            <mat-icon>help</mat-icon>
+                            Questions ({{ getQuestions(i).length }})
+                          </h3>
+                          <button
+                            mat-fab
+                            extended
+                            color="accent"
+                            type="button"
+                            (click)="addQuestion(i)"
+                            class="add-question-btn"
+                          >
+                            <mat-icon>add</mat-icon>
+                            Ajouter une question
+                          </button>
+                        </div>
+
+                        <!-- Liste des questions -->
+                        <div class="questions-list">
+                          <div
+                            *ngFor="
+                              let question of getQuestions(i).controls;
+                              let qIndex = index
+                            "
+                            [formGroupName]="qIndex"
+                            class="question-item"
+                          >
+                            <mat-card class="question-card">
+                              <mat-card-header class="question-header">
+                                <div class="question-number">
+                                  Q{{ qIndex + 1 }}
+                                </div>
+                                <mat-card-title
+                                  >Question {{ qIndex + 1 }}</mat-card-title
+                                >
+                                <div class="question-actions">
+                                  <button
+                                    mat-icon-button
+                                    type="button"
+                                    (click)="removeQuestion(i, qIndex)"
+                                    *ngIf="getQuestions(i).length > 1"
+                                    class="delete-btn"
+                                    matTooltip="Supprimer cette question"
+                                  >
+                                    <mat-icon>delete</mat-icon>
+                                  </button>
+                                </div>
+                              </mat-card-header>
+
+                              <mat-card-content>
+                                <!-- Type de question et texte -->
+                                <div class="form-row two-columns">
+                                  <mat-form-field appearance="outline">
+                                    <mat-label>Type de question</mat-label>
+                                    <mat-select formControlName="type" required>
+                                      <mat-option
+                                        *ngFor="let type of questionTypes"
+                                        [value]="type"
+                                      >
+                                        {{ getQuestionTypeLabel(type) }}
+                                      </mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                      *ngIf="
+                                        getQuestions(i)
+                                          .at(qIndex)
+                                          .get('type')
+                                          ?.hasError('required')
+                                      "
+                                    >
+                                      Le type est obligatoire
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+
+                                <mat-form-field
+                                  appearance="outline"
+                                  class="full-width"
+                                >
+                                  <mat-label>Texte de la question</mat-label>
+                                  <textarea
+                                    matInput
+                                    formControlName="text"
+                                    required
+                                    rows="3"
+                                    placeholder="Posez votre question ici..."
+                                  ></textarea>
+                                  <mat-icon matSuffix>help_outline</mat-icon>
+                                  <mat-error
+                                    *ngIf="
+                                      getQuestions(i)
+                                        .at(qIndex)
+                                        .get('text')
+                                        ?.hasError('required')
+                                    "
+                                  >
+                                    Le texte de la question est obligatoire
+                                  </mat-error>
+                                </mat-form-field>
+
+                                <!-- Section Réponses -->
+                                <div
+                                  class="answers-section"
+                                  formArrayName="answers"
+                                >
+                                  <div class="answers-header">
+                                    <h4 class="answers-title">
+                                      <mat-icon>check_circle</mat-icon>
+                                      Réponses possibles ({{
+                                        getAnswers(i, qIndex).length
+                                      }})
+                                    </h4>
+                                    <button
+                                      mat-button
+                                      color="primary"
+                                      type="button"
+                                      (click)="addAnswer(i, qIndex)"
+                                      class="add-answer-btn"
+                                    >
+                                      <mat-icon>add</mat-icon>
+                                      Ajouter une réponse
+                                    </button>
+                                  </div>
+
+                                  <!-- Liste des réponses -->
+                                  <div class="answers-list">
+                                    <div
+                                      *ngFor="
+                                        let answer of getAnswers(i, qIndex)
+                                          .controls;
+                                        let aIndex = index
+                                      "
+                                      [formGroupName]="aIndex"
+                                      class="answer-item"
+                                    >
+                                      <mat-card class="answer-card">
+                                        <mat-card-content>
+                                          <div class="answer-content">
+                                            <div class="answer-text">
+                                              <mat-form-field
+                                                appearance="outline"
+                                                class="full-width"
+                                              >
+                                                <mat-label
+                                                  >Réponse
+                                                  {{ aIndex + 1 }}</mat-label
+                                                >
+                                                <input
+                                                  matInput
+                                                  formControlName="text"
+                                                  required
+                                                  placeholder="Saisissez la réponse..."
+                                                />
+                                                <mat-error
+                                                  *ngIf="
+                                                    getAnswers(i, qIndex)
+                                                      .at(aIndex)
+                                                      .get('text')
+                                                      ?.hasError('required')
+                                                  "
+                                                >
+                                                  Le texte de la réponse est
+                                                  obligatoire
+                                                </mat-error>
+                                              </mat-form-field>
+                                            </div>
+
+                                            <div class="answer-correct">
+                                              <mat-checkbox
+                                                formControlName="is_correct"
+                                                color="primary"
+                                              >
+                                                Réponse correcte
+                                              </mat-checkbox>
+                                            </div>
+
+                                            <div class="answer-actions">
+                                              <button
+                                                mat-icon-button
+                                                type="button"
+                                                (click)="
+                                                  removeAnswer(
+                                                    i,
+                                                    qIndex,
+                                                    aIndex
+                                                  )
+                                                "
+                                                *ngIf="
+                                                  getAnswers(i, qIndex).length >
+                                                  1
+                                                "
+                                                class="delete-btn"
+                                                matTooltip="Supprimer cette réponse"
+                                              >
+                                                <mat-icon>delete</mat-icon>
+                                              </button>
+                                            </div>
+                                          </div>
+                                        </mat-card-content>
+                                      </mat-card>
+                                    </div>
+                                  </div>
+                                </div>
+                              </mat-card-content>
+                            </mat-card>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </mat-card-content>
@@ -219,13 +539,11 @@
       </mat-card>
 
       <!-- Actions du formulaire -->
-      <!-- Remplace la section form-actions dans ton template par ceci -->
-
-      <!-- Actions du formulaire -->
       <div class="form-actions">
         <div class="actions-container">
           <!-- Debug info (à supprimer en production) -->
-          <!-- <div
+          <!--
+          <div
             class="debug-info"
             style="
               background: #f0f9ff;
@@ -245,7 +563,8 @@
             >
               Debug Console
             </button>
-          </div> -->
+          </div>
+          -->
 
           <button
             mat-button
@@ -258,7 +577,6 @@
           </button>
 
           <div class="primary-actions">
-            <!-- Option 1: Utiliser la validation custom -->
             <button
               mat-raised-button
               color="primary"
@@ -269,18 +587,6 @@
               <mat-icon>save</mat-icon>
               Enregistrer la leçon
             </button>
-
-            <!-- Option 2: Bouton toujours actif (pour test) -->
-            <!-- 
-      <button mat-raised-button 
-              color="primary" 
-              type="button" 
-              (click)="onSubmit()"
-              class="submit-btn">
-        <mat-icon>save</mat-icon>
-        Enregistrer (Test)
-      </button>
-      -->
           </div>
         </div>
       </div>

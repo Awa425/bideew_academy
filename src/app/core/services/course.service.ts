@@ -91,8 +91,7 @@ export class CourseService {
 
   // Mettre à jour lesson
   updateLesson(id: number, formData: FormData): Observable<any> {
-    console.log(formData);
-
+    
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 

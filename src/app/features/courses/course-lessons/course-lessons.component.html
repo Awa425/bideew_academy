@@ -208,66 +208,28 @@
               >
                 {{ lesson.title }}
               </span>
-              <!-- <span
-                class="badge badge-locked"
-              >
-                Verrouillé
-              </span> -->
-              <!-- <span
-                *ngIf="isLessonUnlocked(lesson.id)"
-                class="badge badge-success"
-              >
-                Dévérrouillé
-              </span> -->
               <div class="lesson-meta" *ngIf="!loading">
                 <span class="lesson-duration">
                   <mat-icon inline>schedule</mat-icon>
                   {{ lesson.duration_minutes }} min
                 </span>
-
-                <!-- <div class="lesson-checkbox">
-                  <input
-                    type="checkbox"
-                    [checked]="progressCompleted.includes(lesson.id)"
-                    [disabled]="
-                      !isLessonUnlocked(lesson.id) ||
-                      progressCompleted.includes(lesson.id)
-                    "
-                    (click)="toggleProgress(lesson.id)"
-                  />
-                  <span (click)="showConfirmation = true">
-                    {{
-                      progressCompleted.includes(lesson.id)
-                        ? "Terminé"
-                        : "Marquer comme terminé"
-                    }}
-                  </span>
-                </div> -->
-
-                <!-- <span
-                  *ngIf="loadingLessonId === lesson.id"
-                  class="spinner-border spinner-border-sm text-primary"
-                  role="status"
-                ></span> -->
-              </div>
-              <div
-                class="col-md-8 pe-3 text-md-end"
-                *ngIf="users.user?.role != 'apprenant'"
-              >
-                <!-- <button
-                  class="btn btn-primary me-2"
-                  (click)="redirect_formateur()"
-                >
-                  <i class="fas fa-plus me-2"></i> NOUVEAU LECON
-                </button> -->
                 <button
                   mat-icon-button
                   (click)="redirect_edit_lesson(lesson.id)"
                   matTooltip="Modifier cette leçon"
                 >
-                  <mat-icon>edit</mat-icon>
+                  <mat-icon style="color: blue">edit</mat-icon>
                 </button>
               </div>
+              <!-- <div class="col-md-4" *ngIf="users.user?.role != 'apprenant'">
+                <button
+                  mat-icon-button
+                  (click)="redirect_edit_lesson(lesson.id)"
+                  matTooltip="Modifier cette leçon"
+                >
+                  <mat-icon style="color: blue">edit</mat-icon>
+                </button>
+              </div> -->
             </div>
           </mat-list-item>
         </ng-container>
