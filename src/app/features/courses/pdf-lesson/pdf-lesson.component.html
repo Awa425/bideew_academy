@@ -3,13 +3,26 @@
     <a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR">
       <img src="../../../../assets/left-long-solid.svg" alt="" width="30" />
     </a>
-    <h2>{{ lessons.title }}</h2>
+    <h2>Titre : {{ lessons.title }}</h2>
     <div class="controls">
-      <button (click)="downloadPDF()" class="btn-download">Télécharger</button>
+      <!-- <button (click)="downloadPDF()" class="btn-download">Télécharger</button> -->
     </div>
   </div>
 
   <div *ngIf="pdf; else loading" class="pdf-viewer-container">
+    <div class="pdf-viewer-wrapper">
+      <pdf-viewer
+        [src]="pdf"
+        [page]="currentPage"
+        [zoom]="zoom"
+        [fit-to-page]="fitToPage"
+        [show-all]="false"
+        (after-load-complete)="onPdfLoadComplete($event)"
+        class="pdf-viewer"
+      >
+      </pdf-viewer>
+    </div>
+
     <div class="slide-controls">
       <div class="navigation-controls">
         <button
@@ -76,18 +89,6 @@
           ↻
         </button>
       </div>
-    </div>
-    <div class="pdf-viewer-wrapper">
-      <pdf-viewer
-        [src]="pdf"
-        [page]="currentPage"
-        [zoom]="zoom"
-        [fit-to-page]="fitToPage"
-        [show-all]="false"
-        (after-load-complete)="onPdfLoadComplete($event)"
-        class="pdf-viewer"
-      >
-      </pdf-viewer>
     </div>
   </div>
 

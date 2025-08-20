@@ -25,6 +25,11 @@ export class CoursesComponent implements OnInit {
   userId: string | null = '';
   users: any = [];
 
+  // Variables pour la modal de confirmation
+  showDeleteModal = false;
+  courseToDelete: Course | null = null;
+  isDeleting = false;
+
   constructor(
     private courseService: CourseService,
     private router: Router,
@@ -122,5 +127,46 @@ export class CoursesComponent implements OnInit {
     if (page >= 1 && page <= this.lastPage) {
       this.loadCourses(this.users, page); // Passez this.users comme premier paramètre
     }
+  }
+
+  // Méthodes pour la gestion de la suppression
+  openDeleteConfirmation(course: Course): void {
+    this.courseToDelete = course;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.courseToDelete = null;
+    this.isDeleting = false;
+  }
+
+  confirmDelete(): void {
+    if (!this.courseToDelete) return;
+
+    this.isDeleting = true;
+
+    // this.courseService.deleteCourse(this.courseToDelete.id).subscribe({
+    //   next: (response:any) => {
+    //     // Supprimer le cours de la liste locale
+    //     this.courses = this.courses.filter(
+    //       (c) => c.id !== this.courseToDelete!.id
+    //     );
+    //     this.filteredCourses = this.filteredCourses.filter(
+    //       (c) => c.id !== this.courseToDelete!.id
+    //     );
+
+    //     // Fermer la modal
+    //     this.closeDeleteModal();
+
+    //     // Optionnel : afficher un message de succès
+    //     console.log('Cours supprimé avec succès');
+    //   },
+    //   error: (err:any) => {
+    //     this.error = 'Erreur lors de la suppression du cours';
+    //     this.isDeleting = false;
+    //     console.error('Erreur de suppression:', err);
+    //   },
+    // });
   }
 }

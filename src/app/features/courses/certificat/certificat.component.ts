@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CourseService } from '../../../core/services/course.service';
 import { NgIf } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-certificat',
-  imports: [NgIf],
+  imports: [NgIf, RouterLink],
   templateUrl: './certificat.component.html',
   styleUrl: './certificat.component.scss',
 })

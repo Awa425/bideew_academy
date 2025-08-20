@@ -117,20 +117,26 @@
             <div class="d-flex justify-content-between gap-3">
               <a
                 [routerLink]="['/courses', course.id, 'edit']"
-                class="btn btn-warning flex-grow-1"
+                class="edit-btn outline"
                 *ngIf="users.user?.role != 'apprenant'"
               >
-                <i class="fas fa-edit me-2"></i>
-                Modifier
+                <span class="material-icons">border_color</span>
+              </a>
+
+              <a
+                class="delete-btn outline"
+                *ngIf="users.user?.role != 'apprenant'"
+                (click)="openDeleteConfirmation(course)"
+              >
+                <span class="material-icons">delete_forever</span>
               </a>
 
               <a
                 [routerLink]="['/courses', course.id]"
-                class="btn btn-primary flex-grow-1"
+                class="open-btn outline"
                 *ngIf="users.user?.role != 'apprenant'"
               >
-                <i class="fas fa-eye me-2"></i>
-                Ouvrir
+                <span class="material-icons" title="Ouvrir">launch</span>
               </a>
             </div>
             <a
@@ -212,5 +218,74 @@
         </div>
       </div>
     </section>
+  </div>
+</div>
+
+
+
+
+<!-- Modal de confirmation de suppression -->
+<div
+  class="modal fade"
+  [class.show]="showDeleteModal"
+  [style.display]="showDeleteModal ? 'block' : 'none'"
+  id="deleteConfirmationModal"
+  tabindex="-1"
+  aria-labelledby="deleteConfirmationModalLabel"
+  aria-hidden="true"
+  [class.d-block]="showDeleteModal"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmationModalLabel">
+          <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+          Confirmer la suppression
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeDeleteModal()"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">
+          Êtes-vous sûr de vouloir supprimer le cours suivant ?
+        </p>
+        <div class="alert alert-info" *ngIf="courseToDelete">
+          <strong>{{ courseToDelete.title }}</strong>
+          <br />
+          <small class="text-muted">{{ courseToDelete.description }}</small>
+        </div>
+        <p class="text-danger">
+          <i class="fas fa-warning me-1"></i>
+          Cette action est irréversible.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeDeleteModal()"
+          [disabled]="isDeleting"
+        >
+          Annuler
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="confirmDelete()"
+          [disabled]="isDeleting"
+        >
+          <span
+            *ngIf="isDeleting"
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+          ></span>
+          {{ isDeleting ? "Suppression..." : "Supprimer" }}
+        </button>
+      </div>
+    </div>
   </div>
 </div>
