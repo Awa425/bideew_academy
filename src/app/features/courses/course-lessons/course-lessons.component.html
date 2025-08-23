@@ -36,16 +36,13 @@
     <img src="../../../../assets/left-long-solid.svg" alt="Retour" width="30" />
   </a>
 
-  <!-- Liste des leçons -->
-  <mat-card class="lessons-card">
+  <!-- Header des leçons -->
+  <mat-card class="lessons-header-card">
     <div class="row g-0">
-      <!-- g-0 supprime les gutters -->
       <div class="col-md-4">
         <mat-card-header>
           <mat-card-title>Leçons du cours</mat-card-title>
-          <mat-card-subtitle
-            >Suivez les leçons dans l'ordre recommandé</mat-card-subtitle
-          >
+          <mat-card-subtitle>Suivez les leçons dans l'ordre recommandé</mat-card-subtitle>
         </mat-card-header>
       </div>
       <div
@@ -56,236 +53,218 @@
           <i class="fas fa-plus me-2"></i> NOUVEAU LECONS
         </button>
       </div>
-      <div class="col-md-8 pe-3 text-md-end">
-        <!-- <button class="btn btn-secondary">MON </button> -->
-      </div>
     </div>
+  </mat-card>
 
-    <mat-card-content>
-      <mat-list *ngIf="users.user?.role == 'apprenant'">
-        <ng-container *ngFor="let lesson of lessons.lessons; let i = index">
-          <mat-list-item
-            class="lesson-item"
-            [class.current]="isCurrentLesson(lesson.id)"
+  <!-- Leçons pour apprenants -->
+  <div class="lessons-grid" *ngIf="users.user?.role == 'apprenant'">
+    <!-- Cards des leçons -->
+    <mat-card 
+      *ngFor="let lesson of lessons.lessons; let i = index"
+      class="lesson-card"
+      [class.current]="isCurrentLesson(lesson.id)"
+      [class.completed]="lesson.completed"
+      [class.locked]="!isLessonUnlocked(lesson.id)"
+    >
+      <mat-card-header>
+        <div mat-card-avatar class="lesson-avatar">
+          <mat-icon
+            [class.preview]="lesson.isPreview"
             [class.completed]="lesson.completed"
-            [class.locked]="!isLessonUnlocked(lesson.id)"
           >
-            <div matListItemIcon class="lesson-icon">
-              <mat-icon
-                [class.preview]="lesson.isPreview"
-                [class.completed]="lesson.completed"
-              >
-                {{ getLessonIcon(lesson.title) }}
-              </mat-icon>
-            </div>
+            {{ getLessonIcon(lesson.title) }}
+          </mat-icon>
+        </div>
+        <mat-card-title>{{ lesson.title }}</mat-card-title>
+        <mat-card-subtitle>
+          <mat-icon inline>schedule</mat-icon>
+          {{ lesson.duration_minutes }} min
+        </mat-card-subtitle>
+      </mat-card-header>
 
-            <div matListItemTitle class="lesson-title">
-              <span
-                role="button"
-                tabindex="0"
-                (click)="startLesson(lesson)"
-                (keydown.enter)="redirect(lesson.id)"
-              >
-                {{ lesson.title }}
-              </span>
-              <span
-                *ngIf="!isLessonUnlocked(lesson.id)"
-                class="badge badge-locked"
-              >
-                Verrouillé
-              </span>
-              <span
-                *ngIf="isLessonUnlocked(lesson.id)"
-                class="badge badge-success"
-              >
-                Dévérrouillé
-              </span>
-              <div class="lesson-meta" *ngIf="!loading">
-                <span class="lesson-duration">
-                  <mat-icon inline>schedule</mat-icon>
-                  {{ lesson.duration_minutes }} min
-                </span>
-
-                <div
-                  class="lesson-checkbox"
-                  *ngIf="isLessonUnlocked(lesson.id)"
-                >
-                  <input
-                    type="checkbox"
-                    [checked]="progressCompleted.includes(lesson.id)"
-                    [disabled]="
-                      !isLessonUnlocked(lesson.id) ||
-                      progressCompleted.includes(lesson.id)
-                    "
-                    (click)="toggleProgress(lesson.id)"
-                  />
-                  <span (click)="showConfirmation = true">
-                    {{
-                      progressCompleted.includes(lesson.id)
-                        ? "Terminé"
-                        : "Marquer comme terminé"
-                    }}
-                  </span>
-                </div>
-
-                <span
-                  *ngIf="loadingLessonId === lesson.id"
-                  class="spinner-border spinner-border-sm text-primary"
-                  role="status"
-                ></span>
-              </div>
-            </div>
-          </mat-list-item>
-        </ng-container>
-
-        <!-- <button class="btn-delete" (click)="showConfirmation = true">Supprimer</button> -->
-
-        <!-- Popup de confirmation -->
-        <!-- <div class="confirmation-popup" *ngIf="showConfirmation">
-          <div class="popup-content">
-            <h3>Confirmer l'action</h3>
-            <p>Êtes-vous sûr de vouloir effectuer cette action ?</p>
-            <div class="popup-actions">
-              <button class="btn-cancel" (click)="showConfirmation = false">
-                Annuler
-              </button>
-              <button class="btn-confirm" (click)="confirmAction()">
-                Confirmer
-              </button>
-            </div>
-          </div>
-        </div> -->
-
-        <ng-container
-          *ngIf="(users?.courses_progress?.[0]?.progress_percent || 0) > 80 && lessons.quizzes && isLessonUnlocked(lessons.quizzes.id)"
-        >
-          <mat-list-item
-            class="lesson-item"
-            [class.current]="isCurrentLesson(lessons.quizzes.id)"
-            (click)="startLesson(lessons.quizzes)"
+      <mat-card-content>
+        <div class="lesson-status">
+          <span
+            *ngIf="!isLessonUnlocked(lesson.id)"
+            class="badge badge-locked"
           >
-            <div matListItemIcon class="lesson-icon">
-              <mat-icon>
-                {{ getLessonIcon(lessons.quizzes.title) }}
-              </mat-icon>
-            </div>
-
-            <div matListItemTitle class="lesson-title">
-              <span
-                role="button"
-                tabindex="0"
-                (click)="redirect_quizz()"
-                (keydown.enter)="redirect(lessons.quizzes.id)"
-              >
-                {{ lessons.quizzes.title }}
-              </span>
-              <mat-card-content>
-                <p>{{ lessons.quizzes.description }}</p>
-                <p>
-                  <strong>Date :</strong>
-                  {{ lessons.quizzes.created_at | date : "medium" }}
-                </p>
-              </mat-card-content>
-            </div>
-          </mat-list-item>
-        </ng-container>
-      </mat-list>
-      <mat-list *ngIf="users.user?.role != 'apprenant'">
-        <ng-container *ngFor="let lesson of lessons.lessons; let i = index">
-          <mat-list-item
-            class="lesson-item"
-            [class.current]="isCurrentLesson(lesson.id)"
+            Verrouillé
+          </span>
+          <span
+            *ngIf="isLessonUnlocked(lesson.id)"
+            class="badge badge-success"
           >
-            <div matListItemIcon class="lesson-icon">
-              <mat-icon [class.preview]="lesson.isPreview">
-                {{ getLessonIcon(lesson.title) }}
-              </mat-icon>
-            </div>
-
-            <div matListItemTitle class="lesson-title">
-              <span
-                role="button"
-                tabindex="0"
-                (click)="startLesson(lesson)"
-                (keydown.enter)="redirect(lesson.id)"
-              >
-                {{ lesson.title }}
-              </span>
-              <div class="lesson-meta" *ngIf="!loading">
-                <span class="lesson-duration">
-                  <mat-icon inline>schedule</mat-icon>
-                  {{ lesson.duration_minutes }} min
-                </span>
-                <button
-                  mat-icon-button
-                  (click)="redirect_edit_lesson(lesson.id)"
-                  matTooltip="Modifier cette leçon"
-                >
-                  <mat-icon style="color: blue">edit</mat-icon>
-                </button>
-              </div>
-              <!-- <div class="col-md-4" *ngIf="users.user?.role != 'apprenant'">
-                <button
-                  mat-icon-button
-                  (click)="redirect_edit_lesson(lesson.id)"
-                  matTooltip="Modifier cette leçon"
-                >
-                  <mat-icon style="color: blue">edit</mat-icon>
-                </button>
-              </div> -->
-            </div>
-          </mat-list-item>
-        </ng-container>
-        <!-- Popup de confirmation -->
-        <div class="confirmation-popup" *ngIf="showConfirmation">
-          <div class="popup-content">
-            <h3>Confirmer l'action</h3>
-            <p>Êtes-vous sûr de vouloir effectuer cette action ?</p>
-            <div class="popup-actions">
-              <button class="btn-cancel" (click)="showConfirmation = false">
-                Annuler
-              </button>
-              <button class="btn-confirm" (click)="confirmAction()">
-                Confirmer
-              </button>
-            </div>
-          </div>
+            Déverrouillé
+          </span>
         </div>
 
-        <ng-container
-          *ngIf="lessons.quizzes && isLessonUnlocked(lessons.quizzes.id)"
-        >
-          <mat-list-item
-            class="lesson-item"
-            [class.current]="isCurrentLesson(lessons.quizzes.id)"
-            (click)="startLesson(lessons.quizzes)"
+        <div class="lesson-checkbox" *ngIf="isLessonUnlocked(lesson.id) && !loading">
+          <mat-checkbox
+            [checked]="progressCompleted.includes(lesson.id)"
+            [disabled]="
+              !isLessonUnlocked(lesson.id) ||
+              progressCompleted.includes(lesson.id)
+            "
+            (change)="toggleProgress(lesson.id)"
           >
-            <div matListItemIcon class="lesson-icon">
-              <mat-icon>
-                {{ getLessonIcon(lessons.quizzes.title) }}
-              </mat-icon>
-            </div>
+            {{
+              progressCompleted.includes(lesson.id)
+                ? "Terminé"
+                : "Marquer comme terminé"
+            }}
+          </mat-checkbox>
+        </div>
 
-            <div matListItemTitle class="lesson-title">
-              <span
-                role="button"
-                tabindex="0"
-                (click)="redirect_quizz()"
-                (keydown.enter)="redirect(lessons.quizzes.id)"
-              >
-                {{ lessons.quizzes.title }}
-              </span>
-              <mat-card-content>
-                <p>{{ lessons.quizzes.description }}</p>
-                <p>
-                  <strong>Date :</strong>
-                  {{ lessons.quizzes.created_at | date : "medium" }}
-                </p>
-              </mat-card-content>
-            </div>
-          </mat-list-item>
-        </ng-container>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
+        <div *ngIf="loadingLessonId === lesson.id" class="loading-spinner">
+          <mat-spinner diameter="30"></mat-spinner>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="startLesson(lesson)"
+          [disabled]="!isLessonUnlocked(lesson.id)"
+        >
+          <mat-icon>play_arrow</mat-icon>
+          Commencer
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Card du Quiz pour apprenants -->
+    <mat-card
+      *ngIf="(users?.courses_progress?.[0]?.progress_percent > 80) && lessons.quizzes && isLessonUnlocked(lessons.quizzes.id) && (users?.courses_progress?.[0]?.progress_percent != 100)"
+      class="lesson-card quiz-card"
+      [class.current]="isCurrentLesson(lessons.quizzes.id)"
+    >
+      <mat-card-header>
+        <div mat-card-avatar class="lesson-avatar quiz-avatar">
+          <mat-icon>{{ getLessonIcon(lessons.quizzes.title) }}</mat-icon>
+        </div>
+        <mat-card-title>{{ lessons.quizzes.title }}</mat-card-title>
+        <mat-card-subtitle>Quiz final</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p>{{ lessons.quizzes.description }}</p>
+        <p class="quiz-date">
+          <mat-icon inline>event</mat-icon>
+          <strong>Date :</strong>
+          {{ lessons.quizzes.created_at | date : "medium" }}
+        </p>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="redirect_quizz()"
+        >
+          <mat-icon>quiz</mat-icon>
+          Commencer le Quiz
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Leçons pour formateurs -->
+  <div class="lessons-grid" *ngIf="users.user?.role != 'apprenant'">
+    <!-- Cards des leçons pour formateurs -->
+    <mat-card 
+      *ngFor="let lesson of lessons.lessons; let i = index"
+      class="lesson-card instructor-card"
+      [class.current]="isCurrentLesson(lesson.id)"
+    >
+      <mat-card-header>
+        <div mat-card-avatar class="lesson-avatar">
+          <mat-icon [class.preview]="lesson.isPreview">
+            {{ getLessonIcon(lesson.title) }}
+          </mat-icon>
+        </div>
+        <mat-card-title>{{ lesson.title }}</mat-card-title>
+        <mat-card-subtitle>
+          <mat-icon inline>schedule</mat-icon>
+          {{ lesson.duration_minutes }} min
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="instructor-tools">
+          <span class="lesson-type">{{ getLessonTypeLabel(lesson.type) }}</span>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button
+          mat-icon-button
+          (click)="redirect_edit_lesson(lesson.id)"
+          matTooltip="Modifier cette leçon"
+          color="primary"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="startLesson(lesson)"
+        >
+          <mat-icon>visibility</mat-icon>
+          Aperçu
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Card du Quiz pour formateurs -->
+    <mat-card
+      *ngIf="lessons.quizzes && isLessonUnlocked(lessons.quizzes.id)"
+      class="lesson-card quiz-card instructor-card"
+      [class.current]="isCurrentLesson(lessons.quizzes.id)"
+    >
+      <mat-card-header>
+        <div mat-card-avatar class="lesson-avatar quiz-avatar">
+          <mat-icon>{{ getLessonIcon(lessons.quizzes.title) }}</mat-icon>
+        </div>
+        <mat-card-title>{{ lessons.quizzes.title }}</mat-card-title>
+        <mat-card-subtitle>Quiz final</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p>{{ lessons.quizzes.description }}</p>
+        <p class="quiz-date">
+          <mat-icon inline>event</mat-icon>
+          <strong>Date :</strong>
+          {{ lessons.quizzes.created_at | date : "medium" }}
+        </p>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="redirect_quizz()"
+        >
+          <mat-icon>quiz</mat-icon>
+          Voir le Quiz
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Popup de confirmation -->
+  <div class="confirmation-popup" *ngIf="showConfirmation">
+    <div class="popup-content">
+      <h3>Confirmer l'action</h3>
+      <p>Êtes-vous sûr de vouloir effectuer cette action ?</p>
+      <div class="popup-actions">
+        <button class="btn-cancel" (click)="showConfirmation = false">
+          Annuler
+        </button>
+        <button class="btn-confirm" (click)="confirmAction()">
+          Confirmer
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

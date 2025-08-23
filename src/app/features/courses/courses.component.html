@@ -8,13 +8,13 @@
   integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
   crossorigin="anonymous"
 />
-<div class="courses-container container py-5">
+<div class="courses-container container">
   <!-- Hero Section -->
   <section class="hero-section animate__animated animate__fadeInDown">
     <!-- <a href="#" style="margin-left: -100%;" click="redirect()">
       <img src="../../../assets/left-long-solid.svg" alt="RETOUR" width="50"  title="Retour" />
     </a> -->
-    <div class="hero-content text-center mb-5">
+    <div class="hero-content text-center">
       <h1>Explorez nos formations en Cybersécurité</h1>
       <p class="lead">
         Développez des compétences recherchées grâce à nos cours complets et
@@ -36,7 +36,7 @@
   <div class="row g-0">
     <!-- g-0 supprime les gutters -->
     <div class="col-md-4">
-      <a [routerLink]="['../home']" class="btn-btn-info" title="RETOUR"
+      <a [routerLink]="['../home']" class="btn-retour" title="RETOUR"
         ><img src="../../../assets/left-long-solid.svg" alt="" width="30"
       /></a>
     </div>
@@ -44,8 +44,8 @@
       class="col-md-8 pe-3 text-md-end"
       *ngIf="users.user?.role != 'apprenant'"
     >
-      <a class="btn btn-primary" [routerLink]="['/course-new']">
-        <i class="fas fa-plus me-2"></i> NOUVEAU COURSE
+      <a class="btn btn" style="background-color: #2196f3; color: white;" [routerLink]="['/course-new']">
+        <i class="fas fa-plus me-2"></i> NOUVEAU COURS
       </a>
     </div>
   </div>
@@ -144,7 +144,7 @@
               class="btn btn-primary w-100 mt-auto"
               *ngIf="users.user?.role == 'apprenant'"
               style="
-                background-color: #0056b3;
+                background-color: #2196f3;
                 color: #fff;
                 padding: 0.5em 1em;
                 border-radius: 5px;
