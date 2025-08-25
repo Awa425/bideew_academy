@@ -22,12 +22,12 @@
 
   <!-- Quiz Content -->
   <div *ngIf="!isLoading && !errorMessage && currentQuestion">
-    <div class="quiz-header">
-      <h2>{{ quizTitle }}</h2>
+    <div class="quiz-header mt-5 mb-3">
+      <h4>{{ quizTitle }}</h4>
     </div>
 
     <!-- Quiz Questions -->
-    <div *ngIf="!showResults" class="quiz-content">
+    <div *ngIf="!showResults && !showSummary" class="quiz-content">
       <a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR">
         <img
           src="../../../../assets/left-long-solid.svg"
@@ -61,7 +61,7 @@
         "
         class="options-grid"
       >
-        <div
+        <label
           *ngFor="let option of currentQuestion.options; let i = index"
           class="option-card"
           [ngClass]="{
@@ -71,22 +71,38 @@
               (currentQuestion.type === 'multiple_choice' &&
                 currentQuestion.selected?.includes(i))
           }"
-          (click)="selectOption(i)"
         >
-          <div class="option-selector">
-            <div
-              class="selector-circle"
-              [ngClass]="{
-                active:
-                  (currentQuestion.type === 'single_choice' &&
-                    currentQuestion.selected === i) ||
-                  (currentQuestion.type === 'multiple_choice' &&
-                    currentQuestion.selected?.includes(i))
-              }"
-            ></div>
+          <!-- Checkbox pour multiple_choice -->
+          <div
+            *ngIf="currentQuestion.type === 'multiple_choice'"
+            class="option-selector"
+          >
+            <input
+              type="checkbox"
+              [checked]="currentQuestion.selected?.includes(i)"
+              (change)="selectOption(i)"
+              [id]="'option-' + currentIndex + '-' + i"
+            />
+            <span class="checkbox-custom"></span>
           </div>
+
+          <!-- Radio pour single_choice -->
+          <div
+            *ngIf="currentQuestion.type === 'single_choice'"
+            class="option-selector"
+          >
+            <input
+              type="radio"
+              [checked]="currentQuestion.selected === i"
+              (change)="selectOption(i)"
+              [name]="'question-' + currentIndex"
+              [id]="'option-' + currentIndex + '-' + i"
+            />
+            <span class="radio-custom"></span>
+          </div>
+
           <div class="option-text">{{ option }}</div>
-        </div>
+        </label>
       </div>
 
       <!-- Text Answer -->
@@ -126,17 +142,30 @@
 
     <!-- Résultats -->
     <div
-      *ngIf="showResults"
+      *ngIf="showResults && !showSummary"
       #resultContainer
       class="result-container animate-fade-in"
     >
-      <div class="result-badge">
+      <div class="result-badge" *ngIf="resultat?.percentage > 60">
         <div class="badge-circle">✓</div>
       </div>
-
+      <div class="result-badge" *ngIf="resultat?.percentage < 60">
+        <div class="badge-circle" style="background-color: #f44336">X</div>
+      </div>
+      <div class="div" *ngIf="resultat?.percentage > 60">
+        <span style="color: green; font-size: 22px; display: block"
+          >Félicitation vous avez reussi le teste</span
+        >
+      </div>
+      <div class="div" *ngIf="resultat?.percentage <= 60">
+        <span style="color: red; font-size: 22px; display: block"
+          >Vous n'avez pas reussi le teste</span
+        >
+      </div>
       <h3>Résultats du Quiz</h3>
       <div class="score-display">
-        <div class="score-value">{{ getScore() }}/{{ questions.length }}</div>
+        <div class="score-value">Score : {{ resultat?.score }} Pts</div>
+        <div class="score-value">Pourcentage : {{ resultat?.percentage }}%</div>
         <div class="score-bar">
           <div
             class="score-progress"
@@ -144,8 +173,122 @@
           ></div>
         </div>
       </div>
+      <div class="row" style="align-items: center; justify-content: center">
+        <div class="col-md-3">
+          <button class="btn btn-outline-dark" (click)="goBackToCourses()">
+            Retour
+          </button>
+        </div>
+        <div class="col-md-3" *ngIf="resultat?.percentage >= 80">
+          <button
+            class="btn btn-outline-primary"
+            [routerLink]="['../../../certificat/{{course_id}}']"
+          >
+            Certificat
+          </button>
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-outline-secondary" (click)="showQuizSummary()">
+            Résumé
+          </button>
+        </div>
+      </div>
+    </div>
 
-      <button class="restart-button" (click)="restart()">Recommencer</button>
+    <!-- Section Résumé -->
+    <div *ngIf="showSummary" class="summary-container animate-fade-in">
+      <div class="summary-header">
+        <h3>Résumé du Quiz</h3>
+        <button class="btn btn-outline-secondary" (click)="backToResults()">
+          ← Retour aux résultats
+        </button>
+      </div>
+
+      <div class="summary-stats">
+        <div class="stat-card correct">
+          <div class="stat-number">{{ getCorrectQuestionsCount() }}</div>
+          <div class="stat-label">Correctes</div>
+        </div>
+        <div class="stat-card incorrect">
+          <div class="stat-number">{{ getIncorrectQuestionsCount() }}</div>
+          <div class="stat-label">Incorrectes</div>
+        </div>
+        <div class="stat-card total">
+          <div class="stat-number">{{ questions.length }}</div>
+          <div class="stat-label">Total</div>
+        </div>
+      </div>
+
+      <div class="questions-summary">
+        <div
+          *ngFor="let question of questions; let i = index"
+          class="question-summary-card"
+          [ngClass]="{
+            correct: isQuestionCorrect(question),
+            incorrect: !isQuestionCorrect(question)
+          }"
+        >
+          <div class="question-summary-header">
+            <div class="question-number">Question {{ i + 1 }}</div>
+            <div
+              class="question-status"
+              [ngClass]="
+                isQuestionCorrect(question)
+                  ? 'status-correct'
+                  : 'status-incorrect'
+              "
+            >
+              <span *ngIf="isQuestionCorrect(question)">✓ Correcte</span>
+              <span *ngIf="!isQuestionCorrect(question)">✗ Incorrecte</span>
+            </div>
+          </div>
+
+          <div class="question-text-summary">
+            {{ question.text }}
+          </div>
+
+          <div class="question-type-badge" [ngClass]="question.type">
+            {{
+              question.type === "multiple_choice"
+                ? "QCM"
+                : question.type === "single_choice"
+                ? "Choix Unique"
+                : "Réponse Libre"
+            }}
+          </div>
+
+          <div class="answers-comparison">
+            <div class="user-answer">
+              <strong>Votre réponse :</strong>
+              <span
+                [ngClass]="
+                  isQuestionCorrect(question)
+                    ? 'answer-correct'
+                    : 'answer-incorrect'
+                "
+              >
+                {{ getUserAnswersText(question) }}
+              </span>
+            </div>
+
+            <div class="correct-answer" *ngIf="!isQuestionCorrect(question)">
+              <strong>Réponse correcte :</strong>
+              <span class="answer-correct">
+                {{ getCorrectAnswersText(question) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-footer">
+        <button class="btn btn-primary" (click)="backToResults()">
+          Retour aux résultats
+        </button>
+        <button class="btn btn-outline-dark" [routerLink]="['../../']">
+          Terminer
+        </button>
+      </div>
     </div>
   </div>
 </div>

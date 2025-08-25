@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CourseService } from '../../../core/services/course.service';
 
@@ -8,7 +8,7 @@ import { CourseService } from '../../../core/services/course.service';
   selector: 'app-course-form',
   templateUrl: './course-form.component.html',
   styleUrls: ['./course-form.component.scss'],
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
 })
 export class CourseFormComponent {
   course = {

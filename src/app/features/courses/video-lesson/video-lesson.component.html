@@ -1,27 +1,144 @@
-<div class="youtube-style-player" *ngIf="video">
-  <div class="video-wrapper">
-    <video #targetPlayer controls [src]="video_teste"></video>
+<div class="video-lesson-container">
+  <!-- Bouton retour -->
+  <a [routerLink]="['../../']" class="btn-retour" title="Retour au cours">
+    <mat-icon>arrow_back</mat-icon>
+    <span>Retour</span>
+  </a>
+
+  <!-- Contenu principal -->
+  <div class="main-content" *ngIf="lessons">
+    <!-- Player vidéo -->
+    <div class="video-section">
+      <div class="video-player-container">
+        <div class="video-wrapper">
+          <video 
+            #targetPlayer 
+            controls 
+            [src]="video_teste"
+            class="video-player"
+            poster="../../../../assets/video-placeholder.jpg"
+          >
+            Votre navigateur ne supporte pas la lecture vidéo.
+          </video>
+          
+          <!-- Overlay de chargement -->
+          <div class="loading-overlay" *ngIf="!video_teste">
+            <div class="loading-spinner">
+              <div class="spinner"></div>
+              <p>Chargement de la vidéo...</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Contrôles personnalisés (optionnel) -->
+        <div class="video-controls-info">
+          <div class="video-quality">
+            <mat-icon>hd</mat-icon>
+            <span>HD</span>
+          </div>
+          <div class="video-duration">
+            <mat-icon>schedule</mat-icon>
+            <span>{{ lessons.duration_minutes || 0 }} min</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations de la leçon -->
+    <div class="lesson-info-section">
+      <div class="lesson-header">
+        <div class="lesson-meta">
+          <span class="lesson-type">
+            <mat-icon>play_circle</mat-icon>
+            Cours Vidéo
+          </span>
+          <span class="lesson-chapter">
+            Chapitre {{ lessonId }}
+          </span>
+        </div>
+        
+        <h1 class="lesson-title">{{ lessons.title }}</h1>
+        
+        <div class="lesson-stats">
+          <div class="stat-item">
+            <mat-icon>schedule</mat-icon>
+            <span>{{ lessons.duration_minutes || 0 }} minutes</span>
+          </div>
+          <div class="stat-item">
+            <mat-icon>visibility</mat-icon>
+            <span>{{ lessons.views || 0 }} vues</span>
+          </div>
+          <div class="stat-item">
+            <mat-icon>star</mat-icon>
+            <span>{{ lessons.rating || 'N/A' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="lesson-description">
+        <h3>Description</h3>
+        <div class="description-content">
+          <p>{{ lessons.content || 'Aucune description disponible.' }}</p>
+        </div>
+        
+        <!-- Tags ou sujets -->
+        <div class="lesson-tags" *ngIf="lessons.tags">
+          <span class="tag" *ngFor="let tag of lessons.tags">{{ tag }}</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="lesson-actions">
+        <button class="action-btn primary" (click)="markAsCompleted()">
+          <mat-icon>check_circle</mat-icon>
+          Marquer comme terminé
+        </button>
+        
+        <button class="action-btn secondary" (click)="toggleBookmark()">
+          <mat-icon>bookmark_border</mat-icon>
+          Ajouter aux favoris
+        </button>
+        
+        <button class="action-btn secondary" (click)="downloadResource()" *ngIf="lessons.downloadable">
+          <mat-icon>download</mat-icon>
+          Télécharger
+        </button>
+      </div>
+
+      <!-- Progression -->
+      <div class="lesson-progress">
+        <h4>Progression</h4>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width]="progressPercent + '%'"></div>
+        </div>
+        <span class="progress-text">{{ progressPercent }}% terminé</span>
+      </div>
+    </div>
   </div>
 
-  <div class="video-details">
-    <h1 class="video-title">{{ lessons.title }}</h1>
-    <p class="video-description">
-      {{ lessons.content }}
-    </p>
+  <!-- Navigation entre leçons -->
+  <div class="lesson-navigation">
+    <button class="nav-btn prev" (click)="previousLesson()" [disabled]="!hasPreviousLesson">
+      <mat-icon>skip_previous</mat-icon>
+      <div class="nav-btn-text">
+        <span>Précédent</span>
+        <small>Leçon {{ previousLessonId }}</small>
+      </div>
+    </button>
+
+    <div class="nav-center">
+      <div class="lesson-indicator">
+        {{ currentLessonIndex }} / {{ totalLessons }}
+      </div>
+    </div>
+
+    <button class="nav-btn next" (click)="nextLesson()" [disabled]="!hasNextLesson">
+      <div class="nav-btn-text">
+        <span>Suivant</span>
+        <small>Leçon {{ nextLessonId }}</small>
+      </div>
+      <mat-icon>skip_next</mat-icon>
+    </button>
   </div>
 </div>
-
-<!-- <a
-  href="{{ video_teste }}"
-  target="_blank"
->
-  Pim Pim
-</a> -->
-
-<div class="video-wrapper">
-  <video #targetPlayer controls [src]="video_teste"></video>
-</div>
-
-<a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR"
-  ><img src="../../../../assets/left-long-solid.svg" alt="" width="30"
-/></a>

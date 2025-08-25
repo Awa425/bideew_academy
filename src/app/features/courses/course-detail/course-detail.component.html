@@ -186,8 +186,7 @@
   <header class="course-header">
     <div
       class="course-cover"
-      [style.backgroundImage]="'url(' + course.image_path + ')'"
-    >
+      style="background-image: url('http://localhost:8000/{{ course.image_path }}');" >
       <div class="course-overlay"></div>
       <div class="course-header-content" role="banner">
         <div
@@ -351,7 +350,7 @@
 
     <!-- Barre latérale -->
     <aside class="sidebar">
-      <mat-card class="enroll-card">
+      <mat-card class="enroll-card" *ngIf="users?.user?.role==='apprenant'">
         <mat-card-header>
           <mat-card-title>Commencer le cours</mat-card-title>
         </mat-card-header>
@@ -359,11 +358,11 @@
           <div class="progress-container">
             <div class="progress-info">
               <span>Progression</span>
-              <span>{{ course.progression }}%</span>
+              <span>{{ users?.courses_progress[0]?.progress_percent }}%</span>
             </div>
             <mat-progress-bar
               mode="determinate"
-              [value]="course.progression"
+              [value]="users?.courses_progress[0]?.progress_percent"
               aria-label="Progression du cours"
             ></mat-progress-bar>
           </div>

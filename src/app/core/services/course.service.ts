@@ -77,6 +77,41 @@ export class CourseService {
     return this.http.get(`${envVars.apiBaseUrl}/courses?page=${page}`);
   }
 
+  // Mettre à jour un cours
+  updateCourse(id: number, formData: FormData): Observable<any> {
+    console.log(formData);
+
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.put<any>(`${envVars.apiBaseUrl}/courses/${id}`, formData, {
+      headers,
+    });
+  }
+
+  // Mettre à jour lesson
+  updateLesson(id: number, formData: FormData): Observable<any> {
+    
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.put<any>(`${envVars.apiBaseUrl}/lessons/${id}`, formData, {
+      headers,
+    });
+  }
+
+  getAllCoursesByFormateur(userID: number, page: number = 1): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.get(
+      `${envVars.apiBaseUrl}/courses/user/${userID}?page=${page}`,
+      {
+        headers,
+      }
+    );
+  }
+
   addProgress(lesson_id: number): any {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -93,6 +128,55 @@ export class CourseService {
     );
   }
 
+  generedCertificat(course_id: number): any {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.post(
+      `${envVars.apiBaseUrl}/certificates/generate`,
+      { course_id },
+      {
+        headers,
+      }
+    );
+  }
+
+  // getCertificat(certificat_id: number): any {
+  //   const token = localStorage.getItem('access_token');
+  //   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+  //   return this.http.get(
+  //     `${envVars.apiBaseUrl}/certificates/${certificat_id}`,
+  //     {
+  //       headers,
+  //     }
+  //   );
+  // }
+  getCertificat(certificat_id: number): any {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.get(
+      `${envVars.apiBaseUrl}/certificates/${certificat_id}`,
+      {
+        headers,
+        responseType: 'blob' as 'json', // 👈 important
+      }
+    );
+  }
+
+  createLesson(courseId: number, lessonData: FormData): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    // ✅ IMPORTANT: Pas de Content-Type pour FormData - le navigateur l'ajoute automatiquement
+
+    return this.http.post(
+      `${envVars.apiBaseUrl}/courses/${courseId}/lessons`,
+      lessonData,
+      { headers }
+    );
+  }
+
   getProgress(courseId: number): Observable<any> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -102,7 +186,7 @@ export class CourseService {
     });
   }
 
-  getInfoUser(userID: number): Observable<any> {
+  getInfoUser(userID: string): Observable<any> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
@@ -125,8 +209,6 @@ export class CourseService {
   }
 
   createCourse(data: any): Observable<any> {
-    console.log(data);
-
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
