@@ -6,11 +6,11 @@ import { TextLessonComponent } from './text-lesson/text-lesson.component';
 import { VideoLessonComponent } from './video-lesson/video-lesson.component';
 import { PdfLessonComponent } from './pdf-lesson/pdf-lesson.component';
 import { QuizComponent } from './quiz/quiz.component';
-import { CourseFormComponent } from './course-form/course-form.component';
 import { FormLessonComponent } from './form-lesson/form-lesson.component';
 import { CertificatComponent } from './certificat/certificat.component';
 import { CourseEditComponent } from './course-edit/course-edit.component';
 import { EditLessonComponent } from './edit-lesson/edit-lesson.component';
+import { RessourceComponent } from './ressource/ressource.component';
 
 export const COURSES_ROUTES: Routes = [
   {
@@ -46,14 +46,16 @@ export const COURSES_ROUTES: Routes = [
     component: CertificatComponent,
   },
   {
-    path: ':id/addlessons', 
+    path: ':id/addlessons',
     component: FormLessonComponent,
   },
   {
     path: ':id/lessons/edit-lesson/:lessonId',
-    component: EditLessonComponent, 
+    component: EditLessonComponent,
   },
   { path: ':id/edit', component: CourseEditComponent },
+  // { path: ':id/ressource', component: RessourceComponent },
+  { path: ':id/lessons/:idLesson/ressource', component: RessourceComponent },
 ];
 
 export default COURSES_ROUTES;

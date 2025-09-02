@@ -259,6 +259,14 @@ export class CourseLessonsComponent implements OnInit {
     }
   }
 
+  startRessource(lesson: any) {
+    if (lesson.questions) {
+      this.redirect_quizz();
+    } else {
+    }
+    this.redirect(lesson.id);
+  }
+
   showConfirmation = false;
 
   confirmAction() {

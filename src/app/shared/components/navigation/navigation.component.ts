@@ -15,7 +15,7 @@ export class NavigationComponent {
     { path: '/home', label: 'Accueil' },
     { path: '/courses', label: 'Cours' },
     { path: '/learning-path', label: 'Parcours d\'Apprentissage' },
-    { path: '/resources', label: 'Ressources' }
+    // { path: '/resources', label: 'Ressources' }
   ];
 
   logout() {

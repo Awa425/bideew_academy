@@ -91,7 +91,6 @@ export class CourseService {
 
   // Mettre à jour lesson
   updateLesson(id: number, formData: FormData): Observable<any> {
-    
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
@@ -115,10 +114,6 @@ export class CourseService {
   addProgress(lesson_id: number): any {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    // const body = {
-    //   lesson_id: lesson_id,
-    //   // progress_percent: progress_percent, // ou un autre champ selon ton API
-    // };
     return this.http.patch(
       `${envVars.apiBaseUrl}/lessons/${lesson_id}/progress`,
       {},
@@ -135,6 +130,17 @@ export class CourseService {
     return this.http.post(
       `${envVars.apiBaseUrl}/certificates/generate`,
       { course_id },
+      {
+        headers,
+      }
+    );
+  }
+  getRessourceByID(lesson_id: number): any {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.get(
+      `${envVars.apiBaseUrl}/lesson/${lesson_id}/resources`,
       {
         headers,
       }
@@ -218,6 +224,8 @@ export class CourseService {
   }
 
   calculateScore(courseId: number, data: any): Observable<any> {
+    console.log(data);
+    
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,

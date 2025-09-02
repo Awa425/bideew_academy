@@ -42,7 +42,9 @@
       <div class="col-md-4">
         <mat-card-header>
           <mat-card-title>Leçons du cours</mat-card-title>
-          <mat-card-subtitle>Suivez les leçons dans l'ordre recommandé</mat-card-subtitle>
+          <mat-card-subtitle
+            >Suivez les leçons dans l'ordre recommandé</mat-card-subtitle
+          >
         </mat-card-header>
       </div>
       <div
@@ -59,7 +61,7 @@
   <!-- Leçons pour apprenants -->
   <div class="lessons-grid" *ngIf="users.user?.role == 'apprenant'">
     <!-- Cards des leçons -->
-    <mat-card 
+    <mat-card
       *ngFor="let lesson of lessons.lessons; let i = index"
       class="lesson-card"
       [class.current]="isCurrentLesson(lesson.id)"
@@ -84,21 +86,18 @@
 
       <mat-card-content>
         <div class="lesson-status">
-          <span
-            *ngIf="!isLessonUnlocked(lesson.id)"
-            class="badge badge-locked"
-          >
+          <span *ngIf="!isLessonUnlocked(lesson.id)" class="badge badge-locked">
             Verrouillé
           </span>
-          <span
-            *ngIf="isLessonUnlocked(lesson.id)"
-            class="badge badge-success"
-          >
+          <span *ngIf="isLessonUnlocked(lesson.id)" class="badge badge-success">
             Déverrouillé
           </span>
         </div>
 
-        <div class="lesson-checkbox" *ngIf="isLessonUnlocked(lesson.id) && !loading">
+        <div
+          class="lesson-checkbox"
+          *ngIf="isLessonUnlocked(lesson.id) && !loading"
+        >
           <mat-checkbox
             [checked]="progressCompleted.includes(lesson.id)"
             [disabled]="
@@ -120,7 +119,24 @@
         </div>
       </mat-card-content>
 
-      <mat-card-actions align="end">
+      <mat-card-actions
+        style="display: flex; justify-content: space-between; width: 100%"
+      >
+        <button
+          mat-raised-button
+          color="primary"
+          [routerLink]="[
+            '/courses',
+            courseId,
+            'lessons',
+            lesson.id,
+            'ressource'
+          ]"
+          [disabled]="!isLessonUnlocked(lesson.id)"
+        >
+          <mat-icon>library_books</mat-icon>
+          Ressources
+        </button>
         <button
           mat-raised-button
           color="primary"
@@ -131,6 +147,17 @@
           Commencer
         </button>
       </mat-card-actions>
+      <!-- <mat-card-actions align="end">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="startLesson(lesson)"
+          [disabled]="!isLessonUnlocked(lesson.id)"
+        >
+          <mat-icon>play_arrow</mat-icon>
+          Commencer
+        </button>
+      </mat-card-actions> -->
     </mat-card>
 
     <!-- Card du Quiz pour apprenants -->
@@ -157,11 +184,7 @@
       </mat-card-content>
 
       <mat-card-actions align="end">
-        <button
-          mat-raised-button
-          color="accent"
-          (click)="redirect_quizz()"
-        >
+        <button mat-raised-button color="accent" (click)="redirect_quizz()">
           <mat-icon>quiz</mat-icon>
           Commencer le Quiz
         </button>
@@ -172,7 +195,7 @@
   <!-- Leçons pour formateurs -->
   <div class="lessons-grid" *ngIf="users.user?.role != 'apprenant'">
     <!-- Cards des leçons pour formateurs -->
-    <mat-card 
+    <mat-card
       *ngFor="let lesson of lessons.lessons; let i = index"
       class="lesson-card instructor-card"
       [class.current]="isCurrentLesson(lesson.id)"
@@ -198,18 +221,23 @@
 
       <mat-card-actions align="end">
         <button
-          mat-icon-button
-          (click)="redirect_edit_lesson(lesson.id)"
-          matTooltip="Modifier cette leçon"
+          mat-raised-button
           color="primary"
+          [routerLink]="['/courses', courseId, 'lessons', lesson.id, 'ressource']"
         >
-          <mat-icon>edit</mat-icon>
+          <mat-icon>library_books</mat-icon>
+          Ressources
         </button>
         <button
           mat-raised-button
           color="primary"
-          (click)="startLesson(lesson)"
+          (click)="redirect_edit_lesson(lesson.id)"
+          matTooltip="Modifier cette leçon"
+          color="primary"
         >
+          <mat-icon>edit</mat-icon>Modifier
+        </button>
+        <button mat-raised-button color="primary" (click)="startLesson(lesson)">
           <mat-icon>visibility</mat-icon>
           Aperçu
         </button>
@@ -240,11 +268,7 @@
       </mat-card-content>
 
       <mat-card-actions align="end">
-        <button
-          mat-raised-button
-          color="accent"
-          (click)="redirect_quizz()"
-        >
+        <button mat-raised-button color="accent" (click)="redirect_quizz()">
           <mat-icon>quiz</mat-icon>
           Voir le Quiz
         </button>
@@ -261,9 +285,7 @@
         <button class="btn-cancel" (click)="showConfirmation = false">
           Annuler
         </button>
-        <button class="btn-confirm" (click)="confirmAction()">
-          Confirmer
-        </button>
+        <button class="btn-confirm" (click)="confirmAction()">Confirmer</button>
       </div>
     </div>
   </div>

@@ -26,7 +26,7 @@ export class QuizComponent implements OnInit {
   questions: any[] = [];
   currentIndex = 0;
   showResults = false;
-  showSummary = false; // Nouvelle propriété pour afficher le résumé
+  showSummary = false;
   isLoading = false;
   errorMessage = '';
   quizTitle = 'Quiz interactif';
@@ -82,32 +82,28 @@ export class QuizComponent implements OnInit {
     }
   }
 
-  // Méthode pour obtenir le nombre de questions correctes
   getCorrectQuestionsCount(): number {
     return this.questions.filter((q) => this.isQuestionCorrect(q)).length;
   }
 
-  // Méthode pour obtenir le nombre de questions incorrectes
   getIncorrectQuestionsCount(): number {
     return this.questions.filter((q) => !this.isQuestionCorrect(q)).length;
   }
 
-  // Méthode pour naviguer vers la liste des cours
   goBackToCourses(): void {
     this.router.navigate(['../../'], { relativeTo: this.route });
   }
+  
   showQuizSummary(): void {
     this.showSummary = true;
     this.showResults = false;
   }
 
-  // Nouvelle méthode pour retourner aux résultats
   backToResults(): void {
     this.showSummary = false;
     this.showResults = true;
   }
 
-  // Méthode pour vérifier si une question est correcte
   isQuestionCorrect(question: any): boolean {
     if (question.type === 'text') {
       return true; // On considère toutes les réponses texte comme correctes
@@ -133,7 +129,6 @@ export class QuizComponent implements OnInit {
     return false;
   }
 
-  // Méthode pour obtenir les réponses correctes sous forme de texte
   getCorrectAnswersText(question: any): string {
     if (question.type === 'text') {
       return 'Réponse libre acceptée';
@@ -155,7 +150,6 @@ export class QuizComponent implements OnInit {
     return 'N/A';
   }
 
-  // Méthode pour obtenir les réponses de l'utilisateur sous forme de texte
   getUserAnswersText(question: any): string {
     if (question.type === 'text') {
       return question.selectedText || 'Aucune réponse';
@@ -186,7 +180,25 @@ export class QuizComponent implements OnInit {
     }).length;
   }
 
+  // Version corrigée pour vérifier si une question a une réponse
+  private hasAnswer(question: any): boolean {
+    if (question.type === 'text') {
+      return question.selectedText && question.selectedText.trim() !== '';
+    }
+    return question.selected !== undefined;
+  }
+
   private getSelectedAnswerIds(question: any): number[] {
+    if (question.type === 'text') {
+      // Pour les questions de type text, on doit quand même retourner un answer_id
+      // Généralement, pour les questions text, il n'y a qu'une seule "réponse" possible
+      // qui représente l'acceptation de toute réponse texte
+      if (question.answers && question.answers.length > 0) {
+        return [question.answers[0].id]; // Prendre le premier answer_id disponible
+      }
+      return []; // Si pas d'answers disponibles, retourner tableau vide
+    }
+
     if (question.selected === undefined) return [];
 
     if (Array.isArray(question.selected)) {
@@ -199,64 +211,41 @@ export class QuizComponent implements OnInit {
   }
 
   submitQuiz() {
+    // Filtrer uniquement les questions qui ont une réponse
+    const answeredQuestions = this.questions.filter(q => this.hasAnswer(q));
+
     const submissionData: any = {
       quiz_id: 1,
-      answers: this.questions
-        .filter((q) => q.selected !== undefined)
-        .map((q) => ({
+      answers: answeredQuestions.map((q) => {
+        const answerIds = this.getSelectedAnswerIds(q);
+        
+        const answer: any = {
           question_id: q.id,
-          answer_ids: this.getSelectedAnswerIds(q),
-        })),
-    };
+          answer_ids: answerIds,
+        };
 
+        // Ajouter le texte pour les questions de type text (optionnel selon votre API)
+        if (q.type === 'text') {
+          answer.text_answer = q.selectedText;
+        }
+        
+        return answer;
+      }),
+    };
+    
     this.courseService.calculateScore(1, submissionData).subscribe({
       next: (res) => {
-        console.log('Success', res);
         this.resultat = res;
       },
-      error: (err) => console.error('API Error:', err.error.errors),
+      error: (err) => {
+        console.error('API Error:', err);
+        console.error('Erreur complète:', err.error);
+      },
     });
   }
 
-  // loadQuizData(courseId: number): void {
-  //   this.isLoading = true;
-  //   this.errorMessage = '';
-
-  //   (
-  //     this.courseService.getQuizzByLesson(courseId) as Observable<any[]>
-  //   ).subscribe({
-  //     next: (apiData: any[]) => {
-  //       console.log(apiData);
-
-  //       const quiz = apiData.find((q) => q.course_id === courseId);
-
-  //       if (!quiz?.questions?.length) {
-  //         console.warn(
-  //           'Ce quiz ne contient aucune question. Utilisation des données par défaut.'
-  //         );
-  //         this.loadDefaultData();
-  //         return;
-  //       }
-
-  //       this.quizTitle = quiz.description;
-  //       this.questions = quiz.questions.map((q: any) => {
-  //         q.answers = q.answers || [];
-  //         return this.transformQuestion(q);
-  //       });
-  //       this.currentIndex = 0;
-  //       this.isLoading = false;
-  //     },
-  //     error: (error) => {
-  //       console.error('Erreur lors du chargement du quiz :', error);
-  //       this.errorMessage = error.message || 'Erreur de chargement du quiz';
-  //       this.isLoading = false;
-  //       this.loadDefaultData();
-  //     },
-  //   });
-  // }
-  // Fonction utilitaire pour mélanger un tableau (algorithme Fisher-Yates)
   private shuffleArray<T>(array: T[]): T[] {
-    const shuffled = [...array]; // Créer une copie pour ne pas modifier l'original
+    const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -264,7 +253,6 @@ export class QuizComponent implements OnInit {
     return shuffled;
   }
 
-  // Fonction utilitaire pour sélectionner n éléments aléatoires
   private getRandomQuestions(questions: any[], count: number): any[] {
     const shuffled = this.shuffleArray(questions);
     return shuffled.slice(0, Math.min(count, questions.length));
@@ -278,8 +266,6 @@ export class QuizComponent implements OnInit {
       this.courseService.getQuizzByLesson(courseId) as Observable<any[]>
     ).subscribe({
       next: (apiData: any[]) => {
-        console.log(apiData);
-
         const quiz = apiData.find((q) => q.course_id === courseId);
 
         if (!quiz?.questions?.length) {
@@ -298,12 +284,11 @@ export class QuizComponent implements OnInit {
           return this.transformQuestion(q);
         });
 
+        // Debug: afficher les types de questions
+        const questionTypes = allTransformedQuestions.map((q: { id: any; type: any; }) => ({ id: q.id, type: q.type }));
+       
         // Sélectionner 15 questions aléatoires (ou moins s'il y en a moins de 15)
         this.questions = this.getRandomQuestions(allTransformedQuestions, 15);
-
-        console.log(
-          `${this.questions.length} questions sélectionnées sur ${allTransformedQuestions.length} disponibles`
-        );
 
         this.currentIndex = 0;
         this.isLoading = false;
@@ -354,11 +339,14 @@ export class QuizComponent implements OnInit {
       correctAnswer = q.answers
         ?.map((a: any, index: number) => (a.is_correct === 1 ? index : -1))
         .filter((i: number) => i !== -1);
+    } else if (q.type === 'text') {
+      // Pour les questions de type text, garder la réponse correcte si elle existe
+      correctAnswer = q.correctAnswer || '';
     } else {
       correctAnswer = q.correctAnswer || '';
     }
 
-    return {
+    const transformedQuestion = {
       id: q.id,
       text: q.text || '',
       type: q.type || 'multiple_choice',
@@ -368,5 +356,7 @@ export class QuizComponent implements OnInit {
       correctAnswer: correctAnswer,
       answers: q.answers || [],
     };
+
+    return transformedQuestion;
   }
 }
