@@ -1,5 +1,4 @@
 <div class="course-lessons-container">
-  <!-- En-tête du cours -->
   <mat-card class="course-header">
     <div class="header-content">
       <div class="course-info">
@@ -31,12 +30,10 @@
     </div>
   </mat-card>
 
-  <!-- Bouton retour -->
   <a [routerLink]="['../']" class="btn-retour" title="RETOUR">
     <img src="../../../../assets/left-long-solid.svg" alt="Retour" width="30" />
   </a>
 
-  <!-- Header des leçons -->
   <mat-card class="lessons-header-card">
     <div class="row g-0">
       <div class="col-md-4">
@@ -58,9 +55,7 @@
     </div>
   </mat-card>
 
-  <!-- Leçons pour apprenants -->
   <div class="lessons-grid" *ngIf="users.user?.role == 'apprenant'">
-    <!-- Cards des leçons -->
     <mat-card
       *ngFor="let lesson of lessons.lessons; let i = index"
       class="lesson-card"
@@ -147,20 +142,8 @@
           Commencer
         </button>
       </mat-card-actions>
-      <!-- <mat-card-actions align="end">
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="startLesson(lesson)"
-          [disabled]="!isLessonUnlocked(lesson.id)"
-        >
-          <mat-icon>play_arrow</mat-icon>
-          Commencer
-        </button>
-      </mat-card-actions> -->
     </mat-card>
 
-    <!-- Card du Quiz pour apprenants -->
     <mat-card
       *ngIf="(users?.courses_progress?.[0]?.progress_percent > 80) && lessons.quizzes && isLessonUnlocked(lessons.quizzes.id) && (users?.courses_progress?.[0]?.progress_percent != 100)"
       class="lesson-card quiz-card"
@@ -192,9 +175,7 @@
     </mat-card>
   </div>
 
-  <!-- Leçons pour formateurs -->
   <div class="lessons-grid" *ngIf="users.user?.role != 'apprenant'">
-    <!-- Cards des leçons pour formateurs -->
     <mat-card
       *ngFor="let lesson of lessons.lessons; let i = index"
       class="lesson-card instructor-card"
@@ -223,7 +204,13 @@
         <button
           mat-raised-button
           color="primary"
-          [routerLink]="['/courses', courseId, 'lessons', lesson.id, 'ressource']"
+          [routerLink]="[
+            '/courses',
+            courseId,
+            'lessons',
+            lesson.id,
+            'ressource'
+          ]"
         >
           <mat-icon>library_books</mat-icon>
           Ressources
@@ -244,7 +231,6 @@
       </mat-card-actions>
     </mat-card>
 
-    <!-- Card du Quiz pour formateurs -->
     <mat-card
       *ngIf="lessons.quizzes && isLessonUnlocked(lessons.quizzes.id)"
       class="lesson-card quiz-card instructor-card"
@@ -276,7 +262,6 @@
     </mat-card>
   </div>
 
-  <!-- Popup de confirmation -->
   <div class="confirmation-popup" *ngIf="showConfirmation">
     <div class="popup-content">
       <h3>Confirmer l'action</h3>

@@ -51,6 +51,7 @@ export class CourseDetailComponent implements OnInit {
   @ViewChild('videoPlayer') videoPlayer!: ElementRef<HTMLVideoElement>;
 
   course: any;
+  course_progress: any;
   courId: string | null = null;
   selectedTabIndex = 0;
   currentVideo: VideoConfig | null = null;
@@ -83,7 +84,11 @@ export class CourseDetailComponent implements OnInit {
 
     this.userId = localStorage.getItem('user_id');
     this.authService.getUserById(this.userId).subscribe((data) => {
-      this.users = data;      
+      this.users = data;
+      this.course_progress = this.users.courses_progress.filter(
+        (course: { course_id: number }) =>
+          course.course_id.toString() === this.courId
+      )[0];
     });
   }
 

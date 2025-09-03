@@ -28,25 +28,15 @@ export class CourseService {
     method: string = 'GET',
     body: any = null
   ): void {
-    console.log(`⏳ [${method}] Requête vers:`, url);
     if (body) {
-      console.log('📦 Corps de la requête:', body);
     }
   }
 
   private logResponse(response: any): void {
-    console.log('✅ Réponse reçue:', response);
   }
 
   private logError(error: any, context: string = ''): void {
-    console.error(`❌ Erreur${context ? ' ' + context : ''}:`, {
-      name: error.name,
-      message: error.message,
-      status: error.status,
-      statusText: error.statusText,
-      url: error.url,
-      error: error.error,
-    });
+  
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
@@ -69,7 +59,6 @@ export class CourseService {
       }
     }
 
-    console.error(errorMessage);
     return throwError(() => new Error(errorMessage));
   }
 
@@ -77,9 +66,7 @@ export class CourseService {
     return this.http.get(`${envVars.apiBaseUrl}/courses?page=${page}`);
   }
 
-  // Mettre à jour un cours
   updateCourse(id: number, formData: FormData): Observable<any> {
-    console.log(formData);
 
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -89,7 +76,6 @@ export class CourseService {
     });
   }
 
-  // Mettre à jour lesson
   updateLesson(id: number, formData: FormData): Observable<any> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -147,17 +133,6 @@ export class CourseService {
     );
   }
 
-  // getCertificat(certificat_id: number): any {
-  //   const token = localStorage.getItem('access_token');
-  //   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-
-  //   return this.http.get(
-  //     `${envVars.apiBaseUrl}/certificates/${certificat_id}`,
-  //     {
-  //       headers,
-  //     }
-  //   );
-  // }
   getCertificat(certificat_id: number): any {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -166,7 +141,7 @@ export class CourseService {
       `${envVars.apiBaseUrl}/certificates/${certificat_id}`,
       {
         headers,
-        responseType: 'blob' as 'json', // 👈 important
+        responseType: 'blob' as 'json',
       }
     );
   }
@@ -317,7 +292,6 @@ export class CourseService {
               error,
               `lors de la récupération des leçons du cours ${courseId}`
             ),
-          complete: () => console.log('🏁 Récupération des leçons terminée'),
         }),
         catchError((error: HttpErrorResponse) => this.handleError(error))
       );
@@ -342,7 +316,6 @@ export class CourseService {
               error,
               `lors de la récupération du quiz du cours ${courseId}`
             ),
-          complete: () => console.log('🏁 Récupération du quiz terminée'),
         }),
         catchError((error: HttpErrorResponse) => this.handleError(error))
       );

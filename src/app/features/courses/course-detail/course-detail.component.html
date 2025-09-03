@@ -358,24 +358,14 @@
           <div class="progress-container">
             <div class="progress-info">
               <span>Progression</span>
-              <span>{{ users?.courses_progress[0]?.progress_percent }}%</span>
+              <span>{{ course_progress?.progress_percent }}%</span>
             </div>
             <mat-progress-bar
               mode="determinate"
-              [value]="users?.courses_progress[0]?.progress_percent"
+              [value]="course_progress?.progress_percent"
               aria-label="Progression du cours"
             ></mat-progress-bar>
           </div>
-          <!-- <button
-            mat-raised-button
-            color="primary"
-            class="enroll-button"
-            (click)="enrollInCourse()"
-            aria-label="S'inscrire au cours"
-          >
-            <mat-icon aria-hidden="true">school</mat-icon>
-            S'inscrire maintenant
-          </button> -->
           <div class="course-features">
             <div class="feature">
               <mat-icon aria-hidden="true">check</mat-icon>

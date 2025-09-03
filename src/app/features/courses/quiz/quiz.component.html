@@ -53,7 +53,6 @@
 
       <h3 class="question-text">{{ currentQuestion.text }}</h3>
 
-      <!-- Single or Multiple Choice -->
       <div
         *ngIf="
           currentQuestion.type === 'multiple_choice' ||
@@ -72,7 +71,6 @@
                 currentQuestion.selected?.includes(i))
           }"
         >
-          <!-- Checkbox pour multiple_choice -->
           <div
             *ngIf="currentQuestion.type === 'multiple_choice'"
             class="option-selector"
@@ -86,7 +84,6 @@
             <span class="checkbox-custom"></span>
           </div>
 
-          <!-- Radio pour single_choice -->
           <div
             *ngIf="currentQuestion.type === 'single_choice'"
             class="option-selector"
@@ -105,7 +102,6 @@
         </label>
       </div>
 
-      <!-- Text Answer -->
       <div
         *ngIf="currentQuestion.type === 'text'"
         class="text-answer-container"
@@ -117,7 +113,6 @@
         ></textarea>
       </div>
 
-      <!-- Bouton suivant -->
       <button
         class="next-button"
         (click)="nextQuestion()"
@@ -140,7 +135,6 @@
       </button>
     </div>
 
-    <!-- Résultats -->
     <div
       *ngIf="showResults && !showSummary"
       #resultContainer
@@ -153,14 +147,14 @@
         <div class="badge-circle" style="background-color: #f44336">X</div>
       </div>
       <div class="div" *ngIf="resultat?.percentage > 60">
-        <span style="color: green; font-size: 22px; display: block"
-          >{{ resultat?.message }}</span
-        >
+        <span style="color: green; font-size: 22px; display: block">{{
+          resultat?.message
+        }}</span>
       </div>
       <div class="div" *ngIf="resultat?.percentage <= 60">
-        <span style="color: red; font-size: 22px; display: block"
-          >{{ resultat?.message }}</span
-        >
+        <span style="color: red; font-size: 22px; display: block">{{
+          resultat?.message
+        }}</span>
       </div>
       <h3>Résultats du Quiz</h3>
       <div class="score-display">
@@ -195,7 +189,6 @@
       </div>
     </div>
 
-    <!-- Section Résumé -->
     <div *ngIf="showSummary" class="summary-container animate-fade-in">
       <div class="summary-header">
         <h3>Résumé du Quiz</h3>

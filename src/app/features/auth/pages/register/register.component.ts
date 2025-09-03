@@ -29,7 +29,6 @@ export class RegisterComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
       confirmPassword: ['', Validators.required],
-      role: ['apprenant', Validators.required],
     });
   }
 

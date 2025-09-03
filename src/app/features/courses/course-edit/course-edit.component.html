@@ -10,7 +10,6 @@
 />
 
 <div class="course-edit-container container py-5">
-  <!-- Header Section -->
   <div class="row g-0 mb-4">
     <div class="col-md-6">
       <a [routerLink]="['/courses', courseId]" class="btn btn-outline-secondary" title="Retour au cours">
@@ -22,30 +21,22 @@
       <h1 class="h3 mb-0">Modifier le cours</h1>
     </div>
   </div>
-
-  <!-- Loading State -->
   <div *ngIf="isLoading" class="text-center my-5">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Chargement...</span>
     </div>
     <p class="mt-2">Chargement du cours...</p>
   </div>
-
-  <!-- Error Alert -->
   <div *ngIf="error && !isLoading" class="alert alert-danger alert-dismissible fade show" role="alert">
     <i class="fas fa-exclamation-triangle me-2"></i>
     {{ error }}
     <button type="button" class="btn-close" (click)="error = null"></button>
   </div>
-
-  <!-- Success Alert -->
   <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
     <i class="fas fa-check-circle me-2"></i>
     {{ successMessage }}
     <button type="button" class="btn-close" (click)="successMessage = null"></button>
   </div>
-
-  <!-- Edit Form -->
   <div *ngIf="!isLoading" class="row">
     <div class="col-lg-8 mx-auto">
       <div class="card shadow-sm">
@@ -58,7 +49,6 @@
         <div class="card-body">
           <form [formGroup]="editCourseForm" (ngSubmit)="onSubmit()" novalidate>
             
-            <!-- Titre -->
             <div class="mb-4">
               <label for="title" class="form-label">
                 Titre du cours <span class="text-danger">*</span>
@@ -75,8 +65,6 @@
                 {{ getFieldError('title') }}
               </div>
             </div>
-
-            <!-- Description -->
             <div class="mb-4">
               <label for="description" class="form-label">
                 Description <span class="text-danger">*</span>
@@ -94,7 +82,6 @@
               </div>
             </div>
 
-            <!-- Niveau et Durée (sur la même ligne) -->
             <div class="row mb-4">
               <div class="col-md-6">
                 <label for="level" class="form-label">
@@ -135,7 +122,6 @@
               </div>
             </div>
 
-            <!-- Prérequis -->
             <div class="mb-4">
               <label for="prerequis" class="form-label">Prérequis</label>
               <textarea
@@ -147,7 +133,6 @@
               ></textarea>
             </div>
 
-            <!-- Objectifs d'apprentissage -->
             <div class="mb-4">
               <label for="learning_objectives" class="form-label">Objectifs d'apprentissage</label>
               <textarea
@@ -159,25 +144,6 @@
               ></textarea>
             </div>
 
-            <!-- Contenu -->
-            <!-- <div class="mb-4">
-              <label for="content" class="form-label">
-                Contenu du cours <span class="text-danger">*</span>
-              </label>
-              <textarea
-                id="content"
-                class="form-control"
-                rows="8"
-                [class.is-invalid]="isFieldInvalid('content')"
-                formControlName="content"
-                placeholder="Entrez le contenu détaillé du cours"
-              ></textarea>
-              <div *ngIf="isFieldInvalid('content')" class="invalid-feedback">
-                {{ getFieldError('content') }}
-              </div>
-            </div> -->
-
-            <!-- Image -->
             <div class="mb-4">
               <label for="image" class="form-label">Image du cours</label>
               <input
@@ -191,7 +157,6 @@
                 Formats acceptés : JPG, PNG, GIF. Taille maximale : 5MB
               </div>
               
-              <!-- Aperçu de l'image -->
               <div *ngIf="imagePreview" class="mt-3">
                 <p class="mb-2">Aperçu :</p>
                 <div class="position-relative d-inline-block">
@@ -213,8 +178,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Statut actif -->
             <div class="mb-4">
               <div class="form-check">
                 <input
@@ -228,8 +191,6 @@
                 </label>
               </div>
             </div>
-
-            <!-- Boutons d'action -->
             <div class="d-flex justify-content-between mt-5">
               <button
                 type="button"
@@ -250,7 +211,6 @@
                 {{ isSaving ? 'Sauvegarde...' : 'Sauvegarder les modifications' }}
               </button>
             </div>
-
           </form>
         </div>
       </div>

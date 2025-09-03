@@ -12,9 +12,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatCheckboxModule } from '@angular/material/checkbox'; // Nouveau
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // Nouveau
-import { Course, Lessons } from '../../../core/models/course.model';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CourseService } from '../../../core/services/course.service';
 import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
@@ -40,8 +39,8 @@ interface LessonProgress {
     MatProgressBarModule,
     MatTooltipModule,
     MatRadioModule,
-    MatCheckboxModule,        // Nouveau
-    MatProgressSpinnerModule, // Nouveau
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
     RouterLink,
   ],
   templateUrl: './course-lessons.component.html',
@@ -92,7 +91,6 @@ export class CourseLessonsComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Erreur:', error);
         this.loading = false;
       },
     });
@@ -111,22 +109,18 @@ export class CourseLessonsComponent implements OnInit {
 
   private updateUnlockedLessons() {
     if (!this.lessons?.lessons?.length) return;
-    // Première leçon toujours déverrouillée
     const firstLessonId = this.lessons.lessons[0].id;
     this.unlockedLessons = [firstLessonId];
-    // Ajoute les leçons complétées
     if (this.progressCompleted?.length) {
       this.unlockedLessons = [
         ...new Set([...this.unlockedLessons, ...this.progressCompleted]),
       ];
     }
-    // Ajoute la leçon actuelle
     if (this.currentLessonId) {
       this.unlockedLessons = [
         ...new Set([...this.unlockedLessons, this.currentLessonId]),
       ];
     }
-    // Pour le quiz s'il existe
     if (
       this.lessons.quizzes &&
       this.progressCompleted.length === this.lessons.lessons.length
@@ -182,8 +176,6 @@ export class CourseLessonsComponent implements OnInit {
   redirect_formateur(): void {
     if (this.courseId) {
       this.router.navigate(['courses', this.courseId, 'addlessons']);
-    } else {
-      console.error('ID du cours non disponible');
     }
   }
 
@@ -212,9 +204,7 @@ export class CourseLessonsComponent implements OnInit {
       next: (res: any) => {
         location.reload();
       },
-      error: (err: any) => {
-        console.error('Erreur :', err);
-      },
+      error: (err: any) => {},
     });
   }
 
@@ -262,7 +252,6 @@ export class CourseLessonsComponent implements OnInit {
   startRessource(lesson: any) {
     if (lesson.questions) {
       this.redirect_quizz();
-    } else {
     }
     this.redirect(lesson.id);
   }
@@ -270,14 +259,13 @@ export class CourseLessonsComponent implements OnInit {
   showConfirmation = false;
 
   confirmAction() {
-    console.log('Action confirmée !');
     this.showConfirmation = false;
   }
   redirect_edit_lesson(lessonId: number): void {
     if (this.courseId) {
       this.router.navigate(
         ['courses', this.courseId, 'lessons', 'edit-lesson', lessonId],
-        { relativeTo: this.route.parent?.parent } // Adaptation au routage actuel
+        { relativeTo: this.route.parent?.parent }
       );
     }
   }

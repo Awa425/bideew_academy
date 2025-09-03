@@ -20,12 +20,11 @@ export class CoursesComponent implements OnInit {
   searchQuery: string = '';
   currentPage = 1;
   lastPage = 1;
-  itemsPerPage: number = 8; // Ajustez selon vos besoins
+  itemsPerPage: number = 8; 
   totalItems: number = 0;
   userId: string | null = '';
   users: any = [];
 
-  // Variables pour la modal de confirmation
   showDeleteModal = false;
   courseToDelete: Course | null = null;
   isDeleting = false;
@@ -80,7 +79,6 @@ export class CoursesComponent implements OnInit {
     }
   }
 
-  // Filtrage dynamique
   ngOnChanges() {
     this.filterCourses();
   }
@@ -112,24 +110,12 @@ export class CoursesComponent implements OnInit {
     this.router.navigate(['home']);
   }
 
-  // redirectToCourseForm(): void {
-  //   this.router.navigate(['/courses/new']);
-  //   // Ou si vous utilisez l'alternative :
-  //   // this.router.navigate(['/course-form']);
-  // }
-
-  // goToPage(page: number): void {
-  //   if (page >= 1 && page <= this.lastPage) {
-  //     this.loadCourses(page);
-  //   }
-  // }
   goToPage(page: number): void {
     if (page >= 1 && page <= this.lastPage) {
-      this.loadCourses(this.users, page); // Passez this.users comme premier paramètre
+      this.loadCourses(this.users, page); 
     }
   }
 
-  // Méthodes pour la gestion de la suppression
   openDeleteConfirmation(course: Course): void {
     this.courseToDelete = course;
     this.showDeleteModal = true;
@@ -143,30 +129,6 @@ export class CoursesComponent implements OnInit {
 
   confirmDelete(): void {
     if (!this.courseToDelete) return;
-
     this.isDeleting = true;
-
-    // this.courseService.deleteCourse(this.courseToDelete.id).subscribe({
-    //   next: (response:any) => {
-    //     // Supprimer le cours de la liste locale
-    //     this.courses = this.courses.filter(
-    //       (c) => c.id !== this.courseToDelete!.id
-    //     );
-    //     this.filteredCourses = this.filteredCourses.filter(
-    //       (c) => c.id !== this.courseToDelete!.id
-    //     );
-
-    //     // Fermer la modal
-    //     this.closeDeleteModal();
-
-    //     // Optionnel : afficher un message de succès
-    //     console.log('Cours supprimé avec succès');
-    //   },
-    //   error: (err:any) => {
-    //     this.error = 'Erreur lors de la suppression du cours';
-    //     this.isDeleting = false;
-    //     console.error('Erreur de suppression:', err);
-    //   },
-    // });
   }
 }

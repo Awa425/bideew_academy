@@ -6,7 +6,6 @@
     <img src="../../../../assets/left-long-solid.svg" alt="Retour" width="30" />
   </a>
   <div class="form-content">
-    <!-- Titre -->
     <div class="input-group">
       <label for="title">Titre du cours</label>
       <input
@@ -17,8 +16,6 @@
         placeholder="Introduction à Angular"
       />
     </div>
-
-    <!-- Description -->
     <div class="input-group">
       <label for="description">Description</label>
       <textarea
@@ -28,8 +25,6 @@
         placeholder="Décrivez le contenu du cours..."
       ></textarea>
     </div>
-
-    <!-- Catégorie & Niveau -->
     <div class="grid-cols-2">
       <div class="input-group">
         <label for="category">Catégorie</label>
@@ -51,8 +46,6 @@
         </select>
       </div>
     </div>
-
-    <!-- Durée & Image -->
     <div class="grid-cols-2">
       <div class="input-group">
         <label for="duration">Durée (minutes)</label>
@@ -64,17 +57,6 @@
           min="0"
         />
       </div>
-
-      <!-- <div class="input-group">
-        <label for="image">URL de l'image</label>
-        <input
-          id="image"
-          type="file"
-          [(ngModel)]="course.image_path"
-          class="input"
-          placeholder="https://example.com/image.jpg"
-        />
-      </div> -->
       <div class="input-group">
         <label for="image">Image du cours</label>
         <input
@@ -86,8 +68,6 @@
         />
       </div>
     </div>
-
-    <!-- Prérequis & Objectif -->
     <div class="grid-cols-2">
       <div class="input-group">
         <label for="prerequis">Prérequis</label>
@@ -111,14 +91,10 @@
         />
       </div>
     </div>
-
-    <!-- Publication -->
     <div class="input-group checkbox-group">
       <input type="checkbox" id="published" [(ngModel)]="course.is_published" />
       <label for="published">Publier immédiatement</label>
     </div>
-
-    <!-- Bouton Enregistrer -->
     <div class="input-group">
       <button (click)="submitForm()" class="submit-btn">
         <svg

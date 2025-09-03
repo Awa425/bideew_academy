@@ -77,7 +77,7 @@ export class AuthService {
   }
 
   getUserById(id: any) {
-    const token = localStorage.getItem('access_token'); // Get stored token
+    const token = localStorage.getItem('access_token'); 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(`${envVars.apiBaseUrl}/users/${id}/details`, {
       headers,

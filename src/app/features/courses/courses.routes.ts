@@ -54,7 +54,6 @@ export const COURSES_ROUTES: Routes = [
     component: EditLessonComponent,
   },
   { path: ':id/edit', component: CourseEditComponent },
-  // { path: ':id/ressource', component: RessourceComponent },
   { path: ':id/lessons/:idLesson/ressource', component: RessourceComponent },
 ];
 
