@@ -224,24 +224,19 @@ export class CourseService {
   }
 
   calculateScore(courseId: number, data: any): Observable<any> {
-    console.log(data);
-    
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     });
 
-    return this.http
-      .post(`${envVars.apiBaseUrl}/courses/${courseId}/quizzes/submit`, data, {
+    return this.http.post(
+      `${envVars.apiBaseUrl}/courses/${courseId}/quizzes/submit`,
+      data,
+      {
         headers,
-      })
-      .pipe(
-        catchError((error) => {
-          console.error('Error submitting quiz:', error);
-          return throwError(() => error);
-        })
-      );
+      }
+    );
   }
 
   getCourseById(id: any) {

@@ -154,12 +154,12 @@
       </div>
       <div class="div" *ngIf="resultat?.percentage > 60">
         <span style="color: green; font-size: 22px; display: block"
-          >Félicitation vous avez reussi le teste</span
+          >{{ resultat?.message }}</span
         >
       </div>
       <div class="div" *ngIf="resultat?.percentage <= 60">
         <span style="color: red; font-size: 22px; display: block"
-          >Vous n'avez pas reussi le teste</span
+          >{{ resultat?.message }}</span
         >
       </div>
       <h3>Résultats du Quiz</h3>
