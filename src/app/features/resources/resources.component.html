@@ -1,150 +1,2841 @@
-<div class="resources-container">
-  <section class="hero-section">
-    <div class="hero-bg"></div>
-    <div class="hero-content">
-      <h1 class="animate__animated animate__fadeInDown">Ressources de Cybersécurité</h1>
-      <p class="animate__animated animate__fadeIn">Accédez à nos ressources exclusives pour approfondir vos connaissances en cybersécurité.</p>
-    </div>
-  </section>
-
-  <section class="intro-section">
-    <div class="container">
-      <div class="intro-content">
-        <h2 class="section-title animate__animated animate__fadeInUp">Bienvenue dans nos Ressources de Cybersécurité</h2>
-        <p class="section-description animate__animated animate__fadeInUp animate__delay-1s">Découvrez notre bibliothèque complète de ressources dédiées à la cybersécurité. Que vous soyez débutant ou expert, vous trouverez ici les outils et informations nécessaires pour renforcer vos compétences en sécurité informatique.</p>
-        <div class="intro-stats animate__animated animate__fadeInUp animate__delay-2s">
-          <div class="stat-item">
-            <span class="stat-number">120+</span>
-            <span class="stat-label">Articles</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number">50+</span>
-            <span class="stat-label">Vidéos</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number">30+</span>
-            <span class="stat-label">Outils</span>
-          </div>
-        </div>
+<div class="user-management-container">
+  <section class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="animate__animated animate__fadeInDown">
+          Gestion des Utilisateurs
+        </h1>
+        <p class="subtitle animate__animated animate__fadeIn">
+          Gérez les utilisateurs de votre plateforme de formation
+        </p>
+      </div>
+      <div class="header-actions animate__animated animate__fadeInRight">
+        <!-- <button
+          class="secondary-btn"
+          (click)="exportUsers()"
+          [disabled]="isLoading"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Exporter
+        </button> -->
+        <button class="primary-btn" (click)="openAddUserModal()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <line x1="19" y1="8" x2="19" y2="14" />
+            <line x1="22" y1="11" x2="16" y2="11" />
+          </svg>
+          Nouvel Utilisateur
+        </button>
       </div>
     </div>
   </section>
 
-  <div class="category-grid">
-    <!-- Catégorie 1 -->
-    <div class="category-card" [class.active]="currentCategory === 'articles'" (click)="selectCategory('articles')">
-      <div class="category-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-          <circle cx="12" cy="12" r="3"/>
-        </svg>
+  <!-- Message d'erreur -->
+  <div *ngIf="error" class="error-message">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+    </svg>
+    {{ error }}
+  </div>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="isLoading" class="loading-indicator">
+    <div class="spinner"></div>
+    <p>Chargement des utilisateurs...</p>
+  </div>
+
+  <section
+    class="stats-section animate__animated animate__fadeInUp"
+    *ngIf="!isLoading"
+  >
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon active">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ totalUsers }}</span>
+          <span class="stat-label">Total Utilisateurs</span>
+        </div>
       </div>
-      <div class="category-content">
-        <h3>Articles et Guides</h3>
-        <p>Articles techniques, guides pratiques et études de cas sur la cybersécurité.</p>
-        <span class="item-count">45 articles</span>
+      <div class="stat-card">
+        <div class="stat-icon success">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9 12l2 2 4-4" />
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ activeUsers }}</span>
+          <span class="stat-label">Utilisateurs Actifs</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon warning">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v4" />
+            <path d="M12 16h.01" />
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ inactiveUsers }}</span>
+          <span class="stat-label">Utilisateurs Inactifs</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon danger">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ blockedUsers }}</span>
+          <span class="stat-label">Utilisateurs Bloqués</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="table-section animate__animated animate__fadeInUp animate__delay-1s"
+    *ngIf="!isLoading"
+  >
+    <div class="table-header">
+      <div class="search-filters">
+        <div class="search-box">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Rechercher un utilisateur..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+          />
+        </div>
+        <div class="filter-dropdown">
+          <select [(ngModel)]="selectedRole" (change)="onRoleChange()">
+            <option value="">Tous les rôles</option>
+            <option value="admin">Administrateur</option>
+            <option value="formateur">Formateur</option>
+            <option value="apprenant">Apprenant</option>
+          </select>
+        </div>
+        <!-- <div class="filter-dropdown">
+          <select [(ngModel)]="selectedStatus" (change)="onStatusChange()">
+            <option value="">Tous les statuts</option>
+            <option value="active">Actif</option>
+            <option value="inactive">Inactif</option>
+            <option value="blocked">Bloqué</option>
+          </select>
+        </div> -->
       </div>
     </div>
 
-    <!-- Catégorie 2 -->
-    <div class="category-card" [class.active]="currentCategory === 'videos'" (click)="selectCategory('videos')">
-      <div class="category-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="23 7 16 12 23 17 23 7"/>
-          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-        </svg>
-      </div>
-      <div class="category-content">
-        <h3>Vidéos et Tutoriels</h3>
-        <p>Vidéos explicatives, tutoriels et démonstrations pratiques.</p>
-        <span class="item-count">32 vidéos</span>
+    <div class="table-container">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th (click)="sortBy('name')" class="sortable">Utilisateur</th>
+            <th (click)="sortBy('email')" class="sortable">Email</th>
+            <th (click)="sortBy('role')" class="sortable">Rôle</th>
+            <th (click)="sortBy('created_at')" class="sortable">
+              Date d'inscription
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let user of paginatedUsers; trackBy: trackByUserId"
+            class="user-row"
+          >
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">
+                  <img [src]="user.avatar" [alt]="user.name" />
+                </div>
+                <div class="user-details">
+                  <span class="user-name">{{ user.name }}</span>
+                  <span class="user-id">#{{ user.id }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="user-email">{{ user.email }}</span>
+              <span
+                *ngIf="!user.email_verified_at"
+                class="email-unverified"
+                title="Email non vérifié"
+                >⚠️</span
+              >
+            </td>
+            <td>
+              <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+                {{ getRoleText(user.role) }}
+              </span>
+            </td>
+            <td>
+              <span class="created-date" [title]="user.created_at">
+                {{ user.created_at | date : "dd/MM/yyyy" }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button
+                  class="action-btn view-btn"
+                  (click)="viewUser(user)"
+                  title="Voir détails"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+                <button
+                  class="action-btn edit-btn"
+                  (click)="editUser(user)"
+                  title="Modifier"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M12 20h9" />
+                    <path
+                      d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+                    />
+                  </svg>
+                </button>
+                <div class="dropdown">
+                  <button
+                    class="action-btn more-btn"
+                    (click)="toggleDropdown(user.id)"
+                    title="Plus d'actions"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="12" cy="12" r="1" />
+                      <circle cx="12" cy="5" r="1" />
+                      <circle cx="12" cy="19" r="1" />
+                    </svg>
+                  </button>
+                  <div class="dropdown-menu" [class.show]="user.showDropdown">
+                    <button (click)="resetPassword(user)" class="dropdown-item">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <rect
+                          x="3"
+                          y="11"
+                          width="18"
+                          height="11"
+                          rx="2"
+                          ry="2"
+                        />
+                        <circle cx="12" cy="16" r="1" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      Réinitialiser mot de passe
+                    </button>
+                    <!-- <button
+                      (click)="toggleUserStatus(user)"
+                      class="dropdown-item"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 12l2 2 4-4" />
+                      </svg>
+                      {{ user.status === "active" ? "Désactiver" : "Activer" }}
+                    </button> -->
+                    <!-- <button
+                      (click)="sendWelcomeEmail(user)"
+                      class="dropdown-item"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                        />
+                        <polyline points="22,6 12,13 2,6" />
+                      </svg>
+                      Envoyer email de bienvenue
+                    </button> -->
+                    <button
+                      *ngIf="user.role === 'apprenant'"
+                      (click)="viewUserProgress(user)"
+                      class="dropdown-item"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                      </svg>
+                      Voir progression détaillée
+                    </button>
+                    <hr />
+                    <button
+                      (click)="deleteUser(user)"
+                      class="dropdown-item danger"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path
+                          d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                        />
+                      </svg>
+                      Supprimer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="users.length === 0 && !isLoading" class="empty-state">
+        <div class="empty-icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1"
+          >
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </div>
+        <h3>Aucun utilisateur trouvé</h3>
+        <p>Aucun utilisateur ne correspond à vos critères de recherche.</p>
+        <button class="primary-btn" (click)="clearFilters()">
+          Réinitialiser les filtres
+        </button>
       </div>
     </div>
 
-    <!-- Catégorie 3 -->
-    <div class="category-card" [class.active]="currentCategory === 'tools'" (click)="selectCategory('tools')">
-      <div class="category-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.43 7.43l-2.33 2.33a2 2 0 1 1-2.83-2.83l3.75-3.75a6 6 0 0 1 7.42-7.42z"/>
-        </svg>
+    <!-- <div class="table-footer" *ngIf="users.length > 0">
+      <div class="table-info">
+        <span
+          >Affichage de {{ startIndex + 1 }} à {{ endIndex }} sur
+          {{ totalFilteredUsers }} utilisateurs</span
+        >
+        <div class="selected-info" *ngIf="selectedUsers.length > 0">
+          {{ selectedUsers.length }} utilisateur(s) sélectionné(s)
+          <button class="link-btn" (click)="deleteSelectedUsers()">
+            Supprimer la sélection
+          </button>
+        </div>
       </div>
-      <div class="category-content">
-        <h3>Outils et Logiciels</h3>
-        <p>Outils de cybersécurité, logiciels de test et ressources techniques.</p>
-        <span class="item-count">28 outils</span>
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button
+          class="pagination-btn"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1 || isLoading"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="15,18 9,12 15,6" />
+          </svg>
+          Précédent
+        </button>
+
+        <div class="pagination-numbers">
+          <button
+            *ngFor="let page of visiblePages"
+            class="pagination-number"
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)"
+            [disabled]="isLoading"
+          >
+            {{ page }}
+          </button>
+        </div>
+
+        <button
+          class="pagination-btn"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages || isLoading"
+        >
+          Suivant
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="9,18 15,12 9,6" />
+          </svg>
+        </button>
+      </div>
+    </div> -->
+    <div class="table-footer" *ngIf="users.length > 0">
+      <div class="table-info">
+        <span>
+          Affichage de {{ startIndex + 1 }} à {{ endIndex }} sur
+          {{ totalFilteredUsers }} utilisateurs
+        </span>
+        <div class="selected-info" *ngIf="selectedUsers.length > 0">
+          {{ selectedUsers.length }} utilisateur(s) sélectionné(s)
+          <button class="link-btn" (click)="deleteSelectedUsers()">
+            Supprimer la sélection
+          </button>
+        </div>
+      </div>
+
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button
+          class="pagination-btn"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1 || isLoading"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="15,18 9,12 15,6" />
+          </svg>
+          Précédent
+        </button>
+
+        <div class="pagination-numbers">
+          <button
+            *ngFor="let page of visiblePages"
+            class="pagination-number"
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)"
+            [disabled]="isLoading"
+          >
+            {{ page }}
+          </button>
+        </div>
+
+        <button
+          class="pagination-btn"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages || isLoading"
+        >
+          Suivant
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="9,18 15,12 9,6" />
+          </svg>
+        </button>
       </div>
     </div>
+  </section>
+  <!-- Ajouter après la section table-section -->
 
-    <!-- Catégorie 4 -->
-    <div class="category-card" [class.active]="currentCategory === 'templates'" (click)="selectCategory('templates')">
-      <div class="category-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
+  <!-- Modal pour ajouter/modifier un utilisateur -->
+  <div class="modal-overlay" *ngIf="showUserModal" (click)="closeUserModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          {{ isEditMode ? "Modifier l'utilisateur" : "Nouvel utilisateur" }}
+        </h2>
+        <button class="modal-close" (click)="closeUserModal()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
-      <div class="category-content">
-        <h3>Modèles et Templates</h3>
-        <p>Modèles de rapports, politiques de sécurité et documents standards.</p>
-        <span class="item-count">18 modèles</span>
+
+      <form class="user-form" (ngSubmit)="onSubmitUser()" #userForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Nom complet *</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              [(ngModel)]="userFormData.name"
+              required
+              #nameField="ngModel"
+              placeholder="Entrez le nom complet"
+              [class.error]="
+                nameField.invalid && (nameField.dirty || nameField.touched)
+              "
+            />
+            <div
+              class="error-message"
+              *ngIf="
+                nameField.invalid && (nameField.dirty || nameField.touched)
+              "
+            >
+              <span *ngIf="nameField.errors?.['required']"
+                >Le nom est obligatoire</span
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Adresse email *</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="userFormData.email"
+              required
+              email
+              #emailField="ngModel"
+              placeholder="exemple@domaine.com"
+              [class.error]="
+                emailField.invalid && (emailField.dirty || emailField.touched)
+              "
+            />
+            <div
+              class="error-message"
+              *ngIf="
+                emailField.invalid && (emailField.dirty || emailField.touched)
+              "
+            >
+              <span *ngIf="emailField.errors?.['required']"
+                >L'email est obligatoire</span
+              >
+              <span *ngIf="emailField.errors?.['email']"
+                >Format d'email invalide</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row" *ngIf="!isEditMode">
+          <div class="form-group" *ngIf="!isEditMode">
+            <label for="password">Mot de passe *</label>
+            <div class="password-input">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                name="password"
+                [(ngModel)]="userFormData.password"
+                required
+                minlength="8"
+                #passwordField="ngModel"
+                placeholder="Minimum 8 caractères"
+                [class.error]="
+                  passwordField.invalid &&
+                  (passwordField.dirty || passwordField.touched)
+                "
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePasswordVisibility()"
+              >
+                <svg
+                  *ngIf="!showPassword"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <svg
+                  *ngIf="showPassword"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                  <path
+                    d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"
+                  />
+                  <path
+                    d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"
+                  />
+                  <line x1="2" y1="2" x2="22" y2="22" />
+                </svg>
+              </button>
+            </div>
+            <div
+              class="error-message"
+              *ngIf="
+                passwordField.invalid &&
+                (passwordField.dirty || passwordField.touched)
+              "
+            >
+              <span *ngIf="passwordField.errors?.['required']"
+                >Le mot de passe est obligatoire</span
+              >
+              <span *ngIf="passwordField.errors?.['minlength']"
+                >Le mot de passe doit contenir au moins 8 caractères</span
+              >
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirmer le mot de passe *</label>
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              id="confirmPassword"
+              name="confirmPassword"
+              [(ngModel)]="userFormData.confirmPassword"
+              required
+              #confirmPasswordField="ngModel"
+              placeholder="Confirmer le mot de passe"
+              [class.error]="
+                (confirmPasswordField.invalid &&
+                  (confirmPasswordField.dirty ||
+                    confirmPasswordField.touched)) ||
+                passwordMismatch
+              "
+            />
+            <div
+              class="error-message"
+              *ngIf="
+                (confirmPasswordField.invalid &&
+                  (confirmPasswordField.dirty ||
+                    confirmPasswordField.touched)) ||
+                passwordMismatch
+              "
+            >
+              <span *ngIf="confirmPasswordField.errors?.['required']"
+                >La confirmation est obligatoire</span
+              >
+              <span *ngIf="passwordMismatch"
+                >Les mots de passe ne correspondent pas</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="role">Rôle *</label>
+            <select
+              id="role"
+              name="role"
+              [(ngModel)]="userFormData.role"
+              required
+              #roleField="ngModel"
+              [class.error]="
+                roleField.invalid && (roleField.dirty || roleField.touched)
+              "
+            >
+              <option value="">Sélectionner un rôle</option>
+              <option value="admin">Administrateur</option>
+              <option value="formateur">Formateur</option>
+              <option value="apprenant">Apprenant</option>
+            </select>
+            <div
+              class="error-message"
+              *ngIf="
+                roleField.invalid && (roleField.dirty || roleField.touched)
+              "
+            >
+              <span *ngIf="roleField.errors?.['required']"
+                >Le rôle est obligatoire</span
+              >
+            </div>
+          </div>
+
+          <!-- <div class="form-group" *ngIf="!isEditMode">
+            <div class="form-group">
+              <label for="phone">Téléphone</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                [(ngModel)]="userFormData.phone"
+                placeholder="+221 77 230 45 67"
+              />
+            </div>
+          </div> -->
+        </div>
+
+        <!-- Section additionnelle pour les informations optionnelles -->
+        <!-- <div class="form-section">
+          <h3>Informations complémentaires</h3>
+
+          <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea
+              id="notes"
+              name="notes"
+              [(ngModel)]="userFormData.notes"
+              rows="3"
+              placeholder="Notes ou commentaires additionnels..."
+            ></textarea>
+          </div>
+        </div> -->
+
+        <!-- Message d'erreur général -->
+        <div class="form-error" *ngIf="formError">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+          </svg>
+          {{ formError }}
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="closeUserModal()"
+            [disabled]="isSubmitting"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="userForm.invalid || isSubmitting || passwordMismatch"
+          >
+            <span *ngIf="isSubmitting" class="button-spinner"></span>
+            {{ isEditMode ? "Mettre à jour" : "Créer l'utilisateur" }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Modal de détails utilisateur -->
+  <div
+    class="modal-overlay"
+    *ngIf="showUserDetailsModal"
+    (click)="closeUserDetailsModal()"
+  >
+    <div
+      class="modal-container details-modal"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <h2>Détails de l'utilisateur</h2>
+        <button class="modal-close" (click)="closeUserDetailsModal()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="user-details" *ngIf="selectedUserDetails">
+        <!-- En-tête profil utilisateur -->
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <img
+              [src]="selectedUserDetails.avatar"
+              [alt]="selectedUserDetails.name"
+            />
+            <div
+              class="status-indicator"
+              [class]="getStatusClass(selectedUserDetails.status)"
+            ></div>
+          </div>
+          <div class="profile-info">
+            <h3>{{ selectedUserDetails.name }}</h3>
+            <p class="user-email">{{ selectedUserDetails.email }}</p>
+            <div class="user-badges">
+              <span
+                class="role-badge"
+                [ngClass]="getRoleClass(selectedUserDetails.role)"
+              >
+                {{ getRoleText(selectedUserDetails.role) }}
+              </span>
+              <span
+                class="status-badge"
+                [ngClass]="getStatusClass(selectedUserDetails.status)"
+              >
+                <span class="status-dot"></span>
+                {{ getStatusText(selectedUserDetails.status) }}
+              </span>
+              <span
+                *ngIf="!selectedUserDetails.email_verified_at"
+                class="verification-badge unverified"
+              >
+                Email non vérifié
+              </span>
+              <span
+                *ngIf="selectedUserDetails.email_verified_at"
+                class="verification-badge verified"
+              >
+                Email vérifié
+              </span>
+            </div>
+          </div>
+          <div class="profile-actions">
+            <button
+              class="action-btn edit-btn"
+              (click)="editUserFromDetails()"
+              title="Modifier"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M12 20h9" />
+                <path
+                  d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+                />
+              </svg>
+              Modifier
+            </button>
+          </div>
+        </div>
+
+        <!-- Informations générales -->
+        <div class="details-section">
+          <div class="section-header">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <h4>Informations générales</h4>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>ID Utilisateur</label>
+              <span>#{{ selectedUserDetails.id }}</span>
+            </div>
+            <div class="info-item">
+              <label>Département</label>
+              <span>{{ selectedUserDetails.department || "Non défini" }}</span>
+            </div>
+            <div class="info-item">
+              <label>Téléphone</label>
+              <span>{{ selectedUserDetails.phone || "Non renseigné" }}</span>
+            </div>
+            <div class="info-item">
+              <label>Date d'inscription</label>
+              <span>{{
+                selectedUserDetails.created_at | date : "dd/MM/yyyy à HH:mm"
+              }}</span>
+            </div>
+            <div class="info-item">
+              <label>Dernière mise à jour</label>
+              <span>{{
+                selectedUserDetails.updated_at | date : "dd/MM/yyyy à HH:mm"
+              }}</span>
+            </div>
+            <div
+              class="info-item"
+              *ngIf="selectedUserDetails.email_verified_at"
+            >
+              <label>Email vérifié le</label>
+              <span>{{
+                selectedUserDetails.email_verified_at
+                  | date : "dd/MM/yyyy à HH:mm"
+              }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progression des cours (si apprenant) -->
+        <div
+          class="details-section"
+          *ngIf="selectedUserDetails.role === 'apprenant'"
+        >
+          <div class="section-header">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            <h4>Progression des formations</h4>
+          </div>
+
+          <div
+            class="progress-overview"
+            *ngIf="
+              getUserCourseCount(selectedUserDetails) > 0;
+              else noCoursesTemplate
+            "
+          >
+            <div class="progress-stats">
+              <div class="stat-item">
+                <span class="stat-value">{{
+                  getUserCourseCount(selectedUserDetails)
+                }}</span>
+                <span class="stat-label">Cours inscrit(s)</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value"
+                  >{{ getUserProgress(selectedUserDetails) }}%</span
+                >
+                <span class="stat-label">Progression moyenne</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">{{
+                  getCompletedCoursesCount(selectedUserDetails)
+                }}</span>
+                <span class="stat-label">Cours terminé(s)</span>
+              </div>
+            </div>
+
+            <div class="courses-list">
+              <h5>Détail par cours</h5>
+              <div
+                class="course-item"
+                *ngFor="let progress of selectedUserDetails.course_progress"
+              >
+                <div class="course-info">
+                  <div class="course-name">
+                    Cours #{{ progress.course_id }}
+                    <span
+                      class="course-status"
+                      [class]="getCourseStatusClass(progress)"
+                    >
+                      {{ getCourseStatusText(progress) }}
+                    </span>
+                  </div>
+                  <div class="course-progress">
+                    <div class="progress-bar">
+                      <div
+                        class="progress-fill"
+                        [style.width.%]="progress.progress_percent"
+                      ></div>
+                    </div>
+                    <span class="progress-text"
+                      >{{ progress.progress_percent }}%</span
+                    >
+                  </div>
+                  <div class="course-details">
+                    <span *ngIf="progress.started_at" class="course-date">
+                      Débuté le {{ progress.started_at | date : "dd/MM/yyyy" }}
+                    </span>
+                    <span *ngIf="progress.completed_at" class="course-date">
+                      Terminé le
+                      {{ progress.completed_at | date : "dd/MM/yyyy" }}
+                    </span>
+                    <span class="lessons-count">
+                      {{ progress.completed_lessons!.length || 0 }} leçon(s)
+                      complétée(s)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noCoursesTemplate>
+            <div class="no-courses">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+              <h5>Aucun cours inscrit</h5>
+              <p>
+                Cet utilisateur n'est inscrit à aucune formation pour le moment.
+              </p>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Notes (si disponibles) -->
+        <div class="details-section" *ngIf="selectedUserDetails.notes">
+          <div class="section-header">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+              />
+              <polyline points="14,2 14,8 20,8" />
+            </svg>
+            <h4>Notes</h4>
+          </div>
+          <div class="notes-content">
+            <p>{{ selectedUserDetails.notes }}</p>
+          </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="details-section">
+          <div class="section-header">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" />
+            </svg>
+            <h4>Actions rapides</h4>
+          </div>
+          <div class="quick-actions">
+            <button
+              class="quick-action-btn"
+              (click)="resetPasswordFromDetails()"
+              title="Réinitialiser le mot de passe"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <circle cx="12" cy="16" r="1" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              Réinitialiser mot de passe
+            </button>
+
+            <button
+              class="quick-action-btn"
+              (click)="toggleUserStatusFromDetails()"
+              title="Changer le statut"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M8 12l2 2 4-4" />
+              </svg>
+              {{
+                selectedUserDetails.status === "active"
+                  ? "Désactiver"
+                  : "Activer"
+              }}
+            </button>
+
+            <!-- <button
+              class="quick-action-btn"
+              (click)="sendWelcomeEmailFromDetails()"
+              title="Envoyer email de bienvenue"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              Envoyer email de bienvenue
+            </button> -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="resource-grid">
-    <h2>Ressources en Vedette</h2>
-    <div class="resources-list">
-      <!-- Resource 1 -->
-      <div class="resource-card">
-        <div class="resource-image">
-          <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop" alt="Guide de Sécurité des Réseaux">
-        </div>
-        <div class="resource-content">
-          <h3>Guide Complet de Sécurité des Réseaux</h3>
-          <p>Apprenez à sécuriser vos réseaux avec ce guide détaillé.</p>
-          <div class="resource-meta">
-            <span class="category">Article</span>
-            <span class="duration">30 minutes</span>
+  <!-- Styles CSS pour le modal de détails -->
+  <style>
+    .details-modal {
+      max-width: 900px;
+      max-height: 90vh;
+    }
+
+    .user-details {
+      padding: 0;
+      max-height: calc(90vh - 80px);
+      overflow-y: auto;
+    }
+
+    /* En-tête profil */
+    .profile-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 32px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .profile-avatar {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .profile-avatar img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-indicator {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 3px solid white;
+    }
+
+    .status-indicator.status-active {
+      background-color: #28a745;
+    }
+
+    .status-indicator.status-inactive {
+      background-color: #dc3545;
+    }
+
+    .status-indicator.status-blocked {
+      background-color: #6c757d;
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-info h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #212529;
+    }
+
+    .user-email {
+      margin: 0 0 16px 0;
+      color: #6c757d;
+      font-size: 1rem;
+    }
+
+    .user-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .verification-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .verification-badge.verified {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .verification-badge.unverified {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .profile-actions {
+      flex-shrink: 0;
+    }
+
+    /* Sections de détails */
+    .details-section {
+      padding: 32px;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .details-section:last-child {
+      border-bottom: none;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .section-header svg {
+      color: #667eea;
+    }
+
+    .section-header h4 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .info-item label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-item span {
+      font-size: 1rem;
+      color: #212529;
+    }
+
+    /* Progression des cours */
+    .progress-overview h5 {
+      margin: 0 0 16px 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .progress-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #667eea;
+      line-height: 1;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-top: 4px;
+    }
+
+    .courses-list {
+      margin-top: 24px;
+    }
+
+    .course-item {
+      padding: 20px;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      background: white;
+    }
+
+    .course-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .course-name {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .course-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .course-status.completed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .course-status.in-progress {
+      background-color: #cce7ff;
+      color: #0056b3;
+    }
+
+    .course-status.not-started {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .course-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .course-progress .progress-bar {
+      flex: 1;
+      height: 8px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .course-progress .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #28a745, #20c997);
+      transition: width 0.3s ease;
+    }
+
+    .course-progress .progress-text {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #495057;
+      min-width: 40px;
+    }
+
+    .course-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 0.875rem;
+      color: #6c757d;
+    }
+
+    /* État vide pour les cours */
+    .no-courses {
+      text-align: center;
+      padding: 48px 24px;
+      color: #6c757d;
+    }
+
+    .no-courses svg {
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .no-courses h5 {
+      margin: 0 0 8px 0;
+      font-size: 1.1rem;
+      color: #495057;
+    }
+
+    .no-courses p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    /* Notes */
+    .notes-content {
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .notes-content p {
+      margin: 0;
+      line-height: 1.6;
+      color: #495057;
+    }
+
+    /* Actions rapides */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .quick-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      color: #495057;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .quick-action-btn:hover {
+      background: #e9ecef;
+      border-color: #dee2e6;
+      transform: translateY(-1px);
+    }
+
+    .quick-action-btn svg {
+      flex-shrink: 0;
+    }
+
+    /* Styles responsifs */
+    @media (max-width: 768px) {
+      .profile-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+      }
+
+      .details-section {
+        padding: 24px 20px;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .progress-stats {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 16px;
+        padding: 20px;
+      }
+
+      .course-details {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .quick-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <!-- Styles CSS pour le modal et le formulaire -->
+  <style>
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow: hidden;
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: between;
+      padding: 24px 32px;
+      border-bottom: 1px solid #e9ecef;
+      background: linear-gradient(135deg, #667eea 1000%, #764ba2 0%);
+      color: white;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .user-form {
+      padding: 32px;
+      max-height: calc(90vh - 80px);
+      overflow-y: auto;
+    }
+
+    .form-section {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .form-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .form-section h3 {
+      margin: 0 0 20px 0;
+      color: #495057;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #495057;
+      font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 12px 16px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      background: #fff;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group input.error,
+    .form-group select.error {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+
+    .password-input {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-input input {
+      flex: 1;
+      padding-right: 50px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #6c757d;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: color 0.2s ease;
+    }
+
+    .password-toggle:hover {
+      color: #495057;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .error-message {
+      margin-top: 6px;
+      font-size: 0.85rem;
+      color: #dc3545;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .form-error {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .button-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+
+    /* Styles responsifs */
+    @media (max-width: 768px) {
+      .modal-container {
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+      }
+
+      .modal-header {
+        padding: 20px 24px;
+      }
+
+      .user-form {
+        padding: 24px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .form-actions button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .modal-overlay {
+        padding: 10px;
+      }
+
+      .modal-header {
+        padding: 16px 20px;
+      }
+
+      .modal-header h2 {
+        font-size: 1.25rem;
+      }
+
+      .user-form {
+        padding: 20px;
+      }
+    }
+  </style>
+</div>
+
+<style>
+  /* Styles pour les nouvelles fonctionnalités */
+  .error-message {
+    background-color: #fee;
+    color: #c33;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .loading-indicator {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .email-unverified {
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    color: #f39c12;
+  }
+
+  .progress-info {
+    min-width: 120px;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background-color: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+  }
+
+  .no-progress {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.875rem;
+  }
+
+  .created-date {
+    color: #6c757d;
+    font-size: 0.875rem;
+  }
+
+  /* Styles des rôles adaptés */
+  .role-admin {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .role-manager {
+    background-color: #fd7e14;
+    color: white;
+  }
+
+  .role-user {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  /* Styles des badges de rôle et statut */
+  .role-badge,
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  .status-active {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  .status-active .status-dot {
+    background-color: #28a745;
+  }
+
+  .status-inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  .status-inactive .status-dot {
+    background-color: #dc3545;
+  }
+
+  .status-blocked {
+    background-color: #f1f3f4;
+    color: #5f6368;
+  }
+
+  .status-blocked .status-dot {
+    background-color: #6c757d;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+
+  /* Styles responsifs améliorés */
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .search-filters {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .users-table {
+      font-size: 0.875rem;
+    }
+
+    .user-info {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+    }
+
+    .progress-info {
+      min-width: auto;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .header-actions {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .users-table {
+      min-width: 800px;
+    }
+  }
+</style>
+<!-- Modal de progression détaillée -->
+<div
+  class="modal-overlay"
+  *ngIf="showProgressModal"
+  (click)="closeProgressModal()"
+>
+  <div
+    class="modal-container progress-modal"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal-header">
+      <h2>Progression Détaillée - {{ selectedUserForProgress?.name }}</h2>
+      <button class="modal-close" (click)="closeProgressModal()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="progress-content" *ngIf="selectedUserForProgress">
+      <!-- Résumé général -->
+      <div class="progress-summary">
+        <div class="summary-stats">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">{{
+                getUserCourseCount(selectedUserForProgress)
+              }}</span>
+              <span class="stat-label">Cours Inscrits</span>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12,6 12,12 16,14" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number"
+                >{{ getUserProgress(selectedUserForProgress) }}%</span
+              >
+              <span class="stat-label">Progression Moyenne</span>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22,4 12,14.01 9,11.01" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">{{
+                getCompletedCoursesCount(selectedUserForProgress)
+              }}</span>
+              <span class="stat-label">Cours Terminés</span>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">{{
+                getInProgressCoursesCount(selectedUserForProgress)
+              }}</span>
+              <span class="stat-label">Cours En Cours</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Resource 2 -->
-      <div class="resource-card">
-        <div class="resource-image">
-          <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop" alt="Introduction au Test d'Intrusion">
-        </div>
-        <div class="resource-content">
-          <h3>Introduction au Test d'Intrusion</h3>
-          <p>Découvrez les bases du test d'intrusion éthique.</p>
-          <div class="resource-meta">
-            <span class="category">Vidéo</span>
-            <span class="duration">45 minutes</span>
+      <!-- Liste des cours avec pagination -->
+      <div class="courses-section">
+        <div class="section-header">
+          <h3>Détail des Cours</h3>
+          <div class="course-filters">
+            <select
+              [(ngModel)]="progressFilter"
+              (change)="filterProgressData()"
+            >
+              <option value="">Tous les cours</option>
+              <option value="completed">Terminés</option>
+              <option value="in-progress">En cours</option>
+              <option value="not-started">Non commencés</option>
+            </select>
           </div>
         </div>
-      </div>
 
-      <!-- Resource 3 -->
-      <div class="resource-card">
-        <div class="resource-image">
-          <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop" alt="Kit d'Outils de Sécurité">
-        </div>
-        <div class="resource-content">
-          <h3>Kit d'Outils de Sécurité</h3>
-          <p>Collection d'outils essentiels pour la cybersécurité.</p>
-          <div class="resource-meta">
-            <span class="category">Outils</span>
-            <span class="duration">5 outils</span>
+        <div
+          class="courses-list"
+          *ngIf="paginatedProgressData.length > 0; else noProgressData"
+        >
+          <div
+            class="course-card"
+            *ngFor="let progress of paginatedProgressData"
+          >
+            <div class="course-header">
+              <div class="course-title">
+                <h4>Cours #{{ progress.course_id }}</h4>
+                <span
+                  class="course-status-badge"
+                  [ngClass]="getCourseStatusClass(progress)"
+                >
+                  {{ getCourseStatusText(progress) }}
+                </span>
+              </div>
+              <div class="course-progress-info">
+                <span class="progress-percentage"
+                  >{{ progress.progress_percent }}%</span
+                >
+              </div>
+            </div>
+
+            <div class="course-progress-bar">
+              <div class="progress-track">
+                <div
+                  class="progress-fill"
+                  [style.width.%]="progress.progress_percent"
+                ></div>
+              </div>
+            </div>
+
+            <div class="course-details-grid">
+              <div class="detail-item" *ngIf="progress.started_at">
+                <label>Date de début :</label>
+                <span>{{
+                  progress.started_at | date : "dd/MM/yyyy à HH:mm"
+                }}</span>
+              </div>
+
+              <div class="detail-item" *ngIf="progress.completed_at">
+                <label>Date de fin :</label>
+                <span>{{
+                  progress.completed_at | date : "dd/MM/yyyy à HH:mm"
+                }}</span>
+              </div>
+
+              <div class="detail-item">
+                <label>Leçons complétées :</label>
+                <span>{{ getCompletedLessonsCount(progress) }} leçon(s)</span>
+              </div>
+
+              <div class="detail-item" *ngIf="progress.current_lesson_id">
+                <label>Leçon actuelle :</label>
+                <span>Leçon #{{ progress.current_lesson_id }}</span>
+              </div>
+            </div>
+
+            <!-- Détails des leçons complétées -->
+            <div
+              class="lessons-section"
+              *ngIf="
+                progress.completed_lessons &&
+                progress.completed_lessons.length > 0
+              "
+            >
+              <div class="lessons-header">
+                <button
+                  class="toggle-lessons"
+                  (click)="toggleLessonsDetails(progress.id)"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline
+                      [attr.points]="
+                        progress.showLessons
+                          ? '6 9 12 15 18 9'
+                          : '9 18 15 12 9 6'
+                      "
+                    />
+                  </svg>
+                  Voir les leçons complétées ({{
+                    progress.completed_lessons.length
+                  }})
+                </button>
+              </div>
+
+              <div class="lessons-list" *ngIf="progress.showLessons">
+                <div
+                  class="lesson-item"
+                  *ngFor="let lessonId of progress.completed_lessons"
+                >
+                  <div class="lesson-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polyline points="9 11 12 14 22 4" />
+                      <path
+                        d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+                      />
+                    </svg>
+                  </div>
+                  <span>Leçon #{{ lessonId }}</span>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+
+        <ng-template #noProgressData>
+          <div class="no-progress-data">
+            <div class="empty-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="64"
+                height="64"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            </div>
+            <h4>Aucune donnée de progression</h4>
+            <p>
+              Cet utilisateur n'a pas encore commencé de cours correspondant aux
+              filtres sélectionnés.
+            </p>
+          </div>
+        </ng-template>
+
+        <!-- Pagination pour les cours -->
+        <div class="progress-pagination" *ngIf="totalProgressPages > 1">
+          <button
+            class="pagination-btn"
+            (click)="previousProgressPage()"
+            [disabled]="currentProgressPage === 1"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="15,18 9,12 15,6" />
+            </svg>
+            Précédent
+          </button>
+
+          <div class="pagination-info">
+            <span
+              >Page {{ currentProgressPage }} sur {{ totalProgressPages }}</span
+            >
+            <span class="items-info"
+              >({{ filteredProgressData.length }} cours au total)</span
+            >
+          </div>
+
+          <button
+            class="pagination-btn"
+            (click)="nextProgressPage()"
+            [disabled]="currentProgressPage === totalProgressPages"
+          >
+            Suivant
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="9,18 15,12 9,6" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="cta-section">
-    <h2>Prêt à Explorer les Ressources ?</h2>
-    <p>Découvrez nos ressources exclusives pour approfondir vos connaissances en cybersécurité.</p>
-    <button class="primary-btn">Explorer les Ressources</button>
   </div>
 </div>
+
+<style>
+  .progress-modal {
+    max-width: 1000px;
+    max-height: 90vh;
+  }
+
+  .progress-content {
+    padding: 0;
+    max-height: calc(90vh - 80px);
+    overflow-y: auto;
+  }
+
+  /* Résumé général */
+  .progress-summary {
+    padding: 32px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .stat-info {
+    flex: 1;
+  }
+
+  .stat-number {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #212529;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 4px;
+  }
+
+  /* Section des cours */
+  .courses-section {
+    padding: 32px;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .section-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #495057;
+  }
+
+  .course-filters select {
+    padding: 8px 12px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.875rem;
+  }
+
+  /* Cartes de cours */
+  .courses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .course-card {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 24px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .course-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .course-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .course-title h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
+  }
+
+  .course-status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .course-status-badge.completed {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  .course-status-badge.in-progress {
+    background-color: #cce7ff;
+    color: #0056b3;
+  }
+
+  .course-status-badge.not-started {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  .course-progress-info {
+    text-align: right;
+  }
+
+  .progress-percentage {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #667eea;
+  }
+
+  .course-progress-bar {
+    margin-bottom: 20px;
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 12px;
+    background-color: #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+  }
+
+  .course-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .detail-item label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .detail-item span {
+    font-size: 0.95rem;
+    color: #212529;
+  }
+
+  /* Section des leçons */
+  .lessons-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .toggle-lessons {
+    background: none;
+    border: 1px solid #e9ecef;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #495057;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .toggle-lessons:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+  }
+
+  .lessons-list {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+  }
+
+  .lesson-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 0.875rem;
+  }
+
+  .lesson-icon {
+    color: #28a745;
+    flex-shrink: 0;
+  }
+
+  /* État vide */
+  .no-progress-data {
+    text-align: center;
+    padding: 48px 24px;
+    color: #6c757d;
+  }
+
+  .empty-icon {
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .no-progress-data h4 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    color: #495057;
+  }
+
+  .no-progress-data p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  /* Pagination */
+  .progress-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .pagination-info {
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.875rem;
+  }
+
+  .items-info {
+    display: block;
+    font-size: 0.75rem;
+    margin-top: 2px;
+  }
+
+  .pagination-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    color: #495057;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .pagination-btn:not(:disabled):hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+  }
+
+  .pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Styles responsifs */
+  @media (max-width: 768px) {
+    .progress-modal {
+      margin: 10px;
+      max-height: calc(100vh - 20px);
+    }
+
+    .progress-summary,
+    .courses-section {
+      padding: 24px 20px;
+    }
+
+    .summary-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .stat-item {
+      padding: 16px;
+    }
+
+    .course-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .course-details-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .lessons-list {
+      grid-template-columns: 1fr;
+    }
+
+    .progress-pagination {
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .summary-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .course-card {
+      padding: 20px;
+    }
+
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+  }
+</style>

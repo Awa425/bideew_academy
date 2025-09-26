@@ -8,6 +8,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Course, Lessons, Quiz } from '../models/course.model';
 import { envVars } from 'environments/environments';
+import { finalize } from 'rxjs';
 
 interface QuizSubmission {
   quiz_id: number;
@@ -32,12 +33,9 @@ export class CourseService {
     }
   }
 
-  private logResponse(response: any): void {
-  }
+  private logResponse(response: any): void {}
 
-  private logError(error: any, context: string = ''): void {
-  
-  }
+  private logError(error: any, context: string = ''): void {}
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'Une erreur est survenue';
@@ -67,7 +65,6 @@ export class CourseService {
   }
 
   updateCourse(id: number, formData: FormData): Observable<any> {
-
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
@@ -121,6 +118,7 @@ export class CourseService {
       }
     );
   }
+
   getRessourceByID(lesson_id: number): any {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -294,6 +292,39 @@ export class CourseService {
             ),
         }),
         catchError((error: HttpErrorResponse) => this.handleError(error))
+      );
+  }
+
+  private getDefaultHeaders(): HttpHeaders {
+    const token = localStorage.getItem('access_token');
+    return new HttpHeaders({
+      Accept: 'application/json',
+      'Cache-Control': 'no-cache',
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  deleteCourse(courseId: string): Observable<{ message: string }> {
+    const url = `${envVars.apiBaseUrl}/courses/${courseId}`;
+    this.logRequest(url, 'DELETE');
+
+    return this.http
+      .delete<{ message: string }>(url, {
+        headers: this.getDefaultHeaders(),
+      })
+      .pipe(
+        tap((response) => this.logResponse(response)),
+        catchError((error: HttpErrorResponse) => {
+          this.logError(
+            error,
+            `Erreur lors de la suppression du cours ${courseId}`
+          );
+          return throwError(() => ({
+            status: error.status,
+            message: `Impossible de supprimer le cours ${courseId}: ${error.message}`,
+          }));
+        }),
+        finalize(() => console.log('Suppression terminée'))
       );
   }
 

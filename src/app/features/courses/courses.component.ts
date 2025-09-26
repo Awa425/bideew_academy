@@ -20,7 +20,7 @@ export class CoursesComponent implements OnInit {
   searchQuery: string = '';
   currentPage = 1;
   lastPage = 1;
-  itemsPerPage: number = 8; 
+  itemsPerPage: number = 8;
   totalItems: number = 0;
   userId: string | null = '';
   users: any = [];
@@ -112,23 +112,35 @@ export class CoursesComponent implements OnInit {
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.lastPage) {
-      this.loadCourses(this.users, page); 
+      this.loadCourses(this.users, page);
     }
   }
 
-  openDeleteConfirmation(course: Course): void {
-    this.courseToDelete = course;
-    this.showDeleteModal = true;
-  }
+  confirmDelete(idCour: any): void {
+  if (!this.courseToDelete) return;
 
-  closeDeleteModal(): void {
-    this.showDeleteModal = false;
-    this.courseToDelete = null;
-    this.isDeleting = false;
-  }
+  this.isDeleting = true;
+  this.courseService.deleteCourse(idCour).subscribe({
+    next: () => {
+      this.isDeleting = false;
+      this.courses = this.courses.filter(course => course.id !== idCour);
+      this.filteredCourses = this.filteredCourses.filter(course => course.id !== idCour);
+      this.closeDeleteModal();
+    },
+    error: (err) => {
+      this.isDeleting = false;
+    }
+  });
+}
 
-  confirmDelete(): void {
-    if (!this.courseToDelete) return;
-    this.isDeleting = true;
-  }
+openDeleteConfirmation(course: any): void {
+  this.courseToDelete = course;
+  this.showDeleteModal = true;
+}
+
+closeDeleteModal(): void {
+  this.courseToDelete = null;
+  this.showDeleteModal = false;
+}
+
 }

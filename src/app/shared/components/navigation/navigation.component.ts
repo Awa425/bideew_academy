@@ -14,8 +14,8 @@ export class NavigationComponent {
   menuItems = [
     { path: '/home', label: 'Accueil' },
     { path: '/courses', label: 'Cours' },
-    { path: '/learning-path', label: 'Parcours d\'Apprentissage' },
-    // { path: '/resources', label: 'Ressources' }
+    // { path: '/learning-path', label: 'Parcours d\'Apprentissage' },
+    { path: '/resources', label: 'Gestion des utilisateurs' }
   ];
 
   logout() {

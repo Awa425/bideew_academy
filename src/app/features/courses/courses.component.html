@@ -263,7 +263,7 @@
           Cette action est irréversible.
         </p>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" *ngIf="courseToDelete">
         <button
           type="button"
           class="btn btn-secondary"
@@ -275,7 +275,7 @@
         <button
           type="button"
           class="btn btn-danger"
-          (click)="confirmDelete()"
+          (click)="confirmDelete(courseToDelete.id)"
           [disabled]="isDeleting"
         >
           <span

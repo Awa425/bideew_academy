@@ -64,7 +64,21 @@ export class AuthService {
   }
 
   register(userData: any): Observable<any> {
-    return this.http.post(`${envVars.apiBaseUrl}/register`, userData);
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.post(`${envVars.apiBaseUrl}/register`, userData, {
+      headers,
+    });
+  }
+
+  updateUser(userData: any, id:any): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.put(`${envVars.apiBaseUrl}/users/${id}`, userData, {
+      headers,
+    });
   }
 
   logout(): void {
@@ -77,10 +91,17 @@ export class AuthService {
   }
 
   getUserById(id: any) {
-    const token = localStorage.getItem('access_token'); 
+    const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(`${envVars.apiBaseUrl}/users/${id}/details`, {
       headers,
+    });
+  }
+  getAllUser(params?: any) {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get(`${envVars.apiBaseUrl}/users`, {
+      headers, params
     });
   }
 
