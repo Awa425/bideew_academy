@@ -2,33 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 
-// Interface pour la réponse de l'API
-interface ApiResponse {
-  current_page: number;
-  data: ApiUser[];
-  first_page_url: string;
-  from: number;
-  last_page: number;
-  last_page_url: string;
-  links: PaginationLink[];
-  next_page_url: string | null;
-  path: string;
-  per_page: number;
-  prev_page_url: string | null;
-  to: number;
-  total: number;
-}
-
-interface PaginationLink {
-  url: string | null;
-  label: string;
-  active: boolean;
-}
-
-// Modifiez l'interface CourseProgress existante pour inclure la propriété showLessons
 interface CourseProgress {
   id: number;
   user_id: number;
@@ -40,11 +15,9 @@ interface CourseProgress {
   completed_at: string | null;
   created_at: string;
   updated_at: string;
-  // Nouvelle propriété pour gérer l'affichage des leçons
   showLessons?: boolean;
 }
 
-// Interface pour les utilisateurs de l'API
 interface ApiUser {
   id: number;
   name: string;
@@ -55,22 +28,15 @@ interface ApiUser {
   updated_at: string;
   deleted_at: string | null;
   course_progress: CourseProgress[];
-  phone?: string;
-  department?: string;
-  notes?: string;
 }
 
-// Interface pour l'affichage local
 interface User extends ApiUser {
-  status: 'active' | 'inactive' | 'blocked';
-  department: string;
   avatar?: string;
   lastLogin: Date;
   selected?: boolean;
   showDropdown?: boolean;
 }
 
-// Interface pour le formulaire utilisateur
 interface UserFormData {
   id?: number;
   name: string;
@@ -78,22 +44,16 @@ interface UserFormData {
   role: 'admin' | 'formateur' | 'apprenant' | '';
   password?: string;
   confirmPassword?: string;
-  phone?: string;
-  department?: string;
-  notes?: string;
-  sendWelcomeEmail?: boolean;
 }
 
 @Component({
-  selector: 'app-resources',
+  selector: 'app-users',
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule],
-  templateUrl: './resources.component.html',
-  styleUrls: ['./resources.component.scss'],
+  templateUrl: './users.component.html',
+  styleUrls: ['./users.component.scss'],
 })
-export class ResourcesComponent implements OnInit {
-  private apiUrl = 'http://localhost:8000/api/users';
-
+export class Users implements OnInit {
   users: User[] = [];
   filteredUsers: User[] = [];
   paginatedUsers: User[] = [];
@@ -128,13 +88,13 @@ export class ResourcesComponent implements OnInit {
   showUserDetailsModal: boolean = false;
   selectedUserDetails: User | null = null;
 
-  constructor(private http: HttpClient, private userService: AuthService) {}
+  constructor(private userService: AuthService) {}
 
   showProgressModal: boolean = false;
   selectedUserForProgress: User | null = null;
 
   currentProgressPage: number = 1;
-  progressItemsPerPage: number = 5;
+  progressItemsPerPage: number = 10;
   totalProgressPages: number = 1;
   filteredProgressData: CourseProgress[] = [];
   paginatedProgressData: CourseProgress[] = [];
@@ -147,8 +107,6 @@ export class ResourcesComponent implements OnInit {
     this.progressFilter = '';
     this.filterProgressData();
     user.showDropdown = false;
-    console.log('Progression détaillée pour:', user.name);
-    console.log('Cours en cours:', user.course_progress);
   }
 
   closeProgressModal(): void {
@@ -187,7 +145,7 @@ export class ResourcesComponent implements OnInit {
     }
 
     this.filteredProgressData = filtered;
-    this.currentProgressPage = 1; 
+    this.currentProgressPage = 1;
     this.updateProgressPagination();
   }
 
@@ -256,10 +214,6 @@ export class ResourcesComponent implements OnInit {
       role: '',
       password: '',
       confirmPassword: '',
-      phone: '',
-      department: '',
-      notes: '',
-      sendWelcomeEmail: true,
     };
   }
 
@@ -335,14 +289,9 @@ export class ResourcesComponent implements OnInit {
       role: this.userFormData.role,
       password: this.userFormData.password,
       password_confirmation: this.userFormData.confirmPassword,
-      phone: this.userFormData.phone || null,
-      department: this.userFormData.department || null,
-      notes: this.userFormData.notes || null,
-      send_welcome_email: this.userFormData.sendWelcomeEmail || false,
     };
 
     this.userService.register(userData).subscribe((dataUser: any) => {
-      console.log(dataUser);
     });
   }
 
@@ -359,7 +308,6 @@ export class ResourcesComponent implements OnInit {
     this.userService
       .updateUser(userData, userData.id)
       .subscribe((data: any) => {
-        console.log(data);
       });
   }
 
@@ -382,8 +330,6 @@ export class ResourcesComponent implements OnInit {
   viewUser(user: User): void {
     this.selectedUserDetails = { ...user };
     this.showUserDetailsModal = true;
-    console.log('Voir détails utilisateur:', user);
-    console.log('Progression des cours:', user.course_progress);
   }
 
   closeUserDetailsModal(): void {
@@ -405,17 +351,8 @@ export class ResourcesComponent implements OnInit {
     }
   }
 
-  toggleUserStatusFromDetails(): void {
-    if (this.selectedUserDetails) {
-      this.toggleUserStatus(this.selectedUserDetails);
-      this.selectedUserDetails.status =
-        this.selectedUserDetails.status === 'active' ? 'inactive' : 'active';
-    }
-  }
-
   sendWelcomeEmailFromDetails(): void {
     if (this.selectedUserDetails) {
-      this.sendWelcomeEmail(this.selectedUserDetails);
       this.closeUserDetailsModal();
     }
   }
@@ -542,18 +479,6 @@ export class ResourcesComponent implements OnInit {
     return this.apiResponse?.total || 0;
   }
 
-  get activeUsers(): number {
-    return this.users.filter((user) => user.status === 'active').length;
-  }
-
-  get inactiveUsers(): number {
-    return this.users.filter((user) => user.status === 'inactive').length;
-  }
-
-  get blockedUsers(): number {
-    return this.users.filter((user) => user.status === 'blocked').length;
-  }
-
   get totalFilteredUsers(): number {
     return this.apiResponse?.total || this.filteredUsers.length || 0;
   }
@@ -614,13 +539,6 @@ export class ResourcesComponent implements OnInit {
       if (this.selectedRole) {
         filtered = filtered.filter((user) => user.role === this.selectedRole);
       }
-
-      if (this.selectedStatus) {
-        filtered = filtered.filter(
-          (user) => user.status === this.selectedStatus
-        );
-      }
-
       this.filteredUsers = filtered;
       this.updatePagination();
     }
@@ -719,10 +637,9 @@ export class ResourcesComponent implements OnInit {
     if (
       confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur ${user.name} ?`)
     ) {
-      this.http.delete(`${this.apiUrl}/${user.id}`).subscribe({
+      this.userService.deleteUser(user.id).subscribe({
         next: () => {
-          console.log('Utilisateur supprimé:', user.name);
-          this.loadUsers(this.currentPage); 
+          this.loadUsers(this.currentPage);
         },
         error: (err) => {
           console.error('Erreur lors de la suppression:', err);
@@ -731,35 +648,6 @@ export class ResourcesComponent implements OnInit {
       });
     }
   }
-
-  deleteSelectedUsers(): void {
-    const selectedUsers = this.selectedUsers;
-    const selectedCount = selectedUsers.length;
-
-    if (selectedCount === 0) return;
-
-    if (
-      confirm(
-        `Êtes-vous sûr de vouloir supprimer ${selectedCount} utilisateur(s) ?`
-      )
-    ) {
-      const deleteRequests = selectedUsers.map((user) =>
-        this.http.delete(`${this.apiUrl}/${user.id}`)
-      );
-
-      Promise.all(deleteRequests.map((req) => req.toPromise()))
-        .then(() => {
-          console.log(`${selectedCount} utilisateur(s) supprimé(s)`);
-          this.allSelected = false;
-          this.loadUsers(this.currentPage);
-        })
-        .catch((err) => {
-          console.error('Erreur lors de la suppression:', err);
-          alert('Erreur lors de la suppression des utilisateurs');
-        });
-    }
-  }
-
   toggleDropdown(userId: number): void {
     this.users.forEach((user) => {
       if (user.id === userId) {
@@ -771,68 +659,20 @@ export class ResourcesComponent implements OnInit {
   }
 
   resetPassword(user: User): void {
-    console.log('Réinitialiser mot de passe pour:', user.name);
     user.showDropdown = false;
 
-    this.http.post(`${this.apiUrl}/${user.id}/reset-password`, {}).subscribe({
+    const userData: any = {
+      password: 'bideew',
+      password_confirmation: 'bideew',
+    };
+
+    this.userService.updatePasswordUser(userData, user.id).subscribe({
       next: () => {
         alert(`Email de réinitialisation envoyé à ${user.email}`);
       },
       error: (err) => {
         console.error('Erreur:', err);
         alert("Erreur lors de l'envoi de l'email");
-      },
-    });
-  }
-
-  toggleUserStatus(user: User): void {
-    const newStatus = user.status === 'active' ? 'inactive' : 'active';
-    user.showDropdown = false;
-
-    this.http
-      .patch(`${this.apiUrl}/${user.id}`, { status: newStatus })
-      .subscribe({
-        next: () => {
-          user.status = newStatus;
-          console.log(`Statut de ${user.name} changé vers:`, newStatus);
-        },
-        error: (err) => {
-          console.error('Erreur lors du changement de statut:', err);
-          alert('Erreur lors du changement de statut');
-        },
-      });
-  }
-
-  sendWelcomeEmail(user: User): void {
-    console.log('Envoyer email de bienvenue à :', user.name);
-    user.showDropdown = false;
-
-    this.http.post(`${this.apiUrl}/${user.id}/welcome-email`, {}).subscribe({
-      next: () => {
-        alert(`Email de bienvenue envoyé à ${user.email}`);
-      },
-      error: (err) => {
-        console.error('Erreur:', err);
-        alert("Erreur lors de l'envoi de l'email");
-      },
-    });
-  }
-
-  exportUsers(): void {
-    console.log('Exporter la liste des utilisateurs');
-
-    this.http.get(`${this.apiUrl}/export`, { responseType: 'blob' }).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'utilisateurs.xlsx';
-        a.click();
-        window.URL.revokeObjectURL(url);
-      },
-      error: (err) => {
-        console.error("Erreur lors de l'export:", err);
-        alert("Erreur lors de l'export");
       },
     });
   }
@@ -892,21 +732,5 @@ export class ResourcesComponent implements OnInit {
 
   getUserCourseCount(user: User): number {
     return user.course_progress ? user.course_progress.length : 0;
-  }
-
-  private handleError(error: any, action: string): void {
-    console.error(`Erreur lors de ${action}:`, error);
-
-    if (error.status === 401) {
-      this.error = 'Session expirée. Veuillez vous reconnecter.';
-    } else if (error.status === 403) {
-      this.error = "Vous n'avez pas les permissions nécessaires.";
-    } else if (error.status === 404) {
-      this.error = 'Ressource non trouvée.';
-    } else if (error.status === 500) {
-      this.error = 'Erreur serveur. Veuillez réessayer plus tard.';
-    } else {
-      this.error = error.message || `Erreur lors de ${action}`;
-    }
   }
 }

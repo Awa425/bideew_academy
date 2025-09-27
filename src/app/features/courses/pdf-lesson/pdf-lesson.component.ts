@@ -4,6 +4,7 @@ import { CourseService } from '../../../core/services/course.service';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { envVars } from 'environments/environments';
 
 @Component({
   selector: 'app-pdf-lesson',
@@ -38,7 +39,7 @@ export class PdfLessonComponent {
       next: (lesson: any) => {
         const fullContent = lesson.contents?.[0]?.file_path || '';
         const rawParagraphs: string = fullContent;
-        this.pdf = 'http://localhost:8000/api/' + rawParagraphs;
+        this.pdf = `${envVars.apiBaseUrl}` + rawParagraphs;
         this.lessons = lesson;
         console.log(this.pdf);
       },

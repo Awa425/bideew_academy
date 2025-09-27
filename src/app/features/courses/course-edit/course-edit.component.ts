@@ -9,6 +9,7 @@ import {
 import { CourseService } from '../../../core/services/course.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { NgFor, NgIf } from '@angular/common';
+import { envVars } from 'environments/environments';
 
 @Component({
   selector: 'app-course-edit',
@@ -99,7 +100,8 @@ export class CourseEditComponent implements OnInit {
         this.populateForm(course);
         this.isLoading = false;
         if (course.image_path) {
-          this.imagePreview = `http://localhost:8000/${course.image_path}`;
+          // this.imagePreview = `http://localhost:8000/${course.image_path}`;
+          this.imagePreview = `${envVars.apiBaseUrl}.'/'.${course.image_path}`;
         } else {
           this.imagePreview = null;
         }

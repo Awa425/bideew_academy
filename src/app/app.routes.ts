@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
 import { LearningPathComponent } from './features/learning-path/learning-path.component';
-import { ResourcesComponent } from './features/resources/resources.component';
+import { Users } from './features/users/users.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { AuthGuard } from './core/guards/auth.guard';
@@ -34,8 +34,8 @@ export const routes: Routes = [
         component: LearningPathComponent,
       },
       {
-        path: 'resources',
-        component: ResourcesComponent,
+        path: 'users',
+        component: Users,
       },
     ],
   },

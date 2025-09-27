@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -14,8 +14,8 @@ export class NavigationComponent {
   menuItems = [
     { path: '/home', label: 'Accueil' },
     { path: '/courses', label: 'Cours' },
-    // { path: '/learning-path', label: 'Parcours d\'Apprentissage' },
-    { path: '/resources', label: 'Gestion des utilisateurs' }
+    { path: '/learning-path', label: 'Parcours d\'Apprentissage' },
+    { path: '/users', label: 'Gestion des utilisateurs' }
   ];
 
   logout() {

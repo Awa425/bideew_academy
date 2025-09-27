@@ -4,6 +4,7 @@ import { CourseService } from '../../../core/services/course.service';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { envVars } from 'environments/environments';
 
 @Component({
   selector: 'app-video-lesson',
@@ -50,7 +51,7 @@ export class VideoLessonComponent implements OnInit {
         const fullContent = lesson.contents?.[0]?.file_path || '';
         const rawParagraphs: string = fullContent;
         
-        this.video_teste = 'http://localhost:8000/api/' + rawParagraphs;
+        this.video_teste = `${envVars.apiBaseUrl}` + rawParagraphs;
         console.log(lesson);
         this.lessons = lesson;
         

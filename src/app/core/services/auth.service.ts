@@ -72,7 +72,16 @@ export class AuthService {
     });
   }
 
-  updateUser(userData: any, id:any): Observable<any> {
+  updateUser(userData: any, id: any): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.put(`${envVars.apiBaseUrl}/users/${id}`, userData, {
+      headers,
+    });
+  }
+
+  updatePasswordUser(userData: any, id: any): Observable<any> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
@@ -97,11 +106,20 @@ export class AuthService {
       headers,
     });
   }
+
+  deleteUser(id: any) {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.delete(`${envVars.apiBaseUrl}/users/${id}`, {
+      headers,
+    });
+  }
   getAllUser(params?: any) {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(`${envVars.apiBaseUrl}/users`, {
-      headers, params
+      headers,
+      params,
     });
   }
 
