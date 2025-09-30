@@ -17,6 +17,7 @@ import { FormsModule } from '@angular/forms';
 import { Course, Lessons } from '../../../core/models/course.model';
 import { CourseService } from '../../../core/services/course.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { envVars } from 'environments/environments';
 
 interface VideoConfig {
   src: string;
@@ -67,6 +68,7 @@ export class CourseDetailComponent implements OnInit {
   showLessonContent = false;
   userId: string | null = '';
   users: any = [];
+  api: string = '';
 
   controlsTimeout: any;
 
@@ -81,6 +83,7 @@ export class CourseDetailComponent implements OnInit {
   ngOnInit(): void {
     this.courId = this.route.snapshot.paramMap.get('id');
     this.loadCourseData(this.courId);
+    this.api = `${envVars.apiBaseUrl}`;
 
     this.userId = localStorage.getItem('user_id');
     this.authService.getUserById(this.userId).subscribe((data) => {

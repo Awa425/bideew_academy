@@ -5,6 +5,7 @@ import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CourseService } from '../../core/services/course.service';
 import { Course } from '../../core/models/course.model';
 import { AuthService } from '../../core/services/auth.service';
+import { envVars } from 'environments/environments';
 @Component({
   selector: 'app-courses',
   standalone: true,
@@ -24,6 +25,7 @@ export class CoursesComponent implements OnInit {
   totalItems: number = 0;
   userId: string | null = '';
   users: any = [];
+  api: string = '';
 
   showDeleteModal = false;
   courseToDelete: Course | null = null;
@@ -41,6 +43,7 @@ export class CoursesComponent implements OnInit {
       this.users = data;
       this.loadCourses(this.users);
     });
+    this.api = `${envVars.apiBaseUrl}`;
   }
 
   loadCourses(users: any, page: number = 1): void {

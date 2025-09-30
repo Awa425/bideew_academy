@@ -100,7 +100,6 @@ export class CourseEditComponent implements OnInit {
         this.populateForm(course);
         this.isLoading = false;
         if (course.image_path) {
-          // this.imagePreview = `http://localhost:8000/${course.image_path}`;
           this.imagePreview = `${envVars.apiBaseUrl}.'/'.${course.image_path}`;
         } else {
           this.imagePreview = null;

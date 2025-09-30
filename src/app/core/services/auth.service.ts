@@ -1,6 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, from, of } from 'rxjs';
+import { BehaviorSubject, Observable, from, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { envVars } from 'environments/environments';
@@ -8,32 +8,45 @@ import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 
 declare const google: any;
 
-interface JwtPayload {
-  sub?: string; // Standard JWT pour l'ID utilisateur
-  userId?: number; // Alternative courante
-  id?: number; // Autre alternative
-  [key: string]: any; // Index signature pour les champs dynamiques
-}
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private currentUserSubject = new BehaviorSubject<any>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
+
   constructor(
     private http: HttpClient,
     private router: Router,
     private ngZone: NgZone
   ) {
     this.loadGoogleAuthSdk();
+    this.loadUserFromStorage();
+  }
+
+  private loadUserFromStorage() {
+    try {
+      const savedUser = localStorage.getItem('user_role');
+      if (savedUser) {
+        this.currentUserSubject.next(savedUser);
+      }
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error);
+      localStorage.removeItem('user_role');
+      this.currentUserSubject.next(null);
+    }
+  }
+
+  getCurrentUser() {
+    return this.currentUserSubject.value;
   }
 
   private loadGoogleAuthSdk() {
-    // Vérifier si le script est déjà chargé
     if (
       document.querySelector(
         'script[src^="https://accounts.google.com/gsi/client"]'
       )
     ) {
-      // Déclencher l'événement personnalisé si l'API est déjà chargée
       if (typeof google !== 'undefined') {
         window.dispatchEvent(new Event('google-loaded'));
       }
@@ -45,7 +58,6 @@ export class AuthService {
     script.async = true;
     script.defer = true;
     script.onload = () => {
-      // Déclencher un événement personnalisé lorsque l'API est chargée
       window.dispatchEvent(new Event('google-loaded'));
     };
     script.onerror = (error) => {
@@ -58,9 +70,17 @@ export class AuthService {
     return this.http.post<any>(`${envVars.apiBaseUrl}/login`, credentials).pipe(
       tap((response) => {
         localStorage.setItem('access_token', response.token);
-        localStorage.setItem('user_id', response.user.id); // Supposant que la réponse contient { token, user: { id } }
+        localStorage.setItem('user_id', response.user.id); 
+        localStorage.setItem('user_role', response.user.role);
+        
+        this.currentUserSubject.next(response.user.role);
       })
     );
+  }
+
+  getUserRole(): string {
+    const user = this.getCurrentUser(); 
+    return user; 
   }
 
   register(userData: any): Observable<any> {
@@ -92,6 +112,12 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('user');
+    
+    this.currentUserSubject.next(null);
+    
     this.router.navigate(['/login']);
   }
 
@@ -114,6 +140,7 @@ export class AuthService {
       headers,
     });
   }
+
   getAllUser(params?: any) {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -132,6 +159,12 @@ export class AuthService {
           if (response.success) {
             localStorage.setItem('access_token', response.token);
             localStorage.setItem('user', JSON.stringify(response.user));
+            
+            if (response.user && response.user.role) {
+              localStorage.setItem('user_role', response.user.role);
+              localStorage.setItem('user_id', response.user.id);
+              this.currentUserSubject.next(response.user.role);
+            }
           } else {
             throw new Error(
               response.message || 'Erreur lors de la connexion avec Google'
@@ -159,20 +192,17 @@ export class AuthService {
 
   handleGoogleLogin(): void {
     try {
-      // Vérifier si l'API Google est disponible
       if (typeof google === 'undefined') {
         console.error('Google API not loaded');
         return;
       }
 
-      // Initialiser l'API Google Identity
       google.accounts.id.initialize({
         client_id:
-          '544702559305-0pj57qlosquuhhe7rh3otjdfdj3k7p1t.apps.googleusercontent.com', // À remplacer par votre ID client Google
+          '544702559305-0pj57qlosquuhhe7rh3otjdfdj3k7p1t.apps.googleusercontent.com',
         callback: (response: any) => this.handleGoogleSignIn(response),
       });
 
-      // Rendre le bouton de connexion Google
       const button = document.getElementById('google-signin-button');
       if (button) {
         google.accounts.id.renderButton(button, {
@@ -207,12 +237,10 @@ export class AuthService {
             'Erreur lors de la connexion avec Google:',
             res.message
           );
-          // Afficher un message d'erreur à l'utilisateur
         }
       },
       error: (err) => {
         console.error('Erreur lors de la connexion avec Google', err);
-        // Afficher un message d'erreur à l'utilisateur
         if (err.error && err.error.message) {
           console.error("Message d'erreur:", err.error.message);
         }

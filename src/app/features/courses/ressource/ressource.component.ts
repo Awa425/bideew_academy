@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CourseService } from '../../../core/services/course.service';
+import { envVars } from 'environments/environments';
 
 export interface Resource {
   id: number;
@@ -143,17 +144,14 @@ export class RessourceComponent implements OnInit {
   }
 
   private downloadLocalFile(filePath: string, fileName: string): void {
-    const baseUrl = 'http://localhost:8000/storage/'; // Adaptez à votre URL backend
+    const baseUrl = `${envVars.apiBaseUrl}`+'/storage/'; 
 
-    // Créer un lien temporaire pour le téléchargement
     const link = document.createElement('a');
     link.href = `${baseUrl}${filePath}`;
 
-    // Déterminer l'extension du fichier
     const fileExtension = this.getFileExtension(filePath);
     link.download = `${fileName}${fileExtension}`;
 
-    // Déclencher le téléchargement
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -167,15 +165,9 @@ export class RessourceComponent implements OnInit {
     return filePath.substring(lastDotIndex);
   }
 
-  // openExternalLink(url: string): void {
-  //   if (url) {
-  //     window.open(url, '_blank');
-  //   }
-  // }
   openExternalLink(url: string): void {
     if (!url) return;
 
-    // Déterminer le type de ressource
     const resourceType = this.getResourceType(url);
 
     switch (resourceType) {
@@ -214,8 +206,7 @@ export class RessourceComponent implements OnInit {
   }
 
   private openLocalFile(filePath: string): void {
-    // Adapter cette URL selon votre configuration backend
-    const baseUrl = 'http://localhost:8000/storage/';
+    const baseUrl = `${envVars.apiBaseUrl}`+'/storage/';
     const fullUrl = `${baseUrl}${filePath}`;
 
     window.open(fullUrl, '_blank');

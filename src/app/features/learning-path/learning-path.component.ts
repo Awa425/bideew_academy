@@ -57,7 +57,7 @@ export class LearningPathComponent implements OnInit, OnDestroy {
   loading: boolean = true;
   error: string | null = null;
   timelineItems: TimelineItem[] = [];
-  
+
   private subscription = new Subscription();
 
   constructor(
@@ -93,17 +93,17 @@ export class LearningPathComponent implements OnInit, OnDestroy {
         this.userProgress = data;
         this.generateTimeline();
         this.loading = false;
-        console.log('Progression utilisateur:', this.userProgress);
+        // console.log('Progression utilisateur:', this.userProgress);
       },
       error: (error) => {
         console.error('Erreur lors du chargement de la progression:', error);
-        this.error = 'Impossible de charger votre progression. Veuillez réessayer.';
+        this.error =
+          'Impossible de charger votre progression. Veuillez réessayer.';
         this.loading = false;
       },
     });
 
     this.subscription.add(userSub);
-    
   }
 
   /**
@@ -113,9 +113,10 @@ export class LearningPathComponent implements OnInit, OnDestroy {
     this.timelineItems = [];
 
     if (!this.userProgress) return;
+    // console.log(this.userProgress);
 
     // Traiter les leçons
-    this.userProgress.lessons_progress?.forEach(lesson => {
+    this.userProgress.lessons_progress?.forEach((lesson) => {
       // Événement de début de leçon (estimé)
       this.timelineItems.push({
         type: 'lesson_start',
@@ -124,7 +125,7 @@ export class LearningPathComponent implements OnInit, OnDestroy {
         date: this.estimateStartDate(lesson.completed_at),
         item: lesson,
         icon: 'play',
-        color: '#3b82f6'
+        color: '#3b82f6',
       });
 
       // Événement de complétion de leçon
@@ -136,27 +137,29 @@ export class LearningPathComponent implements OnInit, OnDestroy {
           date: lesson.completed_at,
           item: lesson,
           icon: 'check',
-          color: '#10b981'
+          color: '#10b981',
         });
       }
     });
 
     // Traiter les quiz
-    this.userProgress.quizzes_attempted?.forEach(quiz => {
+    this.userProgress.quizzes_attempted?.forEach((quiz) => {
       this.timelineItems.push({
         type: 'quiz_attempt',
         title: `Quiz tenté: ${quiz.quiz_title || 'Quiz'}`,
-        description: `Score: ${quiz.score}${quiz.max_score ? '/' + quiz.max_score : ''}`,
+        description: `Score: ${quiz.score}${
+          quiz.max_score ? '/' + quiz.max_score : ''
+        }`,
         date: quiz.attempted_at || '',
         item: quiz,
         icon: 'help-circle',
-        color: '#8b5cf6'
+        color: '#8b5cf6',
       });
     });
 
     // Trier par date (du plus récent au plus ancien)
-    this.timelineItems.sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
+    this.timelineItems.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
   }
 
@@ -167,7 +170,7 @@ export class LearningPathComponent implements OnInit, OnDestroy {
     if (!completedAt) {
       return new Date().toISOString();
     }
-    
+
     const completedDate = new Date(completedAt);
     // Estimer que la leçon a commencé 1 heure avant sa complétion
     const startDate = new Date(completedDate.getTime() - 60 * 60 * 1000);
@@ -209,12 +212,12 @@ export class LearningPathComponent implements OnInit, OnDestroy {
       const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
       const diffMinutes = Math.floor(diffMs / (1000 * 60));
 
-      if (diffMinutes < 1) return 'À l\'instant';
+      if (diffMinutes < 1) return "À l'instant";
       if (diffMinutes < 60) return `Il y a ${diffMinutes} min`;
       if (diffHours < 24) return `Il y a ${diffHours} h`;
       if (diffDays === 1) return 'Hier';
       if (diffDays < 7) return `Il y a ${diffDays} jours`;
-      
+
       return this.formatDate(dateString);
     } catch (error) {
       return dateString;
@@ -226,9 +229,9 @@ export class LearningPathComponent implements OnInit, OnDestroy {
    */
   getEventIcon(type: string): string {
     const icons: { [key: string]: string } = {
-      'lesson_start': '▶️',
-      'lesson_complete': '✅',
-      'quiz_attempt': '❓'
+      lesson_start: '▶️',
+      lesson_complete: '✅',
+      quiz_attempt: '❓',
     };
     return icons[type] || '●';
   }
@@ -243,8 +246,20 @@ export class LearningPathComponent implements OnInit, OnDestroy {
   /**
    * Révise une leçon complétée
    */
-  reviewLesson(lessonId: number): void {
-    this.router.navigate(['/lesson', lessonId]);
+  // reviewLesson(lessonId: number): void {
+  //   this.router.navigate(['/lesson', lessonId]);
+  // }
+  reviewLesson(lessonId: any): void {
+    // console.log(lessonId);
+    // Vérifier si l'utilisateur est toujours connecté
+    // const token = localStorage.getItem('access_token');
+    // if (!token) {
+    //   console.error('Token non trouvé, redirection vers login');
+    //   this.router.navigate(['/login']);
+    //   return;
+    // }
+    // console.log('Navigation vers la leçon:', lessonId);
+    // this.router.navigate(['/lesson', lessonId]);
   }
 
   /**
@@ -267,9 +282,10 @@ export class LearningPathComponent implements OnInit, OnDestroy {
   getProgressPercentage(): number {
     const total = this.userProgress?.lessons_progress?.length || 0;
     if (total === 0) return 0;
-    const completed = this.userProgress?.lessons_progress?.filter(
-      lesson => lesson.is_completed === 1
-    ).length || 0;
+    const completed =
+      this.userProgress?.lessons_progress?.filter(
+        (lesson) => lesson.is_completed === 1
+      ).length || 0;
     return Math.round((completed / total) * 100);
   }
 
@@ -277,9 +293,11 @@ export class LearningPathComponent implements OnInit, OnDestroy {
    * Calcule le nombre de leçons complétées
    */
   getCompletedLessonsCount(): number {
-    return this.userProgress?.lessons_progress?.filter(
-      lesson => lesson.is_completed === 1
-    ).length || 0;
+    return (
+      this.userProgress?.lessons_progress?.filter(
+        (lesson) => lesson.is_completed === 1
+      ).length || 0
+    );
   }
 
   /**
@@ -294,7 +312,7 @@ export class LearningPathComponent implements OnInit, OnDestroy {
    */
   filterTimelineByType(type: string): TimelineItem[] {
     if (type === 'all') return this.timelineItems;
-    return this.timelineItems.filter(item => item.type === type);
+    return this.timelineItems.filter((item) => item.type === type);
   }
 
   /**
