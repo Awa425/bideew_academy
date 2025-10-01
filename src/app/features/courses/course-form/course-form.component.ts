@@ -99,15 +99,12 @@ export class CourseFormComponent implements OnInit {
   }
 
   submitForm() {
-    // Valider le formulaire
     if (!this.validateForm()) {
       return;
     }
 
-    // Création du FormData
     const formData = new FormData();
     
-    // Ajouter tous les champs au FormData
     formData.append('title', this.course.title.trim());
     formData.append('description', this.course.description.trim());
     formData.append('prerequis', this.course.prerequis.trim());
@@ -119,13 +116,11 @@ export class CourseFormComponent implements OnInit {
     formData.append('is_published', this.course.is_published ? '1' : '0');
     formData.append('user_id', this.course.user_id.toString());
     
-    // Ajouter l'image seulement si elle existe
     if (this.course.image_path) {
       formData.append('image_path', this.course.image_path);
     }
 console.log(formData);
 
-    // Appel du service pour créer le cours
     this.courseService.createCourse(formData).subscribe({
       next: (response) => {
         console.log('Cours créé avec succès:', response);

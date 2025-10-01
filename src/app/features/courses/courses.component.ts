@@ -43,7 +43,7 @@ export class CoursesComponent implements OnInit {
       this.users = data;
       this.loadCourses(this.users);
     });
-    this.api = `${envVars.apiBaseUrl}`;
+    this.api = `${envVars.apiBaseUrlImage}`;
   }
 
   loadCourses(users: any, page: number = 1): void {

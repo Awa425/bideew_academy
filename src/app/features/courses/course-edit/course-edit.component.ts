@@ -186,7 +186,6 @@ export class CourseEditComponent implements OnInit {
       this.error = null;
       this.successMessage = null;
 
-      // Si il y a une image à traiter (nouvelle ou suppression)
       if (this.selectedFile || this.shouldRemoveImage) {
         console.log('Mise à jour avec gestion d\'image');
         this.updateCourseWithImage();
