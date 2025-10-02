@@ -2,7 +2,7 @@ export interface QuizQuestion {
   id: string;
   question: string;
   options: string[];
-  correctAnswer: number; // Index de la bonne réponse dans le tableau options
+  correctAnswer: number; 
   explanation?: string;
 }
 
@@ -12,5 +12,5 @@ export interface Quiz {
   title: string;
   description: string;
   questions: QuizQuestion[];
-  passingScore: number; // Score minimum pour réussir le quiz (en %)
+  passingScore: number; 
 }

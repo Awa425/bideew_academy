@@ -35,28 +35,23 @@ export class AccessibilityToolbarComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
 
   constructor(private themeService: ThemeService) {
-    // Appliquer les styles initiaux
     this.applyAccessibilityStyles();
   }
 
   private applyAccessibilityStyles(): void {
-    // Utiliser requestAnimationFrame pour regrouper les mises à jour
     if (typeof requestAnimationFrame === 'function') {
       requestAnimationFrame(() => this.applyStylesImmediately());
     } else {
-      // Fallback pour les navigateurs plus anciens
       setTimeout(() => this.applyStylesImmediately(), 0);
     }
   }
 
   private applyStylesImmediately(): void {
-    // Appliquer les styles de manière synchrone
     this.applyFontSize();
     this.applyTheme();
     this.applyContrast();
     this.applyMotion();
     
-    // Forcer un reflow pour s'assurer que les styles sont appliqués
     if (document.body) {
       document.body.offsetHeight;
     }
@@ -64,7 +59,6 @@ export class AccessibilityToolbarComponent implements OnInit, OnDestroy {
 
   private applyFontSize(): void {
     if (document.body) {
-      // Utiliser requestAnimationFrame pour une meilleure performance
       requestAnimationFrame(() => {
         document.body.style.setProperty('font-size', `${this.fontSize}px`, 'important');
       });
@@ -111,7 +105,6 @@ export class AccessibilityToolbarComponent implements OnInit, OnDestroy {
         this.highContrast = settings.highContrast;
         this.reducedMotion = settings.reducedMotion;
         
-        // Forcer la mise à jour des styles
         this.applyAccessibilityStyles();
       })
     );
@@ -164,7 +157,6 @@ export class AccessibilityToolbarComponent implements OnInit, OnDestroy {
 
   toggleToolbar(): void {
     this.isExpanded = !this.isExpanded;
-    // Forcer la détection des changements immédiatement
     window.dispatchEvent(new Event('resize'));
   }
 

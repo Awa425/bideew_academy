@@ -1,13 +1,9 @@
 <div class="video-lesson-container">
-  <!-- Bouton retour -->
   <a [routerLink]="['../../']" class="btn-retour" title="Retour au cours">
     <mat-icon>arrow_back</mat-icon>
     <span>Retour</span>
   </a>
-
-  <!-- Contenu principal -->
   <div class="main-content" *ngIf="lessons">
-    <!-- Player vidéo -->
     <div class="video-section">
       <div class="video-player-container">
         <div class="video-wrapper">
@@ -21,7 +17,6 @@
             Votre navigateur ne supporte pas la lecture vidéo.
           </video>
           
-          <!-- Overlay de chargement -->
           <div class="loading-overlay" *ngIf="!video_teste">
             <div class="loading-spinner">
               <div class="spinner"></div>
@@ -30,7 +25,6 @@
           </div>
         </div>
         
-        <!-- Contrôles personnalisés (optionnel) -->
         <div class="video-controls-info">
           <div class="video-quality">
             <mat-icon>hd</mat-icon>
@@ -44,7 +38,6 @@
       </div>
     </div>
 
-    <!-- Informations de la leçon -->
     <div class="lesson-info-section">
       <div class="lesson-header">
         <div class="lesson-meta">
@@ -75,20 +68,17 @@
         </div>
       </div>
 
-      <!-- Description -->
       <div class="lesson-description">
         <h3>Description</h3>
         <div class="description-content">
           <p>{{ lessons.content || 'Aucune description disponible.' }}</p>
         </div>
         
-        <!-- Tags ou sujets -->
         <div class="lesson-tags" *ngIf="lessons.tags">
           <span class="tag" *ngFor="let tag of lessons.tags">{{ tag }}</span>
         </div>
       </div>
 
-      <!-- Actions -->
       <div class="lesson-actions">
         <button class="action-btn primary" (click)="markAsCompleted()">
           <mat-icon>check_circle</mat-icon>
@@ -106,7 +96,6 @@
         </button>
       </div>
 
-      <!-- Progression -->
       <div class="lesson-progress">
         <h4>Progression</h4>
         <div class="progress-bar">
@@ -117,7 +106,6 @@
     </div>
   </div>
 
-  <!-- Navigation entre leçons -->
   <div class="lesson-navigation">
     <button class="nav-btn prev" (click)="previousLesson()" [disabled]="!hasPreviousLesson">
       <mat-icon>skip_previous</mat-icon>

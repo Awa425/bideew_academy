@@ -19,12 +19,6 @@ import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 
-interface LessonProgress {
-  id: number;
-  is_locked: boolean;
-  progress: number;
-}
-
 @Component({
   selector: 'app-course-lessons',
   standalone: true,

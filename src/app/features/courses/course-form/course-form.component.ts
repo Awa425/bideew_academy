@@ -22,7 +22,7 @@ export class CourseFormComponent implements OnInit {
     image_path: null as File | null,
     duration_minutes: 0,
     is_published: true,
-    user_id: 0, // Sera mis à jour dans ngOnInit
+    user_id: 0,
   };
 
   constructor(
@@ -32,44 +32,50 @@ export class CourseFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Récupérer l'ID de l'utilisateur depuis le localStorage ou votre service d'authentification
     const userData = localStorage.getItem('user_id');
     if (userData) {
       const user = JSON.parse(userData);
-      this.course.user_id = user.id || user.user_id || 1; // Utilisez 1 par défaut si non trouvé
+      this.course.user_id = user.id || user.user_id || 1;
     } else {
-      // Si pas d'utilisateur connecté, rediriger vers login
       console.error('Aucun utilisateur connecté');
-      // this.router.navigate(['/login']);
     }
   }
 
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
     if (file) {
-      // Vérifier la taille du fichier (max 5MB par exemple)
-      const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+      const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
         alert('Le fichier est trop volumineux. Taille maximum : 5MB');
-        event.target.value = ''; // Reset l'input
+        event.target.value = '';
         return;
       }
 
-      // Vérifier le type de fichier
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      const allowedTypes = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+      ];
       if (!allowedTypes.includes(file.type)) {
         alert('Type de fichier non autorisé. Utilisez JPEG, PNG ou GIF.');
-        event.target.value = ''; // Reset l'input
+        event.target.value = '';
         return;
       }
 
       this.course.image_path = file;
-      console.log('Fichier sélectionné:', file.name, 'Taille:', file.size, 'Type:', file.type);
+      console.log(
+        'Fichier sélectionné:',
+        file.name,
+        'Taille:',
+        file.size,
+        'Type:',
+        file.type
+      );
     }
   }
 
   validateForm(): boolean {
-    // Validation des champs obligatoires
     if (!this.course.title || this.course.title.trim() === '') {
       alert('Le titre du cours est obligatoire');
       return false;
@@ -99,15 +105,12 @@ export class CourseFormComponent implements OnInit {
   }
 
   submitForm() {
-    // Valider le formulaire
     if (!this.validateForm()) {
       return;
     }
 
-    // Création du FormData
     const formData = new FormData();
-    
-    // Ajouter tous les champs au FormData
+
     formData.append('title', this.course.title.trim());
     formData.append('description', this.course.description.trim());
     formData.append('prerequis', this.course.prerequis.trim());
@@ -115,17 +118,18 @@ export class CourseFormComponent implements OnInit {
     formData.append('progression', this.course.progression.toString());
     formData.append('category', this.course.category.trim());
     formData.append('level', this.course.level);
-    formData.append('duration_minutes', this.course.duration_minutes.toString());
+    formData.append(
+      'duration_minutes',
+      this.course.duration_minutes.toString()
+    );
     formData.append('is_published', this.course.is_published ? '1' : '0');
     formData.append('user_id', this.course.user_id.toString());
-    
-    // Ajouter l'image seulement si elle existe
+
     if (this.course.image_path) {
       formData.append('image_path', this.course.image_path);
     }
-console.log(formData);
+    console.log(formData);
 
-    // Appel du service pour créer le cours
     this.courseService.createCourse(formData).subscribe({
       next: (response) => {
         console.log('Cours créé avec succès:', response);
@@ -135,7 +139,7 @@ console.log(formData);
       error: (error) => {
         console.error('Erreur lors de la création du cours:', error);
         alert('Erreur lors de la création du cours. Veuillez réessayer.');
-      }
+      },
     });
   }
 }

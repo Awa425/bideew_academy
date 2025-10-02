@@ -81,9 +81,6 @@ export class LearningPathComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  /**
-   * Charge la progression de l'utilisateur depuis l'API
-   */
   loadUserProgress(): void {
     this.loading = true;
     this.error = null;
@@ -93,7 +90,6 @@ export class LearningPathComponent implements OnInit, OnDestroy {
         this.userProgress = data;
         this.generateTimeline();
         this.loading = false;
-        // console.log('Progression utilisateur:', this.userProgress);
       },
       error: (error) => {
         console.error('Erreur lors du chargement de la progression:', error);
@@ -106,18 +102,12 @@ export class LearningPathComponent implements OnInit, OnDestroy {
     this.subscription.add(userSub);
   }
 
-  /**
-   * Génère la timeline du parcours d'apprentissage
-   */
   generateTimeline(): void {
     this.timelineItems = [];
 
     if (!this.userProgress) return;
-    // console.log(this.userProgress);
 
-    // Traiter les leçons
     this.userProgress.lessons_progress?.forEach((lesson) => {
-      // Événement de début de leçon (estimé)
       this.timelineItems.push({
         type: 'lesson_start',
         title: `Début de la leçon: ${lesson.lesson_title}`,
@@ -128,7 +118,6 @@ export class LearningPathComponent implements OnInit, OnDestroy {
         color: '#3b82f6',
       });
 
-      // Événement de complétion de leçon
       if (lesson.is_completed && lesson.completed_at) {
         this.timelineItems.push({
           type: 'lesson_complete',
@@ -142,7 +131,6 @@ export class LearningPathComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Traiter les quiz
     this.userProgress.quizzes_attempted?.forEach((quiz) => {
       this.timelineItems.push({
         type: 'quiz_attempt',
@@ -157,29 +145,21 @@ export class LearningPathComponent implements OnInit, OnDestroy {
       });
     });
 
-    // Trier par date (du plus récent au plus ancien)
     this.timelineItems.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
   }
 
-  /**
-   * Estime la date de début basée sur la date de fin
-   */
   estimateStartDate(completedAt: string | undefined): string {
     if (!completedAt) {
       return new Date().toISOString();
     }
 
     const completedDate = new Date(completedAt);
-    // Estimer que la leçon a commencé 1 heure avant sa complétion
     const startDate = new Date(completedDate.getTime() - 60 * 60 * 1000);
     return startDate.toISOString();
   }
 
-  /**
-   * Formate une date en format lisible
-   */
   formatDate(dateString: string): string {
     if (!dateString) return '';
 
@@ -198,9 +178,6 @@ export class LearningPathComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Formate la date pour l'affichage relatif (il y a...)
-   */
   formatRelativeDate(dateString: string): string {
     if (!dateString) return '';
 
@@ -224,9 +201,6 @@ export class LearningPathComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Obtient l'icône selon le type d'événement
-   */
   getEventIcon(type: string): string {
     const icons: { [key: string]: string } = {
       lesson_start: '▶️',
@@ -236,49 +210,20 @@ export class LearningPathComponent implements OnInit, OnDestroy {
     return icons[type] || '●';
   }
 
-  /**
-   * Continue une leçon
-   */
   continueLesson(lessonId: number): void {
     this.router.navigate(['/lesson', lessonId]);
   }
 
-  /**
-   * Révise une leçon complétée
-   */
-  // reviewLesson(lessonId: number): void {
-  //   this.router.navigate(['/lesson', lessonId]);
-  // }
-  reviewLesson(lessonId: any): void {
-    // console.log(lessonId);
-    // Vérifier si l'utilisateur est toujours connecté
-    // const token = localStorage.getItem('access_token');
-    // if (!token) {
-    //   console.error('Token non trouvé, redirection vers login');
-    //   this.router.navigate(['/login']);
-    //   return;
-    // }
-    // console.log('Navigation vers la leçon:', lessonId);
-    // this.router.navigate(['/lesson', lessonId]);
-  }
+  reviewLesson(lessonId: any): void {}
 
-  /**
-   * Refait un quiz
-   */
   retakeQuiz(quizId: number): void {
     this.router.navigate(['/quiz', quizId]);
   }
 
-  /**
-   * Navigue vers la page d'exploration des cours
-   */
   exploreCoursePage(): void {
     this.router.navigate(['/courses']);
   }
 
-  /**
-   * Calcule le pourcentage de progression
-   */
   getProgressPercentage(): number {
     const total = this.userProgress?.lessons_progress?.length || 0;
     if (total === 0) return 0;
@@ -289,9 +234,6 @@ export class LearningPathComponent implements OnInit, OnDestroy {
     return Math.round((completed / total) * 100);
   }
 
-  /**
-   * Calcule le nombre de leçons complétées
-   */
   getCompletedLessonsCount(): number {
     return (
       this.userProgress?.lessons_progress?.filter(
@@ -300,38 +242,23 @@ export class LearningPathComponent implements OnInit, OnDestroy {
     );
   }
 
-  /**
-   * Calcule le nombre total de leçons
-   */
   getTotalLessonsCount(): number {
     return this.userProgress?.lessons_progress?.length || 0;
   }
 
-  /**
-   * Filtre les événements par type
-   */
   filterTimelineByType(type: string): TimelineItem[] {
     if (type === 'all') return this.timelineItems;
     return this.timelineItems.filter((item) => item.type === type);
   }
 
-  /**
-   * Vérifie s'il y a des activités récentes
-   */
   hasRecentActivity(): boolean {
     return this.timelineItems.length > 0;
   }
 
-  /**
-   * Obtient la dernière activité
-   */
   getLastActivity(): TimelineItem | null {
     return this.timelineItems.length > 0 ? this.timelineItems[0] : null;
   }
 
-  /**
-   * TrackBy functions pour optimiser les performances Angular
-   */
   trackByTimelineItem(index: number, item: TimelineItem): string {
     return `${item.type}-${item.date}-${index}`;
   }

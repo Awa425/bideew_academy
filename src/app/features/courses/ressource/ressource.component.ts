@@ -34,7 +34,7 @@ export class RessourceComponent implements OnInit {
   searchTerm: string = '';
   isLoading: boolean = false;
   lessonId: any;
-  resources: Resource[] = []; // Initialiser avec un tableau vide
+  resources: Resource[] = [];
   categories: Category[] = [];
   filteredResources: Resource[] = [];
 
@@ -52,8 +52,8 @@ export class RessourceComponent implements OnInit {
   dataRessource(lesson_id: any): void {
     this.courseService.getRessourceByID(lesson_id).subscribe((data: any) => {
       this.resources = data;
-      this.initializeCategories(); // Initialiser les catégories APRÈS avoir les ressources
-      this.filterResources(); // Filtrer APRÈS avoir les ressources
+      this.initializeCategories();
+      this.filterResources();
       console.log(this.resources);
     });
   }
@@ -102,7 +102,7 @@ export class RessourceComponent implements OnInit {
   }
 
   filterResources(): void {
-    if (!this.resources) return; // Vérifier que resources existe
+    if (!this.resources) return;
 
     this.filteredResources = this.resources.filter((resource: Resource) => {
       const matchesCategory =
@@ -117,25 +117,13 @@ export class RessourceComponent implements OnInit {
     });
   }
 
-  // handleDownload(resource: Resource): void {
-  //   this.isLoading = true;
-
-  //   // Simulation du téléchargement
-  //   setTimeout(() => {
-  //     this.isLoading = false;
-  //     console.log('Téléchargement:', resource.path);
-  //     // Logique de téléchargement réelle ici
-  //   }, 1000);
-  // }
   handleDownload(resource: Resource): void {
     this.isLoading = true;
 
     if (resource.external_url) {
-      // Pour les URLs externes, on ouvre dans un nouvel onglet
       window.open(resource.external_url, '_blank');
       this.isLoading = false;
     } else if (resource.path) {
-      // Pour les fichiers locaux, on télécharge
       this.downloadLocalFile(resource.path, resource.title);
     } else {
       console.error('Aucune URL ou chemin de fichier disponible');
@@ -144,7 +132,7 @@ export class RessourceComponent implements OnInit {
   }
 
   private downloadLocalFile(filePath: string, fileName: string): void {
-    const baseUrl = `${envVars.apiBaseUrl}`+'/storage/'; 
+    const baseUrl = `${envVars.apiBaseUrl}` + '/storage/';
 
     const link = document.createElement('a');
     link.href = `${baseUrl}${filePath}`;
@@ -206,7 +194,7 @@ export class RessourceComponent implements OnInit {
   }
 
   private openLocalFile(filePath: string): void {
-    const baseUrl = `${envVars.apiBaseUrl}`+'/storage/';
+    const baseUrl = `${envVars.apiBaseUrl}` + '/storage/';
     const fullUrl = `${baseUrl}${filePath}`;
 
     window.open(fullUrl, '_blank');

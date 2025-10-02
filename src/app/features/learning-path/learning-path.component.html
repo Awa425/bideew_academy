@@ -1,5 +1,4 @@
 <div class="learning-path-container">
-  <!-- Section Hero avec informations utilisateur -->
   <div class="hero-section">
     <div class="hero-bg"></div>
     <div class="hero-content">
@@ -13,7 +12,6 @@
         </p>
       </div>
       
-      <!-- Statistiques globales -->
       <div class="stats-overview" *ngIf="userProgress">
         <div class="stat-card">
           <div class="stat-number">{{ getCompletedLessonsCount() }}</div>
@@ -33,14 +31,12 @@
         </div>
       </div>
 
-      <!-- Barre de progression globale -->
       <div class="global-progress-bar">
         <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
       </div>
     </div>
   </div>
 
-  <!-- Timeline du parcours -->
   <div class="timeline-container" *ngIf="userProgress && timelineItems.length > 0">
     <div class="container">
       <h2 class="timeline-title">Historique de votre parcours</h2>
@@ -93,8 +89,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Section détaillée des leçons -->
   <div class="detailed-progress" *ngIf="userProgress && userProgress.lessons_progress.length > 0">
     <div class="container">
       <h2>Détail des leçons</h2>
@@ -138,7 +132,6 @@
     </div>
   </div>
 
-  <!-- Section des Quiz -->
   <div class="quizzes-section" *ngIf="userProgress && userProgress.quizzes_attempted.length > 0">
     <div class="container">
       <h2>Détail des quiz</h2>
@@ -176,8 +169,6 @@
       </div>
     </div>
   </div>
-
-  <!-- État vide -->
   <div class="empty-state" *ngIf="userProgress && timelineItems.length === 0">
     <div class="empty-icon">
       <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -192,7 +183,6 @@
     </button>
   </div>
 
-  <!-- Message de chargement -->
   <div class="loading-state" *ngIf="!userProgress">
     <div class="spinner"></div>
     <p>Chargement de votre parcours...</p>

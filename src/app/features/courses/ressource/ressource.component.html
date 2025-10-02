@@ -1,5 +1,4 @@
 <div class="resources-container">
-  <!-- Header -->
   <header class="header">
     <div class="header-content">
       <div class="header-top">
@@ -16,7 +15,6 @@
         </div>
       </div>
       
-      <!-- Stats -->
       <div class="stats-container">
         <div class="stat-item" *ngFor="let category of categories.slice(1)">
           <div class="stat-number">{{ category.count }}</div>
@@ -25,14 +23,11 @@
       </div>
     </div>
   </header>
-<!-- Bouton retour -->
   <a [routerLink]="['../../']" class="btn-retour" title="RETOUR">
     <img src="../../../../assets/left-long-solid.svg" alt="Retour" width="30" />
   </a>
   <div class="main-content">
-    <!-- Contrôles -->
     <div class="controls-section">
-      <!-- Barre de recherche -->
       <div class="search-container">
         <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"/>
@@ -47,7 +42,6 @@
         />
       </div>
 
-      <!-- Toggle vue -->
       <div class="view-toggle">
         <button
           (click)="setViewMode('grid')"
@@ -80,7 +74,6 @@
       </div>
     </div>
 
-    <!-- Filtres par catégorie -->
     <div class="categories-section">
       <button
         *ngFor="let category of categories"
@@ -112,7 +105,6 @@
         <span class="category-count">{{ category.count }}</span>
       </button>
     </div>
-    <!-- Ressources -->
     <div class="resources-section" [class.list-view]="viewMode === 'list'" [class.grid-view]="viewMode === 'grid'">
       <div
         *ngFor="let resource of filteredResources"
@@ -176,7 +168,6 @@
       </div>
     </div>
 
-    <!-- Message aucune ressource -->
     <div *ngIf="filteredResources.length === 0" class="no-resources">
       <div class="no-resources-icon">📚</div>
       <h3>Aucune ressource trouvée</h3>

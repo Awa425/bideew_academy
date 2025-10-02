@@ -1,7 +1,5 @@
-/* Importez les polices si nécessaire */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-/* Styles de base */
 * {
   margin: 0;
   padding: 0;
@@ -16,18 +14,15 @@ body {
   line-height: 1.6;
 }
 
-/* Styles pour les SVG */
 svg {
   display: inline-block;
   vertical-align: middle;
 }
 .user-management-container {
   min-height: 100vh;
-  // background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   background-color: #f0f9ff;
   padding: 0;
 
-  // Section d'en-tête
   .header-section {
     background: linear-gradient(135deg, #2196f3 100%, #ffffff 100%);
     backdrop-filter: blur(10px);
@@ -106,7 +101,6 @@ svg {
     }
   }
 
-  // Section des statistiques
   .stats-section {
     padding: 2rem;
     background: rgba(255, 255, 255, 0.05);
@@ -186,7 +180,6 @@ svg {
     }
   }
 
-  // Section du tableau
   .table-section {
     padding: 0 2rem 2rem;
 
@@ -497,18 +490,6 @@ svg {
                     }
 
                     .dropdown-item {
-                      // display: flex;
-                      // align-items: center;
-                      // gap: 0.75rem;
-                      // width: 100%;
-                      // padding: 0.75rem 1rem;
-                      // border: none;
-                      // background: none;
-                      // text-align: left;
-                      // font-size: 0.875rem;
-                      // cursor: pointer;
-                      // transition: background-color 0.3s ease;
-
                       &:hover {
                         background: #f9fafb;
                       }
@@ -669,7 +650,6 @@ svg {
   }
 }
 
-// Responsive design
 @media (max-width: 1024px) {
   .user-management-container {
     .header-section .header-content {
@@ -1360,7 +1340,6 @@ svg {
   }
 }
 
-// Responsive design
 @media (max-width: 768px) {
   .header-section .header-content {
     flex-direction: column;
@@ -1390,7 +1369,6 @@ svg {
   }
 }
 
-// <style>
 .progress-modal {
   max-width: 1000px;
   max-height: 90vh;
@@ -1769,9 +1747,7 @@ svg {
     gap: 12px;
   }
 }
-// </style>
 
-// <style>
 .error-message {
   background-color: #fee;
   color: #c33;
@@ -1961,9 +1937,7 @@ svg {
     min-width: 800px;
   }
 }
-// </style>
 
-//  <style>
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -2192,7 +2166,6 @@ svg {
   margin-right: 8px;
 }
 
-/* Styles responsifs */
 @media (max-width: 768px) {
   .modal-container {
     margin: 10px;
@@ -2239,9 +2212,7 @@ svg {
     padding: 20px;
   }
 }
-// </style>
 
-// <style>
 .details-modal {
   max-width: 900px;
   max-height: 90vh;
@@ -2342,7 +2313,6 @@ svg {
   flex-shrink: 0;
 }
 
-/* Sections de détails */
 .details-section {
   padding: 32px;
   border-bottom: 1px solid #e9ecef;
@@ -2395,7 +2365,6 @@ svg {
   color: #212529;
 }
 
-/* Progression des cours */
 .progress-overview h5 {
   margin: 0 0 16px 0;
   font-size: 1.1rem;
@@ -2612,4 +2581,3 @@ svg {
     grid-template-columns: 1fr;
   }
 }
-// </style>

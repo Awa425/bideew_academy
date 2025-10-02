@@ -1,7 +1,6 @@
 @use '@angular/material' as mat;
 @use 'sass:map';
 
-// Variables pour les transitions optimisées
 $fast-transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
 $medium-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 $slow-transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -51,7 +50,7 @@ $transition-speed: 0.3s;
     position: absolute;
     left: 0;
     top: 0;
-    z-index: 1001; // Au-dessus du contenu
+    z-index: 1001; 
     background-color: var(--primary-color);
     color: white;
     will-change: background-color, transform;
@@ -76,11 +75,11 @@ $transition-speed: 0.3s;
     .mat-icon {
       will-change: transform;
       transition: transform $fast-transition, color $fast-transition, opacity $fast-transition;
-      transform: translateZ(0); // Active l'accélération matérielle
+      transform: translateZ(0);
       font-size: 24px;
       width: 24px;
       height: 24px;
-      display: flex !important; // Forcer l'affichage
+      display: flex !important; 
       align-items: center;
       justify-content: center;
       color: var(--text-primary);
@@ -99,8 +98,8 @@ $transition-speed: 0.3s;
     margin-left: $toolbar-collapsed-width;
     padding: 0 16px;
     align-items: center;
-    opacity: 1; // Toujours visible
-    visibility: visible; // Toujours visible
+    opacity: 1; 
+    visibility: visible; 
     background-color: transparent;
     will-change: transform;
     transition: transform $fast-transition;
@@ -175,14 +174,12 @@ $transition-speed: 0.3s;
     }
   }
 
-  // La transition d'opacité est maintenant gérée directement dans .toolbar-content
-
   .toolbar-section {
     display: flex;
     align-items: center;
     gap: 8px;
     position: relative;
-    z-index: 1000; // Assure que les menus déroulants sont au-dessus des autres éléments
+    z-index: 1000; 
     
     button {
       min-width: 40px;
@@ -229,7 +226,6 @@ $transition-speed: 0.3s;
         }
       }
       
-      // Effet de surbrillance au survol
       &::after {
         content: '';
         position: absolute;
@@ -262,7 +258,7 @@ $transition-speed: 0.3s;
       width: 1px;
       height: 24px;
       background-color: var(--border-color);
-      backface-visibility: hidden; // Améliore les performances
+      backface-visibility: hidden;
     }
 
     .font-size-label {
@@ -288,20 +284,16 @@ $transition-speed: 0.3s;
     }
   }
 
-  // Styles pour les icônes dans la barre d'outils
   .mat-icon {
-    // Assurer que les icônes sont toujours visibles
     opacity: 0.9;
     transition: all $fast-transition;
     
-    // Améliorer le contraste au survol
     button:hover & {
       opacity: 1;
       filter: brightness(1.2);
     }
   }
   
-  // Styles pour le mode sombre
   :host-context([data-theme="dark"]) {
     --toolbar-bg: #424242;
     color: white;
@@ -314,8 +306,7 @@ $transition-speed: 0.3s;
       filter: brightness(1.4);
     }
   }
-  
-  // Styles pour le contraste élevé
+
   :host-context(.high-contrast) {
     .toolbar-content {
       button {
@@ -324,7 +315,6 @@ $transition-speed: 0.3s;
     }
   }
 
-// Animation réduite pour le mode mouvement réduit
 :host-context(.reduced-motion) {
   * {
     transition: none !important;
@@ -339,8 +329,6 @@ $transition-speed: 0.3s;
   }
 }
 
-// Styles responsifs
-/* Styles pour le bouton d'accessibilité réduit */
 .accessibility-toolbar:not(.expanded) {
   .toggle-button {
     .mat-icon {
@@ -363,7 +351,6 @@ $transition-speed: 0.3s;
   }
 }
 
-/* Styles pour le contraste élevé */
 :host-context(.high-contrast) {
   .accessibility-toolbar {
     border: 2px solid #000 !important;
@@ -380,7 +367,6 @@ $transition-speed: 0.3s;
   }
 }
 
-/* Styles responsifs */
 @media (max-width: 600px) {
   .accessibility-toolbar {
     top: auto;

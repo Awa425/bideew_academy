@@ -25,7 +25,14 @@
           mode="determinate"
           [value]="progress"
           color="accent"
-        ></mat-progress-bar>
+        ></mat-progress-bar
+        ><br />
+        <button
+          class="btn btn-outline-primary"
+          [routerLink]="['/courses', courseId, 'certificat', courseId]"
+        >
+          Mon Certificat
+        </button>
       </div>
     </div>
   </mat-card>

@@ -21,7 +21,7 @@ export interface NotificationConfig {
   providedIn: 'root'
 })
 export class NotificationService {
-  private defaultDuration = 5000; // 5 seconds
+  private defaultDuration = 5000; 
   private loadingSubject = new Subject<boolean>();
   
   constructor(
@@ -29,7 +29,6 @@ export class NotificationService {
     private dialog: MatDialog
   ) {}
 
-  // Show a basic notification
   show(config: NotificationConfig): void {
     const {
       message,
@@ -50,7 +49,6 @@ export class NotificationService {
     });
   }
 
-  // Success notification
   success(message: string, config?: Omit<NotificationConfig, 'message' | 'type'>): void {
     this.show({
       message,
@@ -61,7 +59,6 @@ export class NotificationService {
   }
 
 
-  // Error notification
   error(message: string, config?: Omit<NotificationConfig, 'message' | 'type'>): void {
     this.show({
       message,
@@ -71,7 +68,6 @@ export class NotificationService {
     });
   }
 
-  // Info notification
   info(message: string, config?: Omit<NotificationConfig, 'message' | 'type'>): void {
     this.show({
       message,
@@ -82,7 +78,6 @@ export class NotificationService {
   }
 
 
-  // Warning notification
   warning(message: string, config?: Omit<NotificationConfig, 'message' | 'type'>): void {
     this.show({
       message,
@@ -92,17 +87,14 @@ export class NotificationService {
     });
   }
 
-  // Show loading indicator
   showLoading(show: boolean = true): void {
     this.loadingSubject.next(show);
   }
 
-  // Get loading state as observable
   getLoadingState(): Observable<boolean> {
     return this.loadingSubject.asObservable();
   }
 
-  // Show a custom dialog
   openDialog<T, D = any, R = any>(
     component: ComponentType<T> | TemplateRef<T>,
     config?: any
@@ -115,7 +107,6 @@ export class NotificationService {
     });
   }
 
-  // Show a confirmation dialog
   confirm(
     title: string,
     message: string,
@@ -141,7 +132,6 @@ export class NotificationService {
   }
 
 
-  // Show a toast with custom component
   showCustomNotification<T>(component: ComponentType<T>, config: MatSnackBarConfig = {}): MatSnackBarRef<T> {
     return this.snackBar.openFromComponent(component, {
       duration: this.defaultDuration,
@@ -153,11 +143,9 @@ export class NotificationService {
   }
 
 
-  // Play an animation
   triggerAnimation(element: HTMLElement, animation: string): void {
     element.classList.add('animate__animated', `animate__${animation}`);
     
-    // Remove the animation class after it completes
     const handleAnimationEnd = () => {
       element.classList.remove('animate__animated', `animate__${animation}`);
       element.removeEventListener('animationend', handleAnimationEnd);
@@ -166,17 +154,14 @@ export class NotificationService {
     element.addEventListener('animationend', handleAnimationEnd);
   }
 
-  // Show a success animation
   showSuccessAnimation(element: HTMLElement): void {
     this.triggerAnimation(element, 'tada');
   }
 
-  // Show an error animation
   showErrorAnimation(element: HTMLElement): void {
     this.triggerAnimation(element, 'shakeX');
   }
 
-  // Show a loading animation
   showLoadingAnimation(element: HTMLElement): void {
     this.triggerAnimation(element, 'pulse');
   }

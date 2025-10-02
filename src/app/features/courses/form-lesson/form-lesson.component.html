@@ -13,7 +13,6 @@
 
   <div class="form-wrapper">
     <form [formGroup]="lessonForm" (ngSubmit)="onSubmit()">
-      <!-- Section 1: Type de contenu en premier -->
       <mat-card class="form-section animate-card" formArrayName="contents">
         <mat-card-header class="section-header">
           <div class="section-icon">
@@ -57,8 +56,6 @@
           </div>
         </mat-card-content>
       </mat-card>
-
-      <!-- Section 2: Informations générales (cachée si type = quiz) -->
       <mat-card class="form-section animate-card" *ngIf="!isQuizContent()">
         <mat-card-header class="section-header">
           <div class="section-icon">
@@ -100,8 +97,6 @@
           </div>
         </mat-card-content>
       </mat-card>
-
-      <!-- Section 3: Contenus de la leçon -->
       <mat-card class="form-section animate-card" formArrayName="contents">
         <mat-card-header class="section-header">
           <div class="section-icon">
@@ -123,12 +118,10 @@
             >
               <mat-card class="content-card">
                 <mat-card-content>
-                  <!-- Contenu spécifique selon le type -->
                   <div
                     class="content-specific"
                     [ngSwitch]="contents.at(i).get('type')?.value"
                   >
-                    <!-- PDF Upload -->
                     <div *ngSwitchCase="'pdf'" class="upload-section">
                       <div class="upload-area" (click)="fileInput.click()">
                         <mat-icon class="upload-icon">cloud_upload</mat-icon>
@@ -143,10 +136,7 @@
                         style="display: none"
                       />
                     </div>
-
-                    <!-- Vidéo URL ou Upload -->
                     <div *ngSwitchCase="'video'" class="video-section">
-                      <!-- Sélecteur du type d'input vidéo -->
                       <div class="video-input-selector">
                         <mat-button-toggle-group
                           [value]="
@@ -169,15 +159,12 @@
                           </mat-button-toggle>
                         </mat-button-toggle-group>
                       </div>
-
-                      <!-- Input selon le type sélectionné -->
                       <div
                         class="video-input-content"
                         [ngSwitch]="
                           contents.at(i).get('video_input_type')?.value || 'url'
                         "
                       >
-                        <!-- URL Video -->
                         <div *ngSwitchCase="'url'" class="video-url-section">
                           <mat-form-field
                             appearance="outline"
@@ -195,8 +182,6 @@
                             >
                           </mat-form-field>
                         </div>
-
-                        <!-- Upload Video -->
                         <div
                           *ngSwitchCase="'upload'"
                           class="video-upload-section"
@@ -228,8 +213,6 @@
                         </div>
                       </div>
                     </div>
-
-                    <!-- Texte -->
                     <div *ngSwitchCase="'text'">
                       <mat-form-field appearance="outline" class="full-width">
                         <mat-label>Contenu textuel</mat-label>
@@ -242,10 +225,7 @@
                         <mat-icon matSuffix>article</mat-icon>
                       </mat-form-field>
                     </div>
-
-                    <!-- Quiz - Section complète avec accordéon amélioré -->
-                    <div *ngSwitchCase="'quiz'" class="quiz-section">
-                      <!-- Informations générales du quiz (remplace titre et durée) -->
+                    <div *ngSwitchCase="'quizzes'" class="quiz-section">
                       <div class="quiz-info-section">
                         <h3 class="quiz-section-title">
                           <mat-icon>info</mat-icon>
@@ -312,8 +292,6 @@
                           </mat-error>
                         </mat-form-field>
                       </div>
-
-                      <!-- Section Questions avec accordéon amélioré -->
                       <div
                         class="quiz-questions-section"
                         formArrayName="questions"
@@ -323,8 +301,6 @@
                             <mat-icon>help</mat-icon>
                             Questions ({{ getQuestions(i).length }})
                           </h3>
-
-                          <!-- Actions pour toutes les questions -->
                           <div
                             class="questions-global-actions"
                             *ngIf="getQuestions(i).length > 0"
@@ -354,8 +330,6 @@
                             </button>
                           </div>
                         </div>
-
-                        <!-- Liste des questions avec accordéon -->
                         <div class="questions-tree">
                           <mat-expansion-panel
                             *ngFor="
@@ -369,7 +343,6 @@
                               onQuestionExpansionChange(i, qIndex, $event)
                             "
                           >
-                            <!-- En-tête de la question -->
                             <mat-expansion-panel-header
                               class="question-panel-header"
                             >
@@ -402,9 +375,7 @@
                               </mat-panel-description>
                             </mat-expansion-panel-header>
 
-                            <!-- Contenu de la question -->
                             <div class="question-content">
-                              <!-- Type de question et texte -->
                               <div class="question-basic-info">
                                 <div class="form-row">
                                   <mat-form-field
@@ -431,8 +402,6 @@
                                       Le type est obligatoire
                                     </mat-error>
                                   </mat-form-field>
-
-                                  <!-- Bouton supprimer question -->
                                   <button
                                     mat-icon-button
                                     type="button"
@@ -471,8 +440,6 @@
                                   </mat-error>
                                 </mat-form-field>
                               </div>
-
-                              <!-- Section Réponses avec accordéon -->
                               <div
                                 class="answers-section"
                                 formArrayName="answers"
@@ -483,8 +450,6 @@
                                     Réponses possibles
                                   </h4>
                                 </div>
-
-                                <!-- Liste des réponses -->
                                 <div class="answers-tree">
                                   <mat-expansion-panel
                                     *ngFor="
@@ -506,7 +471,6 @@
                                       )
                                     "
                                   >
-                                    <!-- En-tête de la réponse -->
                                     <mat-expansion-panel-header
                                       class="answer-panel-header"
                                     >
@@ -552,7 +516,6 @@
                                       </mat-panel-description>
                                     </mat-expansion-panel-header>
 
-                                    <!-- Contenu de la réponse -->
                                     <div class="answer-content">
                                       <div class="answer-form-row">
                                         <mat-form-field
@@ -610,8 +573,6 @@
                                     </div>
                                   </mat-expansion-panel>
                                 </div>
-
-                                <!-- Bouton ajouter réponse en bas -->
                                 <div class="add-answer-container">
                                   <button
                                     mat-stroked-button
@@ -628,8 +589,6 @@
                             </div>
                           </mat-expansion-panel>
                         </div>
-
-                        <!-- Bouton ajouter question en bas -->
                         <div class="add-question-container">
                           <button
                             mat-fab
@@ -652,8 +611,6 @@
           </div>
         </mat-card-content>
       </mat-card>
-
-      <!-- Actions du formulaire -->
       <div class="form-actions">
         <div class="actions-container">
           <button

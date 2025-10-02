@@ -4,7 +4,6 @@ import { RouterModule } from '@angular/router';
 import { register } from 'swiper/element/bundle';
 import { SwiperOptions } from 'swiper/types';
 
-// Enregistrement des composants Swiper
 register();
 
 interface Slide {

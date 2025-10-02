@@ -1,4 +1,3 @@
-// Variables - Palette Bleu et Blanc
 $primary-blue: #1976d2;
 $light-blue: #e3f2fd;
 $dark-blue: #1565c0;
@@ -13,20 +12,17 @@ $shadow-medium: 0 4px 12px rgba(25, 118, 210, 0.15);
 $border-radius: 8px;
 $transition: all 0.3s ease;
 
-// Mixins
 @mixin card-elevation($level: 1) {
   @if $level == 1 {
-    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.1),
-                0 1px 2px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.1), 0 1px 2px rgba(0, 0, 0, 0.04);
   } @else if $level == 2 {
     box-shadow: 0 4px 8px rgba(25, 118, 210, 0.15),
-                0 2px 4px rgba(0, 0, 0, 0.08);
+      0 2px 4px rgba(0, 0, 0, 0.08);
   } @else if $level == 3 {
     box-shadow: 0 6px 12px rgba(25, 118, 210, 0.2),
-                0 3px 6px rgba(0, 0, 0, 0.12);
+      0 3px 6px rgba(0, 0, 0, 0.12);
   } @else {
-    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.1),
-                0 1px 2px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.1), 0 1px 2px rgba(0, 0, 0, 0.04);
   }
 }
 
@@ -36,18 +32,17 @@ $transition: all 0.3s ease;
   justify-content: center;
 }
 
-// Styles principaux
 .lesson-form-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
   padding: 0;
-  
+
   .form-header {
     background: linear-gradient(135deg, $primary-blue 0%, $dark-blue 100%);
     color: $white;
     padding: 2rem 0;
     margin-bottom: 2rem;
-    
+
     .header-content {
       max-width: 1200px;
       margin: 0 auto;
@@ -55,7 +50,7 @@ $transition: all 0.3s ease;
       display: flex;
       align-items: center;
       gap: 1.5rem;
-      
+
       .header-icon {
         @include flex-center;
         width: 64px;
@@ -63,14 +58,14 @@ $transition: all 0.3s ease;
         background: rgba(255, 255, 255, 0.15);
         border-radius: 50%;
         backdrop-filter: blur(10px);
-        
+
         mat-icon {
           font-size: 32px;
           width: 32px;
           height: 32px;
         }
       }
-      
+
       .header-text {
         h1 {
           margin: 0;
@@ -78,7 +73,7 @@ $transition: all 0.3s ease;
           font-weight: 300;
           text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-        
+
         p {
           margin: 0.5rem 0 0;
           font-size: 1.1rem;
@@ -87,7 +82,7 @@ $transition: all 0.3s ease;
       }
     }
   }
-  
+
   .form-wrapper {
     max-width: 1200px;
     margin: 0 auto;
@@ -95,7 +90,6 @@ $transition: all 0.3s ease;
   }
 }
 
-// Sections du formulaire
 .form-section {
   margin-bottom: 2rem;
   border-radius: $border-radius;
@@ -104,17 +98,17 @@ $transition: all 0.3s ease;
   overflow: hidden;
   transition: $transition;
   border: 1px solid $border-color;
-  
+
   &:hover {
     @include card-elevation(2);
     border-color: rgba($primary-blue, 0.3);
   }
-  
+
   .section-header {
     background: $light-gray;
     border-bottom: 1px solid $border-color;
     padding: 1.5rem;
-    
+
     .section-icon {
       @include flex-center;
       width: 40px;
@@ -123,67 +117,65 @@ $transition: all 0.3s ease;
       color: $white;
       border-radius: 50%;
       margin-right: 1rem;
-      
+
       mat-icon {
         font-size: 20px;
         width: 20px;
         height: 20px;
       }
     }
-    
+
     mat-card-title {
       color: $text-color;
       font-weight: 500;
     }
-    
+
     mat-card-subtitle {
       color: $dark-gray;
     }
   }
-  
+
   .section-content {
     padding: 2rem;
   }
 }
 
-// Formulaire responsive
 .form-row {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
-  
+
   &.two-columns {
     @media (max-width: 768px) {
       flex-direction: column;
     }
   }
-  
+
   .full-width {
     flex: 1;
   }
 }
 
-// Contenus de la leçon
 .contents-list {
   .content-item {
     margin-bottom: 2rem;
-    
+
     .content-card {
       border-radius: $border-radius;
       @include card-elevation(1);
       border: 1px solid $border-color;
       background: $white;
       transition: $transition;
-      
+
       &:hover {
         border-color: $primary-blue;
         @include card-elevation(2);
       }
-      
+
       .content-header {
         background: $light-blue;
         position: relative;
-        
+
         .content-number {
           @include flex-center;
           width: 32px;
@@ -195,19 +187,19 @@ $transition: all 0.3s ease;
           font-size: 0.9rem;
           margin-right: 1rem;
         }
-        
+
         mat-card-title {
           color: $text-color;
           font-weight: 500;
         }
-        
+
         .content-actions {
           margin-left: auto;
-          
+
           .delete-btn {
             color: $dark-gray;
             transition: $transition;
-            
+
             &:hover {
               background-color: rgba($dark-gray, 0.1);
               color: #dc3545;
@@ -219,28 +211,26 @@ $transition: all 0.3s ease;
   }
 }
 
-// Section spécifique au contenu
 .content-specific {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid $border-color;
 }
 
-// Video section spécifique
 .video-section {
   .video-input-selector {
     margin-bottom: 1.5rem;
-    
+
     .video-toggle-group {
       width: 100%;
-      
+
       .toggle-option {
         flex: 1;
         display: flex;
         align-items: center;
         gap: 0.5rem;
         font-weight: 500;
-        
+
         mat-icon {
           font-size: 18px;
           width: 18px;
@@ -249,12 +239,8 @@ $transition: all 0.3s ease;
       }
     }
   }
-  
+
   .video-input-content {
-    .video-url-section {
-      // Styles spécifiques pour l'input URL
-    }
-    
     .video-upload-section {
       .selected-file {
         display: flex;
@@ -266,7 +252,7 @@ $transition: all 0.3s ease;
         border-radius: $border-radius;
         color: $primary-blue;
         font-size: 0.9rem;
-        
+
         mat-icon {
           font-size: 16px;
           width: 16px;
@@ -278,7 +264,6 @@ $transition: all 0.3s ease;
   }
 }
 
-// Upload section
 .upload-section {
   .upload-area {
     border: 2px dashed $border-color;
@@ -288,17 +273,17 @@ $transition: all 0.3s ease;
     cursor: pointer;
     transition: $transition;
     background: $light-gray;
-    
+
     &:hover {
       border-color: $primary-blue;
       background: $light-blue;
-      
+
       .upload-icon {
         color: $primary-blue;
         transform: scale(1.1);
       }
     }
-    
+
     .upload-icon {
       font-size: 48px;
       width: 48px;
@@ -307,20 +292,19 @@ $transition: all 0.3s ease;
       margin-bottom: 1rem;
       transition: $transition;
     }
-    
+
     p {
       margin: 0 0 0.5rem;
       font-size: 1.1rem;
       color: $text-color;
     }
-    
+
     small {
       color: $dark-gray;
     }
   }
 }
 
-// Quiz section spécifique
 .quiz-section {
   .quiz-section-title {
     display: flex;
@@ -330,14 +314,14 @@ $transition: all 0.3s ease;
     font-size: 1.2rem;
     margin-bottom: 1.5rem;
     font-weight: 500;
-    
+
     mat-icon {
       font-size: 20px;
       width: 20px;
       height: 20px;
     }
   }
-  
+
   .quiz-info-section {
     background: $light-blue;
     padding: 1.5rem;
@@ -345,25 +329,25 @@ $transition: all 0.3s ease;
     margin-bottom: 2rem;
     border-left: 4px solid $primary-blue;
   }
-  
+
   .quiz-section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
-    
+
     @media (max-width: 768px) {
       flex-direction: column;
       gap: 1rem;
       align-items: stretch;
     }
   }
-  
+
   .add-question-btn {
     background: $primary-blue;
     color: $white;
     box-shadow: $shadow-medium;
-    
+
     &:hover {
       background: $dark-blue;
       transform: translateY(-2px);
@@ -372,20 +356,19 @@ $transition: all 0.3s ease;
   }
 }
 
-// Questions
 .questions-list {
   .question-item {
     margin-bottom: 2rem;
-    
+
     .question-card {
       border-radius: $border-radius;
       @include card-elevation(1);
       border-left: 4px solid $primary-blue;
       background: $white;
-      
+
       .question-header {
         background: rgba($primary-blue, 0.05);
-        
+
         .question-number {
           @include flex-center;
           width: 32px;
@@ -397,18 +380,18 @@ $transition: all 0.3s ease;
           font-size: 0.9rem;
           margin-right: 1rem;
         }
-        
+
         mat-card-title {
           color: $text-color;
           font-weight: 500;
         }
-        
+
         .question-actions {
           margin-left: auto;
-          
+
           .delete-btn {
             color: $dark-gray;
-            
+
             &:hover {
               background-color: rgba($dark-gray, 0.1);
               color: #dc3545;
@@ -420,22 +403,21 @@ $transition: all 0.3s ease;
   }
 }
 
-// Réponses
 .answers-section {
   margin-top: 1.5rem;
-  
+
   .answers-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-    
+
     @media (max-width: 768px) {
       flex-direction: column;
       gap: 1rem;
       align-items: stretch;
     }
-    
+
     .answers-title {
       display: flex;
       align-items: center;
@@ -444,65 +426,65 @@ $transition: all 0.3s ease;
       font-size: 1rem;
       margin: 0;
       font-weight: 500;
-      
+
       mat-icon {
         font-size: 18px;
         width: 18px;
         height: 18px;
       }
     }
-    
+
     .add-answer-btn {
       color: $primary-blue;
       border: 1px solid rgba($primary-blue, 0.3);
-      
+
       &:hover {
         background-color: $light-blue;
         border-color: $primary-blue;
       }
     }
   }
-  
+
   .answers-list {
     .answer-item {
       margin-bottom: 1rem;
-      
+
       .answer-card {
         border-radius: $border-radius;
         border: 1px solid $border-color;
         background: $white;
         @include card-elevation(0);
-        
+
         &:hover {
           @include card-elevation(1);
           border-color: rgba($primary-blue, 0.3);
         }
-        
+
         .answer-content {
           display: flex;
           align-items: center;
           gap: 1rem;
           padding: 1rem;
-          
+
           @media (max-width: 768px) {
             flex-direction: column;
             align-items: stretch;
           }
-          
+
           .answer-text {
             flex: 1;
           }
-          
+
           .answer-correct {
             flex-shrink: 0;
           }
-          
+
           .answer-actions {
             flex-shrink: 0;
-            
+
             .delete-btn {
               color: $dark-gray;
-              
+
               &:hover {
                 background-color: rgba($dark-gray, 0.1);
                 color: #dc3545;
@@ -515,17 +497,16 @@ $transition: all 0.3s ease;
   }
 }
 
-// Boutons d'ajout
 .add-content-section {
   text-align: center;
   padding: 2rem 0;
-  
+
   .add-content-btn {
     background: $primary-blue;
     color: $white;
     box-shadow: $shadow-medium;
     transition: $transition;
-    
+
     &:hover {
       background: $dark-blue;
       transform: translateY(-2px);
@@ -534,7 +515,6 @@ $transition: all 0.3s ease;
   }
 }
 
-// Actions du formulaire
 .form-actions {
   background: $white;
   border-radius: $border-radius;
@@ -542,29 +522,29 @@ $transition: all 0.3s ease;
   padding: 2rem;
   margin-top: 2rem;
   border: 1px solid $border-color;
-  
+
   .actions-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
     @media (max-width: 768px) {
       flex-direction: column;
       gap: 1rem;
       align-items: stretch;
     }
-    
+
     .cancel-btn {
       color: $dark-gray;
       border: 1px solid $border-color;
       background: $white;
-      
+
       &:hover {
         background-color: $light-gray;
         border-color: $dark-gray;
       }
     }
-    
+
     .primary-actions {
       .submit-btn {
         background: $primary-blue;
@@ -574,13 +554,13 @@ $transition: all 0.3s ease;
         font-weight: 500;
         box-shadow: $shadow-medium;
         transition: $transition;
-        
+
         &:hover:not(:disabled) {
           background: $dark-blue;
           transform: translateY(-2px);
           box-shadow: 0 6px 20px rgba(25, 118, 210, 0.3);
         }
-        
+
         &:disabled {
           background: $medium-gray;
           color: $dark-gray;
@@ -592,12 +572,11 @@ $transition: all 0.3s ease;
   }
 }
 
-// Options de sélection
 .option-content {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   mat-icon {
     font-size: 18px;
     width: 18px;
@@ -606,7 +585,6 @@ $transition: all 0.3s ease;
   }
 }
 
-// Animations
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -626,28 +604,27 @@ $transition: all 0.3s ease;
   animation: fadeInUp 0.3s ease-out;
 }
 
-// Responsive design
 @media (max-width: 768px) {
   .lesson-form-container {
     .form-header {
       .header-content {
         padding: 0 1rem;
-        
+
         .header-text h1 {
           font-size: 2rem;
         }
       }
     }
-    
+
     .form-wrapper {
       padding: 0 1rem 2rem;
     }
   }
-  
+
   .form-section .section-content {
     padding: 1.5rem;
   }
-  
+
   .quiz-section {
     .quiz-info-section {
       padding: 1rem;
@@ -655,127 +632,120 @@ $transition: all 0.3s ease;
   }
 }
 
-// Material Design overrides
 ::ng-deep {
-  // Form fields
   .mat-form-field-appearance-outline {
     .mat-form-field-outline {
       border-radius: $border-radius;
       color: $border-color;
     }
-    
+
     &.mat-focused .mat-form-field-outline-thick {
       border-color: $primary-blue;
     }
-    
+
     .mat-form-field-label {
       color: $dark-gray;
     }
-    
+
     &.mat-focused .mat-form-field-label {
       color: $primary-blue;
     }
   }
-  
-  // Cards
+
   .mat-card {
     border-radius: $border-radius;
     background: $white;
   }
-  
+
   .mat-card-header .mat-card-title {
     color: $text-color;
   }
-  
+
   .mat-card-header .mat-card-subtitle {
     color: $dark-gray;
   }
-  
-  // Buttons
+
   .mat-button-base {
     border-radius: $border-radius;
   }
-  
+
   .mat-raised-button.mat-primary {
     background: $primary-blue;
     color: $white;
-    
+
     &:hover {
       background: $dark-blue;
     }
   }
-  
+
   .mat-fab.mat-accent {
     background: $primary-blue;
     color: $white;
-    
+
     &:hover {
       background: $dark-blue;
     }
   }
-  
-  // Checkboxes
+
   .mat-checkbox-checked .mat-checkbox-background {
     background-color: $primary-blue;
   }
-  
-  .mat-checkbox:not(.mat-checkbox-disabled) .mat-checkbox-ripple .mat-ripple-element {
+
+  .mat-checkbox:not(.mat-checkbox-disabled)
+    .mat-checkbox-ripple
+    .mat-ripple-element {
     background-color: rgba($primary-blue, 0.12);
   }
-  
-  // Select
+
   .mat-select-panel {
     border-radius: $border-radius;
   }
-  
+
   .mat-option.mat-selected:not(.mat-option-multiple) {
     background: rgba($primary-blue, 0.1);
     color: $primary-blue;
   }
-  
-  // Button toggles
+
   .mat-button-toggle-group {
     border-radius: $border-radius;
     box-shadow: $shadow-light;
   }
-  
+
   .mat-button-toggle {
     border-radius: $border-radius;
     border-color: $border-color;
     color: $dark-gray;
-    
+
     &.mat-button-toggle-checked {
       background: $primary-blue;
       color: $white;
-      
+
       .mat-button-toggle-label-content {
         color: $white;
       }
     }
-    
+
     &:not(.mat-button-toggle-checked):hover {
       background: $light-blue;
     }
   }
-  
+
   .mat-button-toggle-label-content {
     line-height: 36px;
   }
-  
-  // Icons
+
   .mat-icon-button {
     transition: $transition;
-    
+
     &:hover {
       transform: scale(1.05);
     }
   }
-  
-  // Hints and errors
+
   .mat-hint {
     color: $dark-gray;
   }
-  
+
   .mat-error {
     color: #dc3545;
   }

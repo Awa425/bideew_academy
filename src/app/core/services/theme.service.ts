@@ -59,7 +59,7 @@ export class ThemeService implements OnDestroy {
 
   toggleDarkMode(): void {
     const newMode = this.settings.mode === 'dark' ? 'light' : 'dark';
-    this.settings.mode = newMode; // Mise à jour immédiate
+    this.settings.mode = newMode; 
     this.updateSettings({ mode: newMode });
   }
 
@@ -88,42 +88,34 @@ export class ThemeService implements OnDestroy {
   }
 
   private applySettings(): void {
-    // Utiliser requestAnimationFrame pour regrouper les mises à jour
     const apply = () => {
       try {
         const html = document.documentElement;
         if (!html) return;
         
-        // Appliquer le schéma de couleurs
         const effectiveMode = this.getEffectiveMode();
         if (html.getAttribute('data-theme') !== effectiveMode) {
           html.setAttribute('data-theme', effectiveMode);
         }
 
-        // Appliquer la couleur d'accent
         if (html.getAttribute('data-accent') !== this.settings.accentColor) {
           html.setAttribute('data-accent', this.settings.accentColor);
         }
 
-        // Appliquer le contraste élevé
         this.toggleClass(html, 'high-contrast', this.settings.highContrast);
         
-        // Appliquer le mouvement réduit
         this.toggleClass(html, 'reduced-motion', this.settings.reducedMotion);
         
-        // Appliquer la taille de police
         if (document.body) {
           document.body.style.setProperty('font-size', `${this.settings.fontSize}px`, 'important');
         }
         
-        // Notifier les abonnés
         this.settingsSubject.next({...this.settings});
       } catch (e) {
         console.error('Error applying theme settings:', e);
       }
     };
 
-    // Utiliser requestAnimationFrame ou setTimeout comme fallback
     if (typeof requestAnimationFrame === 'function') {
       requestAnimationFrame(apply);
     } else {
@@ -153,7 +145,6 @@ export class ThemeService implements OnDestroy {
     try {
       this.mediaQueryListener = () => {
         if (this.settings.mode === 'system') {
-          // Utiliser requestAnimationFrame pour éviter les mises à jour trop fréquentes
           if (this.mediaQueryDebounce) {
             cancelAnimationFrame(this.mediaQueryDebounce);
           }
@@ -176,11 +167,9 @@ export class ThemeService implements OnDestroy {
         distinctUntilChanged()
       )
       .subscribe(() => {
-        // Handle responsive design changes if needed
       });
   }
 
-  // Utility methods
   isDarkMode(): boolean {
     return this.settings.mode === 'dark' || 
            (this.settings.mode === 'system' && this.mediaQuery.matches);
@@ -190,11 +179,10 @@ export class ThemeService implements OnDestroy {
     return this.settings.accentColor;
   }
 
-  // Accessibility features
   increaseFontSize(): void {
     if (this.settings.fontSize < 24) {
       const newSize = this.settings.fontSize + 2;
-      this.settings.fontSize = newSize; // Mise à jour immédiate
+      this.settings.fontSize = newSize; 
       this.updateSettings({ fontSize: newSize });
     }
   }
@@ -202,25 +190,25 @@ export class ThemeService implements OnDestroy {
   decreaseFontSize(): void {
     if (this.settings.fontSize > 12) {
       const newSize = this.settings.fontSize - 2;
-      this.settings.fontSize = newSize; // Mise à jour immédiate
+      this.settings.fontSize = newSize; 
       this.updateSettings({ fontSize: newSize });
     }
   }
 
   resetFontSize(): void {
-    this.settings.fontSize = 16; // Mise à jour immédiate
+    this.settings.fontSize = 16; 
     this.updateSettings({ fontSize: 16 });
   }
 
   toggleHighContrast(): void {
     const newValue = !this.settings.highContrast;
-    this.settings.highContrast = newValue; // Mise à jour immédiate
+    this.settings.highContrast = newValue; 
     this.updateSettings({ highContrast: newValue });
   }
 
   toggleReducedMotion(): void {
     const newValue = !this.settings.reducedMotion;
-    this.settings.reducedMotion = newValue; // Mise à jour immédiate
+    this.settings.reducedMotion = newValue; 
     this.updateSettings({ reducedMotion: newValue });
   }
 }

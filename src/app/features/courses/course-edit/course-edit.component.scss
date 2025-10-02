@@ -1,5 +1,4 @@
 .course-edit-container {
-  // background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   background-color:whitesmoke;
   min-height: 100vh;
   padding-top: 2rem;
@@ -177,7 +176,6 @@ textarea.form-control {
   margin-top: 0.25rem;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .course-edit-container {
     padding-top: 1rem;
@@ -192,7 +190,6 @@ textarea.form-control {
   }
 }
 
-/* Animation pour les états de chargement */
 @keyframes pulse {
   0% {
     opacity: 1;
@@ -209,7 +206,6 @@ textarea.form-control {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* Style pour les boutons d'action */
 .d-flex.justify-content-between .btn {
   min-width: 150px;
 }

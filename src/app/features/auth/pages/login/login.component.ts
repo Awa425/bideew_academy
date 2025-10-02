@@ -22,11 +22,9 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    // Vérifier si l'API Google est déjà chargée
     if (typeof google !== 'undefined') {
       this.initializeGoogleSignIn();
     } else {
-      // Si non, attendre qu'elle soit chargée
       window.addEventListener('google-loaded', () => {
         this.initializeGoogleSignIn();
       });
@@ -43,7 +41,6 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Nettoyage si nécessaire
   }
 
   login() {

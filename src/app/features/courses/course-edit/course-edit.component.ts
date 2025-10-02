@@ -27,8 +27,8 @@ export class CourseEditComponent implements OnInit {
   selectedFile: File | null = null;
   imagePreview: string | null = null;
   currentCourse: any = null;
-  
-  // Nouveau flag pour indiquer si l'image doit être supprimée
+  apiBaseUrlImage = envVars.apiBaseUrlImage;
+
   shouldRemoveImage = false;
 
   levels = [
@@ -71,9 +71,7 @@ export class CourseEditComponent implements OnInit {
       description: [
         '',
         [
-          Validators.required,
-          Validators.minLength(10),
-          Validators.maxLength(1000),
+          Validators.required
         ],
       ],
       level: ['', Validators.required],
@@ -90,17 +88,16 @@ export class CourseEditComponent implements OnInit {
   loadCourse(): void {
     this.isLoading = true;
     this.error = null;
-    this.shouldRemoveImage = false; // Réinitialiser le flag
+    this.shouldRemoveImage = false;
 
     this.courseService.getCourseById(this.courseId).subscribe({
       next: (course: any) => {
         this.currentCourse = course;
-        console.log('Cours chargé:', this.currentCourse);
-        
+
         this.populateForm(course);
         this.isLoading = false;
         if (course.image_path) {
-          this.imagePreview = `${envVars.apiBaseUrl}.'/'.${course.image_path}`;
+          this.imagePreview = `${course.image_path}`;
         } else {
           this.imagePreview = null;
         }
@@ -129,22 +126,15 @@ export class CourseEditComponent implements OnInit {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
       this.selectedFile = target.files[0];
-      this.shouldRemoveImage = false; // Réinitialiser le flag de suppression
-      
-      console.log('Fichier sélectionné:', {
-        name: this.selectedFile.name,
-        size: this.selectedFile.size,
-        type: this.selectedFile.type
-      });
-      
+      this.shouldRemoveImage = false; 
       const allowedTypes = [
         'image/jpeg',
         'image/jpg',
         'image/png',
         'image/gif',
       ];
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      
+      const maxSize = 5 * 1024 * 1024;
+
       if (!allowedTypes.includes(this.selectedFile.type)) {
         this.error = 'Type de fichier non supporté. Utilisez JPG, PNG ou GIF.';
         this.selectedFile = null;
@@ -156,11 +146,10 @@ export class CourseEditComponent implements OnInit {
         this.selectedFile = null;
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         this.imagePreview = e.target?.result as string;
-        console.log('Aperçu de l\'image généré');
       };
       reader.readAsDataURL(this.selectedFile);
 
@@ -169,11 +158,10 @@ export class CourseEditComponent implements OnInit {
   }
 
   removeImage(): void {
-    console.log('Suppression de l\'image demandée');
     this.selectedFile = null;
     this.imagePreview = null;
-    this.shouldRemoveImage = true; // Marquer l'image pour suppression
-    
+    this.shouldRemoveImage = true;
+
     const fileInput = document.getElementById('image') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
@@ -186,82 +174,60 @@ export class CourseEditComponent implements OnInit {
       this.error = null;
       this.successMessage = null;
 
-      // Si il y a une image à traiter (nouvelle ou suppression)
       if (this.selectedFile || this.shouldRemoveImage) {
-        console.log('Mise à jour avec gestion d\'image');
         this.updateCourseWithImage();
       } else {
-        console.log('Mise à jour sans changement d\'image');
         this.updateCourseWithoutImage();
       }
     } else {
-      console.log('Formulaire invalide');
       this.markFormGroupTouched();
     }
   }
 
   private updateCourseWithImage(): void {
     const formData = new FormData();
-    
-    // Ajouter les champs du formulaire
-    Object.keys(this.editCourseForm.value).forEach(key => {
+
+    Object.keys(this.editCourseForm.value).forEach((key) => {
       const value = this.editCourseForm.value[key];
       if (value !== null && value !== undefined) {
         formData.append(key, value.toString());
       }
     });
 
-    // Ajouter le fichier image s'il existe
     if (this.selectedFile) {
-      console.log('Ajout du fichier au FormData:', this.selectedFile.name);
       formData.append('image', this.selectedFile, this.selectedFile.name);
     }
 
-    // Indiquer si l'image doit être supprimée
     if (this.shouldRemoveImage) {
-      console.log('Ajout du flag de suppression d\'image');
       formData.append('remove_image', 'true');
     }
 
-    // Debug: Afficher le contenu du FormData
-    console.log('FormData contenu:');
-    for (let pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
-
-    this.courseService.updateCourse(this.courseId, formData)
-      .subscribe({
-        next: (response) => this.handleUpdateSuccess(response),
-        error: (error) => this.handleUpdateError(error)
-      });
+    this.courseService.updateCourse(this.courseId, formData).subscribe({
+      next: (response) => this.handleUpdateSuccess(response),
+      error: (error) => this.handleUpdateError(error),
+    });
   }
 
   private updateCourseWithoutImage(): void {
     const courseData = { ...this.editCourseForm.value };
-    
-    console.log('Données du cours à envoyer:', courseData);
-    
-    this.courseService.updateCourse(this.courseId, courseData)
-      .subscribe({
-        next: (response) => this.handleUpdateSuccess(response),
-        error: (error) => this.handleUpdateError(error)
-      });
+
+    this.courseService.updateCourse(this.courseId, courseData).subscribe({
+      next: (response) => this.handleUpdateSuccess(response),
+      error: (error) => this.handleUpdateError(error),
+    });
   }
 
   private handleUpdateSuccess(response: any): void {
-    console.log('Réponse du serveur:', response);
     this.isSaving = false;
     this.successMessage = 'Cours modifié avec succès !';
-    
-    // Réinitialiser les flags
+
     this.shouldRemoveImage = false;
     this.selectedFile = null;
-    
-    // Recharger pour voir les changements
+
     setTimeout(() => {
       this.loadCourse();
     }, 500);
-    
+
     setTimeout(() => {
       this.router.navigate(['/courses', this.courseId]);
     }, 2000);
@@ -272,9 +238,9 @@ export class CourseEditComponent implements OnInit {
     console.error('Status:', error.status);
     console.error('Message:', error.message);
     console.error('Error body:', error.error);
-    
+
     this.isSaving = false;
-    
+
     let errorMessage = 'Erreur lors de la modification du cours';
     if (error.error?.message) {
       errorMessage += ': ' + error.error.message;
@@ -286,7 +252,7 @@ export class CourseEditComponent implements OnInit {
     } else if (error.message) {
       errorMessage += ': ' + error.message;
     }
-    
+
     this.error = errorMessage;
   }
 
@@ -360,40 +326,19 @@ export class CourseEditComponent implements OnInit {
     if (!this.currentCourse) return false;
 
     const currentValues = this.editCourseForm.value;
-    const hasTextChanges = (
+    const hasTextChanges =
       currentValues.title !== this.currentCourse.title ||
       currentValues.description !== this.currentCourse.description ||
       currentValues.level !== this.currentCourse.level ||
       currentValues.duration_minutes !== this.currentCourse.duration_minutes ||
       currentValues.prerequis !== (this.currentCourse.prerequis || '') ||
-      currentValues.learning_objectives !== (this.currentCourse.objectif || '') ||
-      currentValues.is_active !== this.currentCourse.is_active
-    );
+      currentValues.learning_objectives !==
+        (this.currentCourse.objectif || '') ||
+      currentValues.is_active !== this.currentCourse.is_active;
 
-    const hasImageChanges = (
-      this.selectedFile !== null ||
-      this.shouldRemoveImage
-    );
+    const hasImageChanges =
+      this.selectedFile !== null || this.shouldRemoveImage;
 
     return hasTextChanges || hasImageChanges;
   }
-
-  // Méthode de test pour debug
-  // testImageUpload(): void {
-  //   if (this.selectedFile) {
-  //     console.log('Test d\'upload d\'image');
-  //     const formData = new FormData();
-  //     formData.append('image', this.selectedFile);
-      
-  //     this.courseService.uploadCourseImage(this.courseId, formData).subscribe({
-  //       next: (response) => {
-  //         console.log('Image uploadée avec succès:', response);
-  //         this.loadCourse(); // Recharger pour voir l'image
-  //       },
-  //       error: (error) => {
-  //         console.error('Erreur upload image:', error);
-  //       }
-  //     });
-  //   }
-  // }
 }

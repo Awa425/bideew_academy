@@ -1,11 +1,9 @@
 <div class="quiz-container animate-fade-in">
-  <!-- Loading State -->
   <div *ngIf="isLoading" class="loading-state">
     <div class="loader"></div>
     <p>Chargement du quiz...</p>
   </div>
 
-  <!-- Error State -->
   <div *ngIf="errorMessage && !isLoading" class="error-state">
     <div class="error-content">
       <div class="error-icon">!</div>
@@ -20,13 +18,11 @@
     </div>
   </div>
 
-  <!-- Quiz Content -->
   <div *ngIf="!isLoading && !errorMessage && currentQuestion">
     <div class="quiz-header mt-5 mb-3">
       <h4>{{ quizTitle }}</h4>
     </div>
 
-    <!-- Quiz Questions -->
     <div *ngIf="!showResults && !showSummary" class="quiz-content">
       <a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR">
         <img

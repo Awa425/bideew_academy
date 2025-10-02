@@ -41,17 +41,13 @@ export class CourseService {
     let errorMessage = 'Une erreur est survenue';
 
     if (error.status === 0) {
-      // Erreur réseau ou CORS
       errorMessage =
         'Impossible de se connecter au serveur. Vérifiez votre connexion.';
     } else if (error.error instanceof ErrorEvent) {
-      // Erreur côté client
       errorMessage = `Erreur: ${error.error.message}`;
     } else {
-      // Erreur côté serveur
       errorMessage = `Le serveur a retourné le code ${error.status} avec le message: ${error.message}`;
 
-      // Si le serveur fournit un message d'erreur plus détaillé
       if (error.error && error.error.message) {
         errorMessage = error.error.message;
       }
@@ -106,7 +102,7 @@ export class CourseService {
     );
   }
 
-  generedCertificat(course_id: number): any {
+  generedCertificat(course_id: any): any {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
@@ -147,11 +143,20 @@ export class CourseService {
   createLesson(courseId: number, lessonData: any): Observable<any> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    // ✅ IMPORTANT: Pas de Content-Type pour FormData - le navigateur l'ajoute automatiquement
 
     return this.http.post(
       `${envVars.apiBaseUrl}/courses/${courseId}/lessons`,
       lessonData,
+      { headers }
+    );
+  }
+  createQuiz(courseId: number, quizData: any): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.post(
+      `${envVars.apiBaseUrl}/courses/${courseId}/quizzes`,
+      quizData,
       { headers }
     );
   }
@@ -213,7 +218,7 @@ export class CourseService {
   }
 
   getCourseById(id: any) {
-    const token = localStorage.getItem('access_token'); // Get stored token
+    const token = localStorage.getItem('access_token'); 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(`${envVars.apiBaseUrl}/courses/${id}`, {
       headers,
@@ -221,7 +226,7 @@ export class CourseService {
   }
 
   getLessonsByIdCourse(id: number) {
-    const token = localStorage.getItem('access_token'); // Get stored token
+    const token = localStorage.getItem('access_token'); 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(`${envVars.apiBaseUrl}/courses/${id}\lessons`, {
       headers,
@@ -229,7 +234,7 @@ export class CourseService {
   }
 
   getLessonsByIdLesson(idCour: number, idLesson: number) {
-    const token = localStorage.getItem('access_token'); // Get stored token
+    const token = localStorage.getItem('access_token'); 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(
       `${envVars.apiBaseUrl}/courses/${idCour}\/lessons/${idLesson}`,
@@ -240,7 +245,7 @@ export class CourseService {
   }
 
   getQuizzByLesson(idCour: any) {
-    const token = localStorage.getItem('access_token'); // Get stored token
+    const token = localStorage.getItem('access_token'); 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(`${envVars.apiBaseUrl}/courses/${idCour}\/quizzes`, {
       headers,

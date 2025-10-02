@@ -83,7 +83,6 @@
     }
   }
 
-  // Newsletter form styling
   .newsletter-form {
     display: flex;
     gap: 0.5rem;
@@ -138,7 +137,6 @@
     }
   }
 
-  // Footer bottom section
   .footer-bottom {
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     padding: 1.5rem 0;
@@ -178,7 +176,6 @@
   }
 }
 
-// Responsive design
 @media (max-width: 768px) {
   .footer {
     .footer-content {
@@ -251,7 +248,6 @@
   }
 }
 
-// Animation pour le footer
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -267,7 +263,6 @@
   animation: fadeInUp 0.6s ease-out;
 }
 
-// Hover effects pour les sections
 .footer-section {
   transition: transform 0.3s ease;
   

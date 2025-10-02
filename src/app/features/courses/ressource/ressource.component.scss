@@ -1,10 +1,9 @@
 .resources-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8faff 0%, #e3f2fd 100%);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-// Animation pour le fade-in + slide-down
 @keyframes fadeSlideDown {
   0% {
     opacity: 0;
@@ -16,7 +15,6 @@
   }
 }
 
-// Animation pour le texte (zoom + fade-in)
 @keyframes fadeZoomIn {
   0% {
     opacity: 0;
@@ -28,13 +26,12 @@
   }
 }
 
-// Header principal
 .header {
-  background: linear-gradient(135deg, #2196f3, #000000); // ✅ Dégradé moderne
+  background: linear-gradient(135deg, #2196f3, #000000);
   color: white;
   padding: 2rem 0;
   box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
-  animation: fadeSlideDown 0.9s ease-out; // ✅ Animation d’apparition
+  animation: fadeSlideDown 0.9s ease-out;
 
   &-content {
     max-width: 1200px;
@@ -47,7 +44,6 @@
     text-align: center;
   }
 
-  // Bloc du titre et description
   &-top {
     display: flex;
     flex-direction: column;
@@ -55,7 +51,6 @@
     margin-bottom: 1rem;
   }
 
-  // Titre principal
   &-title {
     margin: 0;
     font-size: 2.5rem;
@@ -64,7 +59,6 @@
     animation: fadeZoomIn 1s ease-out;
   }
 
-  // Description sous le titre
   &-description {
     margin: 0.5rem 0 0 0;
     opacity: 0.85;
@@ -73,7 +67,6 @@
     animation: fadeZoomIn 1.2s ease-out;
   }
 
-  // Bouton d'action éventuel (si tu en ajoutes un)
   &-btn {
     margin-top: 1.5rem;
     background-color: white;
@@ -93,7 +86,6 @@
   }
 }
 
-/* Responsive : meilleure gestion sur mobile */
 @media (max-width: 768px) {
   .header {
     padding: 1.5rem 1rem;
@@ -108,8 +100,6 @@
     }
   }
 }
-
-
 
 .btn-back {
   background: rgba(255, 255, 255, 0.2);
@@ -156,7 +146,6 @@
   }
 }
 
-// Main content
 .main-content {
   max-width: 1200px;
   margin: 0 auto;
@@ -269,7 +258,6 @@
   }
 }
 
-// Resources
 .resources-section {
   &.grid-view {
     display: grid;
@@ -422,7 +410,6 @@
   }
 }
 
-// No resources
 .no-resources {
   text-align: center;
   padding: 3rem;
@@ -442,7 +429,6 @@
   }
 }
 
-// Responsive
 @media (max-width: 768px) {
   .header {
     &-title {

@@ -31,7 +31,6 @@
     </div>
   </section>
 
-  <!-- Message d'erreur -->
   <div *ngIf="error" class="error-message">
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -300,9 +299,6 @@
         </span>
         <div class="selected-info" *ngIf="selectedUsers.length > 0">
           {{ selectedUsers.length }} utilisateur(s) sélectionné(s)
-          <!-- <button class="link-btn" (click)="deleteSelectedUsers()">
-            Supprimer la sélection
-          </button> -->
         </div>
       </div>
 

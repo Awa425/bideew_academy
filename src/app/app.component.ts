@@ -20,13 +20,11 @@ export class AppComponent implements OnInit {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
-        // Vérifie si on est sur la page login
         this.isLoginPage = event.urlAfterRedirects.includes('/login');
       });
   }
 
   ngOnInit(): void {
-    // Initialisation du thème
     this.themeService.getSettings().subscribe();
   }
 }

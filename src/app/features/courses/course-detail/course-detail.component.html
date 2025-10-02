@@ -1,4 +1,3 @@
-<!-- Lecteur vidéo modal amélioré -->
 <div class="video-modal" *ngIf="currentVideo" [@fadeInOut]>
   <div class="video-backdrop" (click)="closeVideo()"></div>
   <div
@@ -31,7 +30,6 @@
         Votre navigateur ne supporte pas la lecture de vidéos HTML5.
       </video>
 
-      <!-- Overlay de lecture -->
       <div
         class="video-overlay"
         *ngIf="!isVideoPlaying"
@@ -47,7 +45,6 @@
         </button>
       </div>
 
-      <!-- Contrôles du lecteur vidéo -->
       <div
         class="video-controls"
         [class.hidden]="!showControls && isVideoPlaying"
@@ -176,13 +173,7 @@
     </div>
   </div>
 </div>
-<!-- Contenu principal du cours -->
-<!-- ===========================================
-     PAGE DE DÉTAIL DU COURS
-     =========================================== -->
 <main class="course-detail-container" *ngIf="course">
-  <!-- En-tête avec image de couverture et informations principales -->
-  <!-- En-tête avec image de couverture -->
   <header class="course-header">
     <div
       class="course-cover"
@@ -198,10 +189,6 @@
           {{ course.level | titlecase }}
         </div>
         <h1 class="course-title">{{ course.title }}</h1>
-        <!-- <p class="course-instructor">
-          <mat-icon aria-hidden="true">person</mat-icon>
-          {{ course.user.name }}
-        </p> -->
         <div
           class="course-meta"
           role="contentinfo"
@@ -212,15 +199,9 @@
             {{ course.duration_minutes }} heures
           </span>
           <span class="meta-item">
-            <!-- <mat-icon aria-hidden="true">star</mat-icon>
-            <span>{{ course.rating }}</span> -->
             <mat-icon aria-hidden="true">person</mat-icon>
             Dr. {{ course.user.name }}
           </span>
-          <!-- <span class="meta-item">
-            <mat-icon aria-hidden="true">people</mat-icon>
-            <span>{{ course.studentsEnrolled | number }} étudiants</span>
-          </span> -->
         </div>
         <button
           mat-raised-button
@@ -237,7 +218,6 @@
   </header>
 
   <div class="course-content" role="main">
-    <!-- Contenu principal -->
     <div class="main-content">
       <h2 class="visually-hidden">Contenu principal du cours</h2>
       <a [routerLink]="['../']" class="btn-btn-info" title="RETOUR"
@@ -248,7 +228,6 @@
         animationDuration="0ms"
         aria-label="Navigation des sections du cours"
       >
-        <!-- Onglet Aperçu -->
         <mat-tab label="Aperçu">
           <div class="tab-content">
             <section aria-labelledby="about-course-heading">
@@ -262,7 +241,6 @@
                 aria-labelledby="learning-objectives-heading"
               >
                 <li *ngFor="let objective of course.objectifList">
-                  <!-- <li> -->
                   <mat-icon aria-hidden="true">check_circle</mat-icon>
                   <span>{{ objective }}</span>
                 </li>
@@ -274,11 +252,6 @@
                 class="prerequisites"
                 aria-labelledby="prerequisites-heading"
               >
-                <!-- <mat-chip-listbox>
-                  <mat-chip *ngFor="let prereq of course.prerequisites">
-                    {{ course.prerequis }}
-                  </mat-chip>
-                </mat-chip-listbox> -->
                 <mat-chip-listbox>
                   <mat-chip *ngFor="let prereq of course.prerequisList">
                     {{ prereq }}
@@ -288,68 +261,9 @@
             </section>
           </div>
         </mat-tab>
-
-        <!-- Onglet Programme -->
-        <!-- <mat-tab label="Programme">
-          <div class="tab-content">
-            <div class="lessons-container" role="list">
-              <div
-                *ngFor="let lesson of course.lessons; trackBy: trackByLessonId"
-                class="lesson-card"
-                role="listitem"
-                [attr.aria-label]="
-                  'Leçon : ' +
-                  lesson.title +
-                  (lesson.isPreview ? ' (Aperçu)' : '') +
-                  (isLessonCompleted(lesson.id) ? ' - Terminée' : '')
-                "
-                tabindex="0"
-                [class.preview]="lesson.isPreview"
-                (click)="
-                  lesson.isPreview
-                    ? playPreviewVideo(lesson)
-                    : showLesson(lesson)
-                "
-                matRipple
-              >
-                <div class="lesson-header">
-                  <div
-                    class="lesson-icon"
-                    [class.preview]="lesson.isPreview"
-                    aria-hidden="true"
-                  ></div>
-
-                  <div class="lesson-title-wrapper">
-                    <h3 class="lesson-title">
-                      <mat-icon
-                        [color]="lesson.isPreview ? 'primary' : 'accent'"
-                      >
-                        {{ getLessonIcon(lesson.title) }} </mat-icon
-                      >{{ lesson.title }}
-                    </h3>
-                    <div class="lesson-meta">
-                      <span class="preview-badge" *ngIf="lesson.isPreview">
-                        <mat-icon aria-hidden="true">play_circle</mat-icon>
-                        Aperçu
-                      </span>
-                      <span
-                        class="completed-badge"
-                        *ngIf="isLessonCompleted(lesson.id)"
-                      >
-                        <mat-icon aria-hidden="true">check_circle</mat-icon>
-                        Terminé
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </mat-tab> -->
       </mat-tab-group>
     </div>
 
-    <!-- Barre latérale -->
     <aside class="sidebar">
       <mat-card class="enroll-card" *ngIf="users?.user?.role === 'apprenant'">
         <mat-card-header>

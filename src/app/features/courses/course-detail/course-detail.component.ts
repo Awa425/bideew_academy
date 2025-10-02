@@ -98,7 +98,6 @@ export class CourseDetailComponent implements OnInit {
   private loadCourseData(id: any) {
     this.courseService.getCourseById(id).subscribe((data) => {
       this.course = data;
-      //PREREQUIS
       if (this.course.prerequis) {
         this.course.prerequisList = this.course.prerequis
           .split(',')
@@ -106,7 +105,6 @@ export class CourseDetailComponent implements OnInit {
       } else {
         this.course.prerequisList = [];
       }
-      //OBJECTIF
       if (this.course.objectif) {
         this.course.objectifList = this.course.objectif
           .split(',')
@@ -130,7 +128,6 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  // Méthode pour obtenir l'icône en fonction du type de leçon
   getLessonIcon(type: string): string {
     switch (type) {
       case 'video':
@@ -144,32 +141,24 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  // Vérifie si une leçon est terminée
   isLessonCompleted(lessonId: string): boolean {
-    // Implémentez la logique pour vérifier si la leçon est terminée
     return false;
   }
 
-  // Vérifie si une leçon est déverrouillée
   isLessonUnlocked(lesson: any): boolean {
-    // Implémentez la logique pour vérifier si la leçon est déverrouillée
     return true;
   }
 
-  // Obtient la progression d'une leçon
   getLessonProgress(lessonId: string): number {
-    // Implémentez la logique pour obtenir la progression de la leçon
     return 0;
   }
 
-  // Affiche le contenu d'une leçon
   showLesson(lesson: Lessons[]): void {
     if (!this.isLessonUnlocked(lesson)) {
       return;
     }
     this.currentLesson = lesson;
     this.showLessonContent = true;
-    // Faites défiler jusqu'au contenu de la leçon
     setTimeout(() => {
       const element = document.getElementById('lesson-content');
       if (element) {
@@ -178,7 +167,6 @@ export class CourseDetailComponent implements OnInit {
     }, 100);
   }
 
-  // Obtient la leçon suivante
   getNextLesson(): Lessons[] | null {
     if (!this.course || !this.currentLesson) return null;
     const currentIndex = this.course.lessons.findIndex();
@@ -187,14 +175,12 @@ export class CourseDetailComponent implements OnInit {
       : null;
   }
 
-  // Obtient la leçon précédente
   getPreviousLesson(): any {
     if (!this.course || !this.currentLesson) return null;
     const currentIndex = this.course.lessons.findIndex();
     return currentIndex > 0 ? this.course.lessons[currentIndex - 1] : null;
   }
 
-  // Gestion du lecteur vidéo
   playPreviewVideo(lesson: any): void {
     this.currentVideo = {
       src: lesson.videoUrl,
@@ -298,12 +284,6 @@ export class CourseDetailComponent implements OnInit {
       }, 1000);
     }
   }
-
-  /**
-   * Formate un nombre de secondes au format MM:SS
-   * @param timeInSeconds Le temps en secondes
-   * @returns Le temps formaté (ex: 02:30)
-   */
   formatTime(timeInSeconds: number): string {
     if (isNaN(timeInSeconds) || !isFinite(timeInSeconds)) {
       return '00:00';
@@ -318,48 +298,12 @@ export class CourseDetailComponent implements OnInit {
     ].join(':');
   }
 
-  // ngOnDestroy(): void {
-  //   if (this.controlsTimeout) {
-  //     clearTimeout(this.controlsTimeout);
-  //   }
-  //   if (this.isFullscreen && document.exitFullscreen) {
-  //     document.exitFullscreen();
-  //   }
-  // }
-
-  /**
-   * Fonction de suivi pour l'optimisation du rendu de la liste des leçons
-   * @param index Index de l'élément dans la liste
-   * @param lesson La leçon courante
-   * @returns Un identifiant unique pour la leçon
-   */
   trackByLessonId(index: number, lesson: Lessons): string {
     return lesson.id;
   }
 
-  /**
-   * Démarre le cours en affichant la première leçon disponible
-   */
-  // startCourse(): void {
-  //   if (!this.course?.lessons?.length) {
-  //     console.error('Aucune leçon disponible pour ce cours');
-  //     return;
-  //   }
-  //   // Faire défiler vers la section de la leçon
-  //   setTimeout(() => {
-  //     const lessonSection = document.getElementById('lesson-content');
-  //     if (lessonSection) {
-  //       lessonSection.scrollIntoView({ behavior: 'smooth' });
-  //     }
-  //   }, 100);
-  // }
-
-  /**
-   * Redirige vers la page des leçons du cours
-   */
   enrollInCourse(): void {
     if (this.course) {
-      // Le chemin est relatif au chemin actuel, donc on utilise juste 'lessons'
       this.router.navigate(['lessons'], { relativeTo: this.route });
     }
   }

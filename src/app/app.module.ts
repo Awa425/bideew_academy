@@ -5,7 +5,6 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-// Angular Material Modules
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,10 +18,8 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule } from '@angular/material/dialog';
 
-// Interceptors
 import { HttpErrorInterceptor } from './core/interceptors/http-error.interceptor';
 
-// Components
 import { RegisterComponent } from './features/auth/pages/register/register.component';
 import { LoginComponent } from './features/auth/pages/login/login.component';
 import { CoursesComponent } from './features/courses/courses.component';
@@ -44,7 +41,6 @@ import { PdfViewerModule } from 'ng2-pdf-viewer';
     HttpClientModule,
     AppRoutingModule,
     
-    // Angular Material Modules
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -66,6 +62,6 @@ import { PdfViewerModule } from 'ng2-pdf-viewer';
       multi: true
     }
   ],
-  bootstrap: [LoginComponent] // You can change this to AppComponent if needed
+  bootstrap: [LoginComponent] 
 })
 export class AppModule { }

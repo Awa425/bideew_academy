@@ -3,7 +3,6 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   
-  // Section Hero
   .hero-section {
     position: relative;
     padding: 4rem 2rem 3rem;
@@ -44,7 +43,6 @@
       }
     }
     
-    // Statistiques globales
     .stats-overview {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -102,7 +100,6 @@
       }
     }
     
-    // Barre de progression globale
     .global-progress-bar {
       max-width: 600px;
       margin: 2rem auto;
@@ -134,7 +131,6 @@
     }
   }
   
-  // Timeline
   .timeline-container {
     background: #f8fafc;
     padding: 4rem 0;
@@ -323,7 +319,6 @@
         }
       }
       
-      // Couleurs selon le type
       &.lesson_start .timeline-content {
         border-left-color: #3b82f6;
       }
@@ -338,7 +333,6 @@
     }
   }
   
-  // Section détaillée des leçons
   .detailed-progress {
     background: linear-gradient(135deg, #f8fafc, #e2e8f0);
     padding: 4rem 0;
@@ -476,7 +470,6 @@
     }
   }
   
-  // Section des Quiz
   .quizzes-section {
     background: white;
     padding: 4rem 0;
@@ -601,7 +594,6 @@
     }
   }
   
-  // États vides
   .empty-state {
     text-align: center;
     padding: 6rem 2rem;
@@ -656,7 +648,6 @@
     }
   }
   
-  // Message de chargement
   .loading-state {
     text-align: center;
     padding: 6rem 2rem;
@@ -679,7 +670,6 @@
     }
   }
   
-  // Animations
   @keyframes spin {
     0% {
       transform: rotate(0deg);
@@ -705,7 +695,6 @@
     }
   }
   
-  // Responsive
   @media (max-width: 768px) {
     .hero-section {
       padding: 2rem 1rem;

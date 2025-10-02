@@ -16,10 +16,10 @@ import { Course, Lessons } from '../../../core/models/course.model';
     MatButtonModule,
     MatIconModule,
     MatDividerModule,
-    MatListModule
+    MatListModule,
   ],
   templateUrl: './course-start.component.html',
-  styleUrls: ['./course-start.component.scss']
+  styleUrls: ['./course-start.component.scss'],
 })
 export class CourseStartComponent {
   @Input() course: Lessons | null = null;
@@ -39,11 +39,11 @@ export class CourseStartComponent {
 
   get estimatedDuration(): string {
     if (!this.course?.title?.length) return 'N/A';
-    
-    const totalMinutes = this.course.id.length * 15; // Estimation de 15 minutes par leçon
+
+    const totalMinutes = this.course.id.length * 15;
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-    
+
     if (hours > 0) {
       return `${hours}h${minutes > 0 ? ` ${minutes}min` : ''}`;
     }

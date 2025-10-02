@@ -21,14 +21,20 @@ export class CertificatComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.courseService.generedCertificat(1).subscribe((data: any) => {
-      this.courseService
-        .getCertificat(data.certificate_id)
-        .subscribe((pdfBlob: Blob) => {
-          const unsafeUrl = URL.createObjectURL(pdfBlob);
-          this.certificat =
-            this.sanitizer.bypassSecurityTrustResourceUrl(unsafeUrl);
-        });
-    });
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.courseService.generedCertificat(id).subscribe((data: any) => {
+        this.courseService
+          .getCertificat(data.certificate_id)
+          .subscribe((pdfBlob: Blob) => {
+            const unsafeUrl = URL.createObjectURL(pdfBlob);
+            this.certificat =
+              this.sanitizer.bypassSecurityTrustResourceUrl(unsafeUrl);
+          });
+      });
+    } else {
+      console.error('Course ID is missing');
+      this.router.navigate(['/courses']);
+    }
   }
 }

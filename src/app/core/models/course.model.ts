@@ -5,7 +5,7 @@ export interface Course {
   description: string;
   longDescription?: string;
   level: 'beginner' | 'intermediate' | 'advanced';
-  duration_minutes: number; // in hours
+  duration_minutes: number;
   image_path: string;
   instructor: string;
   rating: number;
@@ -23,19 +23,19 @@ export interface Course {
 export interface Lessons {
   id: string;
   title: string;
-  description?: string; // Description détaillée de la leçon
-  duration_minutes: number; // in minutes
-  order: number; // in minutes
+  description?: string; 
+  duration_minutes: number; 
+  order: number;
   type: 'video' | 'text' | 'quiz' | 'assignment';
-  content?: string; // URL or text content
+  content?: string; 
   isPreview: boolean;
   course_id : Course[];
   resources: Resource[];
   quiz?: Quiz;
-  is_published?: string; // URL de la miniature pour la vidéo
-  created_at?: string; // URL de la vidéo pour les leçons de type vidéo
-  updated_at?: string; // URL de la vidéo pour les leçons de type vidéo
-  is_locked?: string; // URL de la vidéo pour les leçons de type vidéo
+  is_published?: string; 
+  created_at?: string; 
+  updated_at?: string; 
+  is_locked?: string; 
 }
 
 export interface Resource {
@@ -51,7 +51,7 @@ export interface Quiz {
   description?: string;
   questions: Question[];
   passingScore: number;
-  timeLimit?: number; // in minutes
+  timeLimit?: number; 
 }
 
 export interface Question {
@@ -63,9 +63,6 @@ export interface Question {
   explanation?: string;
   points: number;
 }
-
-// Créez un fichier api-response.model.ts
-// api-response.model.ts// api-response.model.ts
 export interface PaginationLinks {
   url: string | null;
   label: string;

@@ -106,7 +106,7 @@ export class QuizComponent implements OnInit {
 
   isQuestionCorrect(question: any): boolean {
     if (question.type === 'text') {
-      return true; // On considère toutes les réponses texte comme correctes
+      return true; 
     }
 
     if (question.type === 'single_choice') {
@@ -180,7 +180,6 @@ export class QuizComponent implements OnInit {
     }).length;
   }
 
-  // Version corrigée pour vérifier si une question a une réponse
   private hasAnswer(question: any): boolean {
     if (question.type === 'text') {
       return question.selectedText && question.selectedText.trim() !== '';

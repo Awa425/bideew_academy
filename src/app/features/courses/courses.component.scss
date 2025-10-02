@@ -1,4 +1,3 @@
-// Variables
 :root {
   --primary-color: #6f42c1;
   --secondary-color: #f8f9fa;
@@ -24,7 +23,6 @@
   }
 }
 .courses-container {
-  // padding: 2rem 1rem;
   max-width: 17000px;
   margin: 0 auto;
 
@@ -50,13 +48,7 @@
   }
   .hero-section {
     position: relative;
-    background: linear-gradient(
-        to right,
-        rgba(10, 50, 150, 0.7) 0%,
-        /* Bleu royal intense */ rgba(0, 100, 200, 0.8) 30%,
-        /* Bleu électrique */ rgba(200, 230, 255, 0.5) 70%,
-        /* Blanc bleuté léger */ rgba(0, 0, 0, 0.3) 100% /* Noir subtil */
-      ),
+    background: linear-gradient(to right, rgba(10, 50, 150, 0.7) 0%),
       url("/assets/images/background-pattern-dark.png") center/cover no-repeat;
     text-align: center;
     height: 320px;
@@ -64,7 +56,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    // padding: 2rem;
     margin-top: 0.5rem;
     border-radius: 1rem;
     overflow: hidden;
@@ -107,7 +98,6 @@
     animation: slideUp 1.8s ease forwards;
   }
 
-  /* Animations */
   @keyframes fadeIn {
     0% {
       opacity: 0;
@@ -192,56 +182,6 @@
     background: linear-gradient(to right, #9c27b0, #6a1b9a);
     transform: scale(1.05);
   }
-
-  // .courses-grid {
-  //   display: grid;
-  //   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  //   gap: 2rem;
-  //   margin-bottom: 4rem;
-
-  //   .course-card {
-  //     background: white;
-  //     border-radius: 1rem;
-  //     overflow: hidden;
-  //     box-shadow: var(--shadow);
-  //     transition: transform 0.3s ease;
-
-  //     &:hover {
-  //       transform: translateY(-5px);
-  //     }
-
-  //     .course-image {
-  //       height: 200px;
-  //       overflow: hidden;
-
-  //       img {
-  //         width: 100%;
-  //         height: 100%;
-  //         object-fit: cover;
-  //       }
-  //     }
-
-  //     .course-content {
-  //       padding: 1.5rem;
-
-  //       h3 {
-  //         font-size: 1.25rem;
-  //         margin-bottom: 1rem;
-  //         color: var(--primary-dark);
-  //       }
-
-  //       p {
-  //         color: var(--gray-600);
-  //         margin-bottom: 1.5rem;
-  //       }
-
-  //       .course-meta {
-  //         display: flex;
-  //         gap: 1rem;
-  //         margin-bottom: 1.5rem;
-
-  //         span {
-  // Card styles
   .card {
     border: none;
     border-radius: var(--border-radius);
@@ -300,69 +240,6 @@
       }
     }
   }
-  //             background: var(--primary-light);
-  //             color: var(--primary-dark);
-  //           }
-
-  //           &.level {
-  //             background: var(--gray-100);
-  //             color: var(--gray-600);
-  //           }
-  //         }
-  //       }
-
-  //       .enroll-btn {
-  //         width: 100%;
-  //         padding: 0.75rem;
-  //         background: var(--primary-color);
-  //         color: white;
-  //         border: none;
-  //         border-radius: 0.5rem;
-  //         cursor: pointer;
-  //         transition: background 0.3s ease;
-
-  //         &:hover {
-  //           background: var(--primary-dark);
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-
-  // .cta-section {
-  //   text-align: center;
-  //   padding: 4rem 0;
-  //   background: var(--gray-50);
-  //   border-radius: 1rem;
-
-  //   h2 {
-  //     font-size: 2rem;
-  //     color: var(--primary-dark);
-  //     margin-bottom: 1rem;
-  //   }
-
-  //   p {
-  //     color: var(--gray-600);
-  //     margin-bottom: 2rem;
-  //   }
-
-  //   .primary-btn {
-  //     padding: 1rem 2rem;
-  //     background: var(--primary-color);
-  //     color: white;
-  //     border: none;
-  //     border-radius: 0.5rem;
-  //     font-size: 1.125rem;
-  //     cursor: pointer;
-  //     transition: background 0.3s ease;
-
-  //     &:hover {
-  //       background: var(--primary-dark);
-  //     }
-  //   }
-  // }
-
-  // Search bar
   .search-bar {
     max-width: 600px;
     margin: 0 auto 2rem;
@@ -393,51 +270,11 @@
     }
   }
 
-  // Loading spinner
   .spinner-border {
     width: 3rem;
     height: 3rem;
     color: var(--primary-color);
   }
-  //     margin-bottom: 2rem;
-  // }
-
-  // @media (max-width: 768px) {
-  //     padding: 2rem 1rem;
-
-  //     .hero-section {
-  //     background-image: linear-gradient(to right, rgba(186, 104, 200, 0.7), rgba(171, 71, 188, 0.7)), url('/assets/images/background-pattern-dark.png');
-  //     background-size: cover;
-  //     background-position: center;
-  //       h1 {
-  //       font-size: 3rem;
-  //       color: var(--primary-color);
-  //       margin-bottom: 1rem;
-  //       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-  //       transform: scale(1.05);
-  //       transition: transform 0.3s ease;
-
-  //       &:hover {
-  //         transform: scale(1.1);
-  //       }
-  //         font-size: 2rem;
-  //       }
-
-  //       p {
-  //         font-size: 1.125rem;
-  //       }
-  //     }
-
-  //     .courses-grid {
-  //       grid-template-columns: 1fr;
-  //     }
-
-  //     .cta-section {
-  //       padding: 2rem 0;
-  //     }
-  //   }
-
-  /* ===== Modernisation des styles pour la section des cours ===== */
 
   .courses-main {
     padding: 2rem;
@@ -591,7 +428,6 @@
     }
   }
 
-  /* Responsive padding */
   @media (max-width: 768px) {
     .courses-main {
       padding: 1rem;
@@ -677,7 +513,6 @@
     min-height: 150px;
   }
 
-  // Responsive adjustments
   @media (max-width: 768px) {
     .courses-container {
       padding: 1.5rem 1rem;
@@ -743,7 +578,6 @@
     }
   }
 
-  /* Responsive adjustments */
   @media (max-width: 768px) {
     .cta-section {
       flex-direction: column;
