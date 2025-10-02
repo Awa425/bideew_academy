@@ -1,1 +1,14 @@
-<p>confirmation-dialog works!</p>
+<div class="dialog-overlay" (click)="onCancel()">
+  <div class="dialog-container" (click)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <h6>Confirmation de déconnexion</h6>
+    </div>
+    <div class="dialog-body">
+      <p>Êtes-vous sûr de vouloir vous déconnecter ?</p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" (click)="onCancel()">Annuler</button>
+      <button class="btn btn-danger" (click)="onConfirm()">Se déconnecter</button>
+    </div>
+  </div>
+</div>

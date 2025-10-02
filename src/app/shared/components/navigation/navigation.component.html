@@ -10,7 +10,7 @@
   </ul>
   
   <div class="nav-actions">
-    <button (click)="logout()" class="btn btn-outline-light logout-btn">
+    <button (click)="openLogoutDialog()" class="btn btn-outline-light logout-btn">
       <span class="btn-text">Déconnexion</span>
       <span class="btn-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -20,4 +20,9 @@
       </span>
     </button>
   </div>
+
+  <app-confirmation-dialog 
+    *ngIf="showLogoutDialog"
+    (confirmed)="onLogoutConfirmation($event)">
+  </app-confirmation-dialog>
 </nav>

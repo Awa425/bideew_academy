@@ -3,15 +3,17 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { Subscription } from 'rxjs';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-navigation',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ConfirmationDialogComponent],
   templateUrl: './navigation.component.html',
   styleUrls: ['./navigation.component.scss']
 })
 export class NavigationComponent implements OnInit, OnDestroy {
   menuItems: any[] = [];
+  showLogoutDialog = false; // Nouvelle variable pour contrôler l'affichage du dialogue
   private authSubscription?: Subscription;
 
   private menuConfig = [
@@ -60,7 +62,19 @@ export class NavigationComponent implements OnInit, OnDestroy {
     );
   }
 
+  openLogoutDialog() {
+    this.showLogoutDialog = true;
+  }
+
+  onLogoutConfirmation(confirmed: boolean) {
+    this.showLogoutDialog = false;
+    
+    if (confirmed) {
+      this.authService.logout();
+    }
+  }
+
   logout() {
-    this.authService.logout();
+    this.openLogoutDialog();
   }
 }
