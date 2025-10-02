@@ -83,7 +83,7 @@ export class CourseDetailComponent implements OnInit {
   ngOnInit(): void {
     this.courId = this.route.snapshot.paramMap.get('id');
     this.loadCourseData(this.courId);
-    this.api = `${envVars.apiBaseUrl}`;
+    this.api = `${envVars.apiBaseUrlImage}`;
 
     this.userId = localStorage.getItem('user_id');
     this.authService.getUserById(this.userId).subscribe((data) => {

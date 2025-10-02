@@ -28,7 +28,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
     { 
       path: '/learning-path', 
       label: 'Parcours d\'Apprentissage',
-      roles: ['admin', 'apprenant']
+      roles: ['apprenant']
     },
     { 
       path: '/users', 
