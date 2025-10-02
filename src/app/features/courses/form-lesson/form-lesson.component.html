@@ -20,7 +20,10 @@
             <mat-icon>category</mat-icon>
           </div>
           <mat-card-title>Type de contenu</mat-card-title>
-          <mat-card-subtitle>Choisissez le type de contenu que vous voulez créer</mat-card-subtitle>
+          <mat-card-subtitle
+            >Choisissez le type de contenu que vous voulez
+            créer</mat-card-subtitle
+          >
         </mat-card-header>
 
         <mat-card-content class="section-content">
@@ -37,10 +40,7 @@
                   required
                   (selectionChange)="onContentTypeChange(i, $event.value)"
                 >
-                  <mat-option
-                    *ngFor="let type of contentTypes"
-                    [value]="type"
-                  >
+                  <mat-option *ngFor="let type of contentTypes" [value]="type">
                     <div class="option-content">
                       <mat-icon>{{ getContentIcon(type) }}</mat-icon>
                       <span>{{ getContentLabel(type) }}</span>
@@ -59,16 +59,15 @@
       </mat-card>
 
       <!-- Section 2: Informations générales (cachée si type = quiz) -->
-      <mat-card 
-        class="form-section animate-card" 
-        *ngIf="!isQuizContent()"
-      >
+      <mat-card class="form-section animate-card" *ngIf="!isQuizContent()">
         <mat-card-header class="section-header">
           <div class="section-icon">
             <mat-icon>info</mat-icon>
           </div>
           <mat-card-title>Informations générales</mat-card-title>
-          <mat-card-subtitle>Définissez les bases de votre leçon</mat-card-subtitle>
+          <mat-card-subtitle
+            >Définissez les bases de votre leçon</mat-card-subtitle
+          >
         </mat-card-header>
 
         <mat-card-content class="section-content">
@@ -110,7 +109,8 @@
           </div>
           <mat-card-title>Contenu de la leçon</mat-card-title>
           <mat-card-subtitle>
-            Configurez votre contenu {{ getContentLabel(getCurrentContentType()) }}
+            Configurez votre contenu
+            {{ getContentLabel(getCurrentContentType()) }}
           </mat-card-subtitle>
         </mat-card-header>
 
@@ -276,7 +276,7 @@
                               Le titre du quiz est obligatoire
                             </mat-error>
                           </mat-form-field>
-                          
+
                           <mat-form-field appearance="outline">
                             <mat-label>Durée estimée (minutes)</mat-label>
                             <input
@@ -314,15 +314,21 @@
                       </div>
 
                       <!-- Section Questions avec accordéon amélioré -->
-                      <div class="quiz-questions-section" formArrayName="questions">
+                      <div
+                        class="quiz-questions-section"
+                        formArrayName="questions"
+                      >
                         <div class="quiz-section-header">
                           <h3 class="quiz-section-title">
                             <mat-icon>help</mat-icon>
                             Questions ({{ getQuestions(i).length }})
                           </h3>
-                          
+
                           <!-- Actions pour toutes les questions -->
-                          <div class="questions-global-actions" *ngIf="getQuestions(i).length > 0">
+                          <div
+                            class="questions-global-actions"
+                            *ngIf="getQuestions(i).length > 0"
+                          >
                             <button
                               mat-button
                               type="button"
@@ -337,7 +343,10 @@
                               mat-button
                               type="button"
                               (click)="collapseAllQuestions(i)"
-                              *ngIf="!hasCollapsedQuestions(i) && getQuestions(i).length > 1"
+                              *ngIf="
+                                !hasCollapsedQuestions(i) &&
+                                getQuestions(i).length > 1
+                              "
                               class="collapse-all-btn"
                             >
                               <mat-icon>expand_less</mat-icon>
@@ -349,25 +358,43 @@
                         <!-- Liste des questions avec accordéon -->
                         <div class="questions-tree">
                           <mat-expansion-panel
-                            *ngFor="let question of getQuestions(i).controls; let qIndex = index"
+                            *ngFor="
+                              let question of getQuestions(i).controls;
+                              let qIndex = index
+                            "
                             [formGroupName]="qIndex"
                             class="question-expansion-panel"
                             [expanded]="isQuestionExpanded(i, qIndex)"
-                            (expandedChange)="onQuestionExpansionChange(i, qIndex, $event)"
+                            (expandedChange)="
+                              onQuestionExpansionChange(i, qIndex, $event)
+                            "
                           >
                             <!-- En-tête de la question -->
-                            <mat-expansion-panel-header class="question-panel-header">
+                            <mat-expansion-panel-header
+                              class="question-panel-header"
+                            >
                               <mat-panel-title class="question-panel-title">
                                 <div class="question-title-content">
-                                  <span class="question-number">Q{{ qIndex + 1 }}</span>
+                                  <span class="question-number"
+                                    >Q{{ qIndex + 1 }}</span
+                                  >
                                   <span class="question-preview">
-                                    {{ getQuestionPreview(i, qIndex) || 'Nouvelle question' }}
+                                    {{
+                                      getQuestionPreview(i, qIndex) ||
+                                        "Nouvelle question"
+                                    }}
                                   </span>
                                 </div>
                               </mat-panel-title>
-                              <mat-panel-description class="question-panel-description">
+                              <mat-panel-description
+                                class="question-panel-description"
+                              >
                                 <span class="question-type-badge">
-                                  {{ getQuestionTypeLabel(question.get('type')?.value) }}
+                                  {{
+                                    getQuestionTypeLabel(
+                                      question.get("type")?.value
+                                    )
+                                  }}
                                 </span>
                                 <span class="answers-count">
                                   {{ getAnswers(i, qIndex).length }} réponse(s)
@@ -380,7 +407,10 @@
                               <!-- Type de question et texte -->
                               <div class="question-basic-info">
                                 <div class="form-row">
-                                  <mat-form-field appearance="outline" class="question-type-field">
+                                  <mat-form-field
+                                    appearance="outline"
+                                    class="question-type-field"
+                                  >
                                     <mat-label>Type de question</mat-label>
                                     <mat-select formControlName="type" required>
                                       <mat-option
@@ -401,7 +431,7 @@
                                       Le type est obligatoire
                                     </mat-error>
                                   </mat-form-field>
-                                  
+
                                   <!-- Bouton supprimer question -->
                                   <button
                                     mat-icon-button
@@ -416,7 +446,10 @@
                                   </button>
                                 </div>
 
-                                <mat-form-field appearance="outline" class="full-width">
+                                <mat-form-field
+                                  appearance="outline"
+                                  class="full-width"
+                                >
                                   <mat-label>Texte de la question</mat-label>
                                   <textarea
                                     matInput
@@ -440,7 +473,10 @@
                               </div>
 
                               <!-- Section Réponses avec accordéon -->
-                              <div class="answers-section" formArrayName="answers">
+                              <div
+                                class="answers-section"
+                                formArrayName="answers"
+                              >
                                 <div class="answers-header">
                                   <h4 class="answers-title">
                                     <mat-icon>check_circle</mat-icon>
@@ -451,33 +487,64 @@
                                 <!-- Liste des réponses -->
                                 <div class="answers-tree">
                                   <mat-expansion-panel
-                                    *ngFor="let answer of getAnswers(i, qIndex).controls; let aIndex = index"
+                                    *ngFor="
+                                      let answer of getAnswers(i, qIndex)
+                                        .controls;
+                                      let aIndex = index
+                                    "
                                     [formGroupName]="aIndex"
                                     class="answer-expansion-panel"
-                                    [expanded]="isAnswerExpanded(i, qIndex, aIndex)"
-                                    (expandedChange)="onAnswerExpansionChange(i, qIndex, aIndex, $event)"
+                                    [expanded]="
+                                      isAnswerExpanded(i, qIndex, aIndex)
+                                    "
+                                    (expandedChange)="
+                                      onAnswerExpansionChange(
+                                        i,
+                                        qIndex,
+                                        aIndex,
+                                        $event
+                                      )
+                                    "
                                   >
                                     <!-- En-tête de la réponse -->
-                                    <mat-expansion-panel-header class="answer-panel-header">
-                                      <mat-panel-title class="answer-panel-title">
+                                    <mat-expansion-panel-header
+                                      class="answer-panel-header"
+                                    >
+                                      <mat-panel-title
+                                        class="answer-panel-title"
+                                      >
                                         <div class="answer-title-content">
-                                          <span class="answer-number">R{{ aIndex + 1 }}</span>
+                                          <span class="answer-number"
+                                            >R{{ aIndex + 1 }}</span
+                                          >
                                           <span class="answer-preview">
-                                            {{ getAnswerPreview(i, qIndex, aIndex) || 'Nouvelle réponse' }}
+                                            {{
+                                              getAnswerPreview(
+                                                i,
+                                                qIndex,
+                                                aIndex
+                                              ) || "Nouvelle réponse"
+                                            }}
                                           </span>
                                         </div>
                                       </mat-panel-title>
-                                      <mat-panel-description class="answer-panel-description">
-                                        <mat-chip 
-                                          *ngIf="answer.get('is_correct')?.value" 
+                                      <mat-panel-description
+                                        class="answer-panel-description"
+                                      >
+                                        <mat-chip
+                                          *ngIf="
+                                            answer.get('is_correct')?.value
+                                          "
                                           class="correct-answer-chip"
                                           color="primary"
                                         >
                                           <mat-icon>check</mat-icon>
                                           Correcte
                                         </mat-chip>
-                                        <mat-chip 
-                                          *ngIf="!answer.get('is_correct')?.value" 
+                                        <mat-chip
+                                          *ngIf="
+                                            !answer.get('is_correct')?.value
+                                          "
                                           class="incorrect-answer-chip"
                                         >
                                           Incorrecte
@@ -488,8 +555,13 @@
                                     <!-- Contenu de la réponse -->
                                     <div class="answer-content">
                                       <div class="answer-form-row">
-                                        <mat-form-field appearance="outline" class="answer-text-field">
-                                          <mat-label>Réponse {{ aIndex + 1 }}</mat-label>
+                                        <mat-form-field
+                                          appearance="outline"
+                                          class="answer-text-field"
+                                        >
+                                          <mat-label
+                                            >Réponse {{ aIndex + 1 }}</mat-label
+                                          >
                                           <input
                                             matInput
                                             formControlName="text"
@@ -504,7 +576,8 @@
                                                 ?.hasError('required')
                                             "
                                           >
-                                            Le texte de la réponse est obligatoire
+                                            Le texte de la réponse est
+                                            obligatoire
                                           </mat-error>
                                         </mat-form-field>
 
@@ -516,12 +589,16 @@
                                           >
                                             Correcte
                                           </mat-checkbox>
-                                          
+
                                           <button
                                             mat-icon-button
                                             type="button"
-                                            (click)="removeAnswer(i, qIndex, aIndex)"
-                                            *ngIf="getAnswers(i, qIndex).length > 1"
+                                            (click)="
+                                              removeAnswer(i, qIndex, aIndex)
+                                            "
+                                            *ngIf="
+                                              getAnswers(i, qIndex).length > 1
+                                            "
                                             class="delete-answer-btn"
                                             matTooltip="Supprimer cette réponse"
                                             color="warn"

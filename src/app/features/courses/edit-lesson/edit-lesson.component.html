@@ -20,7 +20,9 @@
             <mat-icon>info</mat-icon>
           </div>
           <mat-card-title>Informations générales</mat-card-title>
-          <mat-card-subtitle>Modifiez les bases de votre leçon</mat-card-subtitle>
+          <mat-card-subtitle
+            >Modifiez les bases de votre leçon</mat-card-subtitle
+          >
         </mat-card-header>
 
         <mat-card-content class="section-content">
@@ -49,18 +51,17 @@
                 placeholder="45"
               />
               <mat-icon matSuffix>schedule</mat-icon>
-              <mat-error *ngIf="lessonForm.get('duration_minutes')?.hasError('required')">
+              <mat-error
+                *ngIf="lessonForm.get('duration_minutes')?.hasError('required')"
+              >
                 La durée est obligatoire
               </mat-error>
-              <mat-error *ngIf="lessonForm.get('duration_minutes')?.hasError('min')">
+              <mat-error
+                *ngIf="lessonForm.get('duration_minutes')?.hasError('min')"
+              >
                 La durée doit être supérieure à 0
               </mat-error>
             </mat-form-field>
-          </div>
-
-          <div class="form-row">
-            <mat-checkbox formControlName="is_published">Publié</mat-checkbox>
-            <mat-checkbox formControlName="is_locked">Verrouillé</mat-checkbox>
           </div>
         </mat-card-content>
       </mat-card>
@@ -109,31 +110,40 @@
                     <mat-form-field appearance="outline" class="full-width">
                       <mat-label>Type de contenu</mat-label>
                       <mat-select formControlName="type" required>
-                        <mat-option *ngFor="let type of contentTypes" [value]="type">
+                        <mat-option
+                          *ngFor="let type of contentTypes"
+                          [value]="type"
+                        >
                           <div class="option-content">
                             <mat-icon>{{ getContentIcon(type) }}</mat-icon>
                             <span>{{ getContentLabel(type) }}</span>
                           </div>
                         </mat-option>
                       </mat-select>
-                      <mat-error *ngIf="contents.at(i).get('type')?.hasError('required')">
+                      <mat-error
+                        *ngIf="contents.at(i).get('type')?.hasError('required')"
+                      >
                         Le type est obligatoire
                       </mat-error>
                     </mat-form-field>
                   </div>
 
-                  <div class="content-specific" [ngSwitch]="contents.at(i).get('type')?.value">
-                    
+                  <div
+                    class="content-specific"
+                    [ngSwitch]="contents.at(i).get('type')?.value"
+                  >
                     <div *ngSwitchCase="'pdf'" class="upload-section">
                       <div class="upload-area" (click)="fileInput.click()">
                         <mat-icon class="upload-icon">cloud_upload</mat-icon>
                         <p>
                           {{
-                            contents.at(i).get('file')?.value
-                              ? 'Nouveau fichier: ' + contents.at(i).get('file')?.value.name
-                              : contents.at(i).get('file_path')?.value
-                              ? 'Fichier actuel: ' + contents.at(i).get('file_path')?.value
-                              : 'Cliquez pour sélectionner un fichier PDF'
+                            contents.at(i).get("file")?.value
+                              ? "Nouveau fichier: " +
+                                contents.at(i).get("file")?.value.name
+                              : contents.at(i).get("file_path")?.value
+                              ? "Fichier actuel: " +
+                                contents.at(i).get("file_path")?.value
+                              : "Cliquez pour sélectionner un fichier PDF"
                           }}
                         </p>
                         <small>Format PDF uniquement • Max 10MB</small>
@@ -156,7 +166,9 @@
                           placeholder="https://www.youtube.com/watch?v=..."
                         />
                         <mat-icon matSuffix>video_library</mat-icon>
-                        <mat-hint>YouTube, Vimeo ou lien direct supportés</mat-hint>
+                        <mat-hint
+                          >YouTube, Vimeo ou lien direct supportés</mat-hint
+                        >
                       </mat-form-field>
                     </div>
 
@@ -210,7 +222,12 @@
 
       <div class="form-actions">
         <div class="actions-container">
-          <button mat-button type="button" (click)="goBack()" class="cancel-btn">
+          <button
+            mat-button
+            type="button"
+            (click)="goBack()"
+            class="cancel-btn"
+          >
             <mat-icon>arrow_back</mat-icon>
             Retour
           </button>

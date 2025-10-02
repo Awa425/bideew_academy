@@ -144,7 +144,7 @@ export class CourseService {
     );
   }
 
-  createLesson(courseId: number, lessonData: FormData): Observable<any> {
+  createLesson(courseId: number, lessonData: any): Observable<any> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     // ✅ IMPORTANT: Pas de Content-Type pour FormData - le navigateur l'ajoute automatiquement
