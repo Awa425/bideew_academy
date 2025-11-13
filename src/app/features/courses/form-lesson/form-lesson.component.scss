@@ -546,6 +546,42 @@ $transition: all 0.3s ease;
     }
 
     .primary-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.75rem;
+
+      .quiz-validation-error {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 6px;
+        color: #856404;
+        font-size: 0.9rem;
+        font-weight: 500;
+        animation: shake 0.5s ease-in-out;
+
+        mat-icon {
+          color: #ffc107;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+
+        @media (max-width: 768px) {
+          width: 100%;
+        }
+      }
+
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
+
       .submit-btn {
         background: $primary-blue;
         color: $white;
@@ -748,5 +784,159 @@ $transition: all 0.3s ease;
 
   .mat-error {
     color: #dc3545;
+  }
+
+  // Styles pour l'éditeur de texte riche
+  .rich-text-editor-container {
+    padding: 1.5rem;
+    background: $white;
+    border-radius: $border-radius;
+    @include card-elevation(1);
+
+    .editor-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: $primary-blue;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+
+      mat-icon {
+        font-size: 1.3rem;
+        width: 1.3rem;
+        height: 1.3rem;
+      }
+    }
+
+    .editor-hint {
+      color: $dark-gray;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+
+    .quill-editor {
+      min-height: 400px;
+      background: $white;
+      border-radius: $border-radius;
+
+      ::ng-deep .ql-toolbar {
+        background: $light-gray;
+        border: 1px solid $border-color;
+        border-radius: $border-radius $border-radius 0 0;
+        padding: 12px;
+
+        .ql-stroke {
+          stroke: $text-color;
+        }
+
+        .ql-fill {
+          fill: $text-color;
+        }
+
+        .ql-picker-label {
+          color: $text-color;
+        }
+
+        button:hover,
+        button.ql-active {
+          .ql-stroke {
+            stroke: $primary-blue;
+          }
+
+          .ql-fill {
+            fill: $primary-blue;
+          }
+        }
+      }
+
+      ::ng-deep .ql-container {
+        border: 1px solid $border-color;
+        border-top: none;
+        border-radius: 0 0 $border-radius $border-radius;
+        font-family: 'Roboto', sans-serif;
+        font-size: 1rem;
+        min-height: 350px;
+
+        .ql-editor {
+          min-height: 350px;
+          padding: 1.5rem;
+          line-height: 1.6;
+
+          &.ql-blank::before {
+            color: $dark-gray;
+            font-style: italic;
+          }
+
+          h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            color: $text-color;
+          }
+
+          h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0.875rem 0;
+            color: $text-color;
+          }
+
+          h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0.75rem 0;
+            color: $text-color;
+          }
+
+          h4 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin: 0.625rem 0;
+            color: $text-color;
+          }
+
+          p {
+            margin: 0.5rem 0;
+          }
+
+          ul,
+          ol {
+            margin: 0.75rem 0;
+            padding-left: 1.5rem;
+          }
+
+          blockquote {
+            border-left: 4px solid $primary-blue;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: $dark-gray;
+            font-style: italic;
+          }
+
+          code {
+            background: $light-gray;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+          }
+
+          pre {
+            background: $light-gray;
+            padding: 1rem;
+            border-radius: $border-radius;
+            overflow-x: auto;
+          }
+        }
+      }
+    }
+
+    .mat-error-custom {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      display: block;
+    }
   }
 }

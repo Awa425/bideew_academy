@@ -81,7 +81,7 @@ export class CourseEditComponent implements OnInit {
       ],
       prerequis: [''],
       learning_objectives: [''],
-      is_active: [true],
+      is_active: [true], // Valeur par défaut: true
     });
   }
 
@@ -118,7 +118,7 @@ export class CourseEditComponent implements OnInit {
       duration_minutes: course.duration_minutes,
       prerequis: course.prerequis || '',
       learning_objectives: course.objectif || '',
-      is_active: course.is_active,
+      is_active: course.is_published !== undefined ? course.is_published : true, // Backend utilise is_published
     });
   }
 
@@ -174,6 +174,14 @@ export class CourseEditComponent implements OnInit {
       this.error = null;
       this.successMessage = null;
 
+      // Protection timeout: débloquer après 30 secondes si aucune réponse
+      setTimeout(() => {
+        if (this.isSaving) {
+          this.isSaving = false;
+          this.error = 'La requête a expiré. Veuillez réessayer.';
+        }
+      }, 30000); // 30 secondes
+
       if (this.selectedFile || this.shouldRemoveImage) {
         this.updateCourseWithImage();
       } else {
@@ -187,15 +195,33 @@ export class CourseEditComponent implements OnInit {
   private updateCourseWithImage(): void {
     const formData = new FormData();
 
+    // Mapping des champs pour correspondre au backend Laravel
+    const fieldMapping: { [key: string]: string } = {
+      'learning_objectives': 'objectif',
+      'is_active': 'is_published'
+    };
+
     Object.keys(this.editCourseForm.value).forEach((key) => {
       const value = this.editCourseForm.value[key];
       if (value !== null && value !== undefined) {
-        formData.append(key, value.toString());
+        // Utiliser le nom mappé ou le nom original
+        const backendKey = fieldMapping[key] || key;
+
+        // Conversion spéciale pour les booleans
+        let valueToSend: string;
+        if (typeof value === 'boolean') {
+          valueToSend = value ? '1' : '0'; // Laravel préfère 1/0 pour les booleans
+        } else {
+          valueToSend = value.toString();
+        }
+
+        formData.append(backendKey, valueToSend);
       }
     });
 
     if (this.selectedFile) {
-      formData.append('image', this.selectedFile, this.selectedFile.name);
+      // Le backend attend 'image_path' pour le fichier image
+      formData.append('image_path', this.selectedFile, this.selectedFile.name);
     }
 
     if (this.shouldRemoveImage) {
@@ -209,9 +235,34 @@ export class CourseEditComponent implements OnInit {
   }
 
   private updateCourseWithoutImage(): void {
-    const courseData = { ...this.editCourseForm.value };
+    // Convertir l'objet en FormData pour cohérence avec l'API
+    const formData = new FormData();
 
-    this.courseService.updateCourse(this.courseId, courseData).subscribe({
+    // Mapping des champs pour correspondre au backend Laravel
+    const fieldMapping: { [key: string]: string } = {
+      'learning_objectives': 'objectif',  // Frontend → Backend
+      'is_active': 'is_published'         // Frontend → Backend
+    };
+
+    Object.keys(this.editCourseForm.value).forEach((key) => {
+      const value = this.editCourseForm.value[key];
+      if (value !== null && value !== undefined) {
+        // Utiliser le nom mappé ou le nom original
+        const backendKey = fieldMapping[key] || key;
+
+        // Conversion spéciale pour les booleans
+        let valueToSend: string;
+        if (typeof value === 'boolean') {
+          valueToSend = value ? '1' : '0'; // Laravel préfère 1/0 pour les booleans
+        } else {
+          valueToSend = value.toString();
+        }
+
+        formData.append(backendKey, valueToSend);
+      }
+    });
+
+    this.courseService.updateCourse(this.courseId, formData).subscribe({
       next: (response) => this.handleUpdateSuccess(response),
       error: (error) => this.handleUpdateError(error),
     });
@@ -229,20 +280,21 @@ export class CourseEditComponent implements OnInit {
     }, 500);
 
     setTimeout(() => {
-      this.router.navigate(['/courses', this.courseId]);
+      this.router.navigate(['/courses']);
     }, 2000);
   }
 
   private handleUpdateError(error: any): void {
-    console.error('Erreur complète:', error);
-    console.error('Status:', error.status);
-    console.error('Message:', error.message);
-    console.error('Error body:', error.error);
+    console.error('Erreur lors de la modification du cours:', error);
 
+    // IMPORTANT: Toujours débloquer le bouton en cas d'erreur
     this.isSaving = false;
 
     let errorMessage = 'Erreur lors de la modification du cours';
-    if (error.error?.message) {
+
+    if (error.status === 0) {
+      errorMessage = 'Impossible de contacter le serveur. Vérifiez votre connexion internet.';
+    } else if (error.error?.message) {
       errorMessage += ': ' + error.error.message;
     } else if (error.error?.errors) {
       const firstError = Object.values(error.error.errors)[0];

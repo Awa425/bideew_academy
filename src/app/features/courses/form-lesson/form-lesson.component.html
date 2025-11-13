@@ -11,6 +11,21 @@
     </div>
   </div>
 
+  <!-- Messages de notification -->
+  <div class="row justify-content-center mt-3">
+    <div class="col-md-6">
+      <div class="alert alert-success alert-dismissible fade show text-center" role="alert" *ngIf="success">
+        {{ success }}
+        <button type="button" class="btn-close" (click)="closeSuccessAlert()" aria-label="Close"></button>
+      </div>
+      
+      <div class="alert alert-danger alert-dismissible fade show text-center" role="alert" *ngIf="error">
+        {{ error }}
+        <button type="button" class="btn-close" (click)="closeErrorAlert()" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
   <div class="form-wrapper">
     <form [formGroup]="lessonForm" (ngSubmit)="onSubmit()">
       <mat-card class="form-section animate-card" formArrayName="contents">
@@ -56,6 +71,8 @@
           </div>
         </mat-card-content>
       </mat-card>
+
+      <!-- Informations générales - Afficher pour tous les types sauf quiz -->
       <mat-card class="form-section animate-card" *ngIf="!isQuizContent()">
         <mat-card-header class="section-header">
           <div class="section-icon">
@@ -74,11 +91,11 @@
               <input
                 matInput
                 formControlName="title"
-                required
+                [required]="!isQuizContent()"
                 placeholder="Ex: Introduction aux variables en JavaScript"
               />
               <mat-icon matSuffix>title</mat-icon>
-              <mat-error *ngIf="lessonForm.get('title')?.hasError('required')">
+              <mat-error *ngIf="lessonForm.get('title')?.hasError('required') && !isQuizContent()">
                 Le titre est obligatoire
               </mat-error>
             </mat-form-field>
@@ -89,14 +106,18 @@
                 type="number"
                 formControlName="duration_minutes"
                 min="1"
-                required
+                [required]="!isQuizContent()"
                 placeholder="45"
               />
               <mat-icon matSuffix>schedule</mat-icon>
+              <mat-error *ngIf="lessonForm.get('duration_minutes')?.hasError('required') && !isQuizContent()">
+                La durée est obligatoire
+              </mat-error>
             </mat-form-field>
           </div>
         </mat-card-content>
       </mat-card>
+
       <mat-card class="form-section animate-card" formArrayName="contents">
         <mat-card-header class="section-header">
           <div class="section-icon">
@@ -122,11 +143,19 @@
                     class="content-specific"
                     [ngSwitch]="contents.at(i).get('type')?.value"
                   >
+                    <!-- Section PDF -->
                     <div *ngSwitchCase="'pdf'" class="upload-section">
                       <div class="upload-area" (click)="fileInput.click()">
                         <mat-icon class="upload-icon">cloud_upload</mat-icon>
                         <p>Cliquez pour sélectionner un fichier PDF</p>
                         <small>Format PDF uniquement • Max 10MB</small>
+                        <div
+                          class="selected-file"
+                          *ngIf="contents.at(i).get('file')?.value"
+                        >
+                          <mat-icon>check_circle</mat-icon>
+                          <span>{{ contents.at(i).get('file')?.value?.name }}</span>
+                        </div>
                       </div>
                       <input
                         #fileInput
@@ -135,14 +164,19 @@
                         accept=".pdf"
                         style="display: none"
                       />
+                      <mat-error
+                        *ngIf="contents.at(i).get('file')?.invalid && contents.at(i).get('file')?.touched"
+                        class="file-error"
+                      >
+                        Un fichier PDF est obligatoire
+                      </mat-error>
                     </div>
+
+                    <!-- Section Vidéo -->
                     <div *ngSwitchCase="'video'" class="video-section">
                       <div class="video-input-selector">
                         <mat-button-toggle-group
-                          [value]="
-                            contents.at(i).get('video_input_type')?.value ||
-                            'url'
-                          "
+                          [value]="contents.at(i).get('video_input_type')?.value || 'url'"
                           (change)="onVideoInputTypeChange(i, $event.value)"
                           class="video-toggle-group"
                         >
@@ -161,9 +195,7 @@
                       </div>
                       <div
                         class="video-input-content"
-                        [ngSwitch]="
-                          contents.at(i).get('video_input_type')?.value || 'url'
-                        "
+                        [ngSwitch]="contents.at(i).get('video_input_type')?.value || 'url'"
                       >
                         <div *ngSwitchCase="'url'" class="video-url-section">
                           <mat-form-field
@@ -181,6 +213,12 @@
                               >YouTube, Vimeo ou lien direct supportés</mat-hint
                             >
                           </mat-form-field>
+                          <mat-error
+                            *ngIf="contents.at(i).get('external_url')?.invalid && contents.at(i).get('external_url')?.touched"
+                            class="url-error"
+                          >
+                            L'URL de la vidéo est obligatoire
+                          </mat-error>
                         </div>
                         <div
                           *ngSwitchCase="'upload'"
@@ -198,9 +236,7 @@
                               *ngIf="contents.at(i).get('file')?.value"
                             >
                               <mat-icon>check_circle</mat-icon>
-                              <span>{{
-                                contents.at(i).get("file")?.value?.name
-                              }}</span>
+                              <span>{{ contents.at(i).get('file')?.value?.name }}</span>
                             </div>
                           </div>
                           <input
@@ -210,21 +246,33 @@
                             accept="video/*"
                             style="display: none"
                           />
+                          <mat-error
+                            *ngIf="contents.at(i).get('file')?.invalid && contents.at(i).get('file')?.touched"
+                            class="file-error"
+                          >
+                            Un fichier vidéo est obligatoire
+                          </mat-error>
                         </div>
                       </div>
                     </div>
-                    <div *ngSwitchCase="'text'">
-                      <mat-form-field appearance="outline" class="full-width">
-                        <mat-label>Contenu textuel</mat-label>
-                        <textarea
-                          matInput
-                          formControlName="data"
-                          rows="6"
-                          placeholder="Rédigez votre contenu ici..."
-                        ></textarea>
-                        <mat-icon matSuffix>article</mat-icon>
-                      </mat-form-field>
+
+                    <!-- Section Texte -->
+                    <div *ngSwitchCase="'text'" class="rich-text-editor-container">
+                      <h4 class="editor-title">
+                        <mat-icon>article</mat-icon>
+                        Contenu textuel enrichi
+                      </h4>
+                      <p class="editor-hint">Utilisez la barre d'outils pour formater votre texte avec des titres, listes, mise en forme, etc.</p>
+                      <div #quillEditor class="quill-editor"></div>
+                      <mat-error
+                        *ngIf="contents.at(i).get('data')?.hasError('required') && contents.at(i).get('data')?.touched"
+                        class="mat-error-custom"
+                      >
+                        Le contenu textuel est obligatoire
+                      </mat-error>
                     </div>
+
+                    <!-- Section Quiz -->
                     <div *ngSwitchCase="'quizzes'" class="quiz-section">
                       <div class="quiz-info-section">
                         <h3 class="quiz-section-title">
@@ -246,12 +294,7 @@
                             />
                             <mat-icon matSuffix>quiz</mat-icon>
                             <mat-error
-                              *ngIf="
-                                contents
-                                  .at(i)
-                                  .get('quiz_title')
-                                  ?.hasError('required')
-                              "
+                              *ngIf="contents.at(i).get('quiz_title')?.hasError('required')"
                             >
                               Le titre du quiz est obligatoire
                             </mat-error>
@@ -281,17 +324,14 @@
                           ></textarea>
                           <mat-icon matSuffix>description</mat-icon>
                           <mat-error
-                            *ngIf="
-                              contents
-                                .at(i)
-                                .get('quiz_description')
-                                ?.hasError('required')
-                            "
+                            *ngIf="contents.at(i).get('quiz_description')?.hasError('required')"
                           >
                             La description est obligatoire
                           </mat-error>
                         </mat-form-field>
                       </div>
+
+                      <!-- Questions du quiz -->
                       <div
                         class="quiz-questions-section"
                         formArrayName="questions"
@@ -319,10 +359,7 @@
                               mat-button
                               type="button"
                               (click)="collapseAllQuestions(i)"
-                              *ngIf="
-                                !hasCollapsedQuestions(i) &&
-                                getQuestions(i).length > 1
-                              "
+                              *ngIf="!hasCollapsedQuestions(i) && getQuestions(i).length > 1"
                               class="collapse-all-btn"
                             >
                               <mat-icon>expand_less</mat-icon>
@@ -330,44 +367,27 @@
                             </button>
                           </div>
                         </div>
+
                         <div class="questions-tree">
                           <mat-expansion-panel
-                            *ngFor="
-                              let question of getQuestions(i).controls;
-                              let qIndex = index
-                            "
+                            *ngFor="let question of getQuestions(i).controls; let qIndex = index"
                             [formGroupName]="qIndex"
                             class="question-expansion-panel"
                             [expanded]="isQuestionExpanded(i, qIndex)"
-                            (expandedChange)="
-                              onQuestionExpansionChange(i, qIndex, $event)
-                            "
+                            (expandedChange)="onQuestionExpansionChange(i, qIndex, $event)"
                           >
-                            <mat-expansion-panel-header
-                              class="question-panel-header"
-                            >
+                            <mat-expansion-panel-header class="question-panel-header">
                               <mat-panel-title class="question-panel-title">
                                 <div class="question-title-content">
-                                  <span class="question-number"
-                                    >Q{{ qIndex + 1 }}</span
-                                  >
+                                  <span class="question-number">Q{{ qIndex + 1 }}</span>
                                   <span class="question-preview">
-                                    {{
-                                      getQuestionPreview(i, qIndex) ||
-                                        "Nouvelle question"
-                                    }}
+                                    {{ getQuestionPreview(i, qIndex) || "Nouvelle question" }}
                                   </span>
                                 </div>
                               </mat-panel-title>
-                              <mat-panel-description
-                                class="question-panel-description"
-                              >
+                              <mat-panel-description class="question-panel-description">
                                 <span class="question-type-badge">
-                                  {{
-                                    getQuestionTypeLabel(
-                                      question.get("type")?.value
-                                    )
-                                  }}
+                                  {{ getQuestionTypeLabel(question.get('type')?.value) }}
                                 </span>
                                 <span class="answers-count">
                                   {{ getAnswers(i, qIndex).length }} réponse(s)
@@ -378,27 +398,14 @@
                             <div class="question-content">
                               <div class="question-basic-info">
                                 <div class="form-row">
-                                  <mat-form-field
-                                    appearance="outline"
-                                    class="question-type-field"
-                                  >
+                                  <mat-form-field appearance="outline" class="question-type-field">
                                     <mat-label>Type de question</mat-label>
                                     <mat-select formControlName="type" required>
-                                      <mat-option
-                                        *ngFor="let type of questionTypes"
-                                        [value]="type"
-                                      >
+                                      <mat-option *ngFor="let type of questionTypes" [value]="type">
                                         {{ getQuestionTypeLabel(type) }}
                                       </mat-option>
                                     </mat-select>
-                                    <mat-error
-                                      *ngIf="
-                                        getQuestions(i)
-                                          .at(qIndex)
-                                          .get('type')
-                                          ?.hasError('required')
-                                      "
-                                    >
+                                    <mat-error *ngIf="getQuestions(i).at(qIndex).get('type')?.hasError('required')">
                                       Le type est obligatoire
                                     </mat-error>
                                   </mat-form-field>
@@ -415,10 +422,7 @@
                                   </button>
                                 </div>
 
-                                <mat-form-field
-                                  appearance="outline"
-                                  class="full-width"
-                                >
+                                <mat-form-field appearance="outline" class="full-width">
                                   <mat-label>Texte de la question</mat-label>
                                   <textarea
                                     matInput
@@ -428,89 +432,44 @@
                                     placeholder="Posez votre question ici..."
                                   ></textarea>
                                   <mat-icon matSuffix>help_outline</mat-icon>
-                                  <mat-error
-                                    *ngIf="
-                                      getQuestions(i)
-                                        .at(qIndex)
-                                        .get('text')
-                                        ?.hasError('required')
-                                    "
-                                  >
+                                  <mat-error *ngIf="getQuestions(i).at(qIndex).get('text')?.hasError('required')">
                                     Le texte de la question est obligatoire
                                   </mat-error>
                                 </mat-form-field>
                               </div>
-                              <div
-                                class="answers-section"
-                                formArrayName="answers"
-                              >
+
+                              <!-- Réponses -->
+                              <div class="answers-section" formArrayName="answers">
                                 <div class="answers-header">
                                   <h4 class="answers-title">
                                     <mat-icon>check_circle</mat-icon>
                                     Réponses possibles
                                   </h4>
                                 </div>
+
                                 <div class="answers-tree">
                                   <mat-expansion-panel
-                                    *ngFor="
-                                      let answer of getAnswers(i, qIndex)
-                                        .controls;
-                                      let aIndex = index
-                                    "
+                                    *ngFor="let answer of getAnswers(i, qIndex).controls; let aIndex = index"
                                     [formGroupName]="aIndex"
                                     class="answer-expansion-panel"
-                                    [expanded]="
-                                      isAnswerExpanded(i, qIndex, aIndex)
-                                    "
-                                    (expandedChange)="
-                                      onAnswerExpansionChange(
-                                        i,
-                                        qIndex,
-                                        aIndex,
-                                        $event
-                                      )
-                                    "
+                                    [expanded]="isAnswerExpanded(i, qIndex, aIndex)"
+                                    (expandedChange)="onAnswerExpansionChange(i, qIndex, aIndex, $event)"
                                   >
-                                    <mat-expansion-panel-header
-                                      class="answer-panel-header"
-                                    >
-                                      <mat-panel-title
-                                        class="answer-panel-title"
-                                      >
+                                    <mat-expansion-panel-header class="answer-panel-header">
+                                      <mat-panel-title class="answer-panel-title">
                                         <div class="answer-title-content">
-                                          <span class="answer-number"
-                                            >R{{ aIndex + 1 }}</span
-                                          >
+                                          <span class="answer-number">R{{ aIndex + 1 }}</span>
                                           <span class="answer-preview">
-                                            {{
-                                              getAnswerPreview(
-                                                i,
-                                                qIndex,
-                                                aIndex
-                                              ) || "Nouvelle réponse"
-                                            }}
+                                            {{ getAnswerPreview(i, qIndex, aIndex) || "Nouvelle réponse" }}
                                           </span>
                                         </div>
                                       </mat-panel-title>
-                                      <mat-panel-description
-                                        class="answer-panel-description"
-                                      >
-                                        <mat-chip
-                                          *ngIf="
-                                            answer.get('is_correct')?.value
-                                          "
-                                          class="correct-answer-chip"
-                                          color="primary"
-                                        >
+                                      <mat-panel-description class="answer-panel-description">
+                                        <mat-chip *ngIf="answer.get('is_correct')?.value" class="correct-answer-chip" color="primary">
                                           <mat-icon>check</mat-icon>
                                           Correcte
                                         </mat-chip>
-                                        <mat-chip
-                                          *ngIf="
-                                            !answer.get('is_correct')?.value
-                                          "
-                                          class="incorrect-answer-chip"
-                                        >
+                                        <mat-chip *ngIf="!answer.get('is_correct')?.value" class="incorrect-answer-chip">
                                           Incorrecte
                                         </mat-chip>
                                       </mat-panel-description>
@@ -518,29 +477,16 @@
 
                                     <div class="answer-content">
                                       <div class="answer-form-row">
-                                        <mat-form-field
-                                          appearance="outline"
-                                          class="answer-text-field"
-                                        >
-                                          <mat-label
-                                            >Réponse {{ aIndex + 1 }}</mat-label
-                                          >
+                                        <mat-form-field appearance="outline" class="answer-text-field">
+                                          <mat-label>Réponse {{ aIndex + 1 }}</mat-label>
                                           <input
                                             matInput
                                             formControlName="text"
                                             required
                                             placeholder="Saisissez la réponse..."
                                           />
-                                          <mat-error
-                                            *ngIf="
-                                              getAnswers(i, qIndex)
-                                                .at(aIndex)
-                                                .get('text')
-                                                ?.hasError('required')
-                                            "
-                                          >
-                                            Le texte de la réponse est
-                                            obligatoire
+                                          <mat-error *ngIf="getAnswers(i, qIndex).at(aIndex).get('text')?.hasError('required')">
+                                            Le texte de la réponse est obligatoire
                                           </mat-error>
                                         </mat-form-field>
 
@@ -556,12 +502,8 @@
                                           <button
                                             mat-icon-button
                                             type="button"
-                                            (click)="
-                                              removeAnswer(i, qIndex, aIndex)
-                                            "
-                                            *ngIf="
-                                              getAnswers(i, qIndex).length > 1
-                                            "
+                                            (click)="removeAnswer(i, qIndex, aIndex)"
+                                            *ngIf="getAnswers(i, qIndex).length > 1"
                                             class="delete-answer-btn"
                                             matTooltip="Supprimer cette réponse"
                                             color="warn"
@@ -573,6 +515,7 @@
                                     </div>
                                   </mat-expansion-panel>
                                 </div>
+
                                 <div class="add-answer-container">
                                   <button
                                     mat-stroked-button
@@ -589,6 +532,7 @@
                             </div>
                           </mat-expansion-panel>
                         </div>
+
                         <div class="add-question-container">
                           <button
                             mat-fab
@@ -611,6 +555,7 @@
           </div>
         </mat-card-content>
       </mat-card>
+
       <div class="form-actions">
         <div class="actions-container">
           <button
@@ -624,16 +569,24 @@
           </button>
 
           <div class="primary-actions">
+            <!-- Message d'erreur de validation pour quiz -->
+            <div *ngIf="isQuizContent() && getQuizValidationError()" class="quiz-validation-error">
+              <mat-icon>error_outline</mat-icon>
+              <span>{{ getQuizValidationError() }}</span>
+            </div>
+
             <button
               mat-raised-button
               color="primary"
               type="submit"
-              [disabled]="!canSubmitForm()"
+              [disabled]="!canSubmitForm() || isSubmitting"
               class="submit-btn"
             >
-              <mat-icon>save</mat-icon>
-              <span *ngIf="isQuizContent()">Enregistrer le quiz</span>
-              <span *ngIf="!isQuizContent()">Enregistrer la leçon</span>
+              <mat-icon *ngIf="!isSubmitting">save</mat-icon>
+              <mat-icon *ngIf="isSubmitting" class="spinner">hourglass_empty</mat-icon>
+              <span *ngIf="isQuizContent() && !isSubmitting">Enregistrer le quiz</span>
+              <span *ngIf="!isQuizContent() && !isSubmitting">Enregistrer la leçon</span>
+              <span *ngIf="isSubmitting">Envoi en cours...</span>
             </button>
           </div>
         </div>

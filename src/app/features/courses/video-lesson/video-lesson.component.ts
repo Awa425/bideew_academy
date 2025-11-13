@@ -133,17 +133,17 @@ export class VideoLessonComponent implements OnInit {
 
   previousLesson() {
     if (this.hasPreviousLesson && this.previousLessonId) {
-      this.router.navigate(['../../../lessons'], {
-        relativeTo: this.route,
-      });
+      // Navigation vers la leçon précédente
+      const courseId = this.route.snapshot.paramMap.get('id');
+      this.router.navigate(['/courses', courseId, 'lessons', this.previousLessonId, 'video']);
     }
   }
 
   nextLesson() {
     if (this.hasNextLesson && this.nextLessonId) {
-      this.router.navigate(['../../../lessons'], {
-        relativeTo: this.route,
-      });
+      // Navigation vers la leçon suivante
+      const courseId = this.route.snapshot.paramMap.get('id');
+      this.router.navigate(['/courses', courseId, 'lessons', this.nextLessonId, 'video']);
     }
   }
 

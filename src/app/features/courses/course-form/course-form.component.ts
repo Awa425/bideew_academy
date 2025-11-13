@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CourseService } from '../../../core/services/course.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { SecureStorageService } from '../../../core/services/secure-storage.service';
 
 @Component({
   selector: 'app-course-form',
@@ -28,16 +30,20 @@ export class CourseFormComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private notificationService: NotificationService,
+    private secureStorage: SecureStorageService
   ) {}
 
   ngOnInit() {
-    const userData = localStorage.getItem('user_id');
-    if (userData) {
-      const user = JSON.parse(userData);
-      this.course.user_id = user.id || user.user_id || 1;
+    // Utilisation de SecureStorageService au lieu de localStorage
+    const userId = this.secureStorage.getUserId();
+    if (userId) {
+      // Convertir la chaîne en nombre
+      this.course.user_id = parseInt(userId, 10);
     } else {
       console.error('Aucun utilisateur connecté');
+      this.notificationService.setErrorMessage('Vous devez être connecté pour créer un cours');
     }
   }
 
@@ -46,7 +52,7 @@ export class CourseFormComponent implements OnInit {
     if (file) {
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
-        alert('Le fichier est trop volumineux. Taille maximum : 5MB');
+        this.notificationService.setErrorMessage('Le fichier est trop volumineux. Taille maximum : 5MB');
         event.target.value = '';
         return;
       }
@@ -58,7 +64,7 @@ export class CourseFormComponent implements OnInit {
         'image/gif',
       ];
       if (!allowedTypes.includes(file.type)) {
-        alert('Type de fichier non autorisé. Utilisez JPEG, PNG ou GIF.');
+        this.notificationService.setErrorMessage('Type de fichier non autorisé. Utilisez JPEG, PNG ou GIF.');
         event.target.value = '';
         return;
       }
@@ -77,27 +83,27 @@ export class CourseFormComponent implements OnInit {
 
   validateForm(): boolean {
     if (!this.course.title || this.course.title.trim() === '') {
-      alert('Le titre du cours est obligatoire');
+      this.notificationService.setErrorMessage('Le titre du cours est obligatoire');
       return false;
     }
 
     if (!this.course.description || this.course.description.trim() === '') {
-      alert('La description du cours est obligatoire');
+      this.notificationService.setErrorMessage('La description du cours est obligatoire');
       return false;
     }
 
     if (!this.course.category || this.course.category.trim() === '') {
-      alert('La catégorie du cours est obligatoire');
+      this.notificationService.setErrorMessage('La catégorie du cours est obligatoire');
       return false;
     }
 
     if (this.course.duration_minutes <= 0) {
-      alert('La durée du cours doit être supérieure à 0');
+      this.notificationService.setErrorMessage('La durée du cours doit être supérieure à 0');
       return false;
     }
 
     if (this.course.user_id === 0) {
-      alert('Erreur: utilisateur non identifié. Veuillez vous reconnecter.');
+      this.notificationService.setErrorMessage('Erreur: utilisateur non identifié. Veuillez vous reconnecter.');
       return false;
     }
 
@@ -128,17 +134,15 @@ export class CourseFormComponent implements OnInit {
     if (this.course.image_path) {
       formData.append('image_path', this.course.image_path);
     }
-    console.log(formData);
 
     this.courseService.createCourse(formData).subscribe({
       next: (response) => {
-        console.log('Cours créé avec succès:', response);
-        alert('Cours créé avec succès!');
+        this.notificationService.setSuccessMessage('Cours créé avec succès!');
         this.router.navigate(['/courses']);
       },
       error: (error) => {
         console.error('Erreur lors de la création du cours:', error);
-        alert('Erreur lors de la création du cours. Veuillez réessayer.');
+        this.notificationService.setErrorMessage('Erreur lors de la création du cours. Veuillez réessayer.');
       },
     });
   }

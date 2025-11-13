@@ -46,7 +46,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   login() {
     this.authService.login({email: this.email, password: this.password}).subscribe({
       next: (res:any) => {
-        localStorage.setItem('token', res.token);
+        // Le token est déjà géré par AuthService via SecureStorageService
         this.router.navigate(['/home']);
       },
       error: (err) => {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
+import { NotificationService } from '../../core/services/notification.service';
 
 interface CourseProgress {
   id: number;
@@ -88,7 +89,10 @@ export class Users implements OnInit {
   showUserDetailsModal: boolean = false;
   selectedUserDetails: User | null = null;
 
-  constructor(private userService: AuthService) {}
+  constructor(
+    private userService: AuthService,
+    private notificationService: NotificationService
+  ) {}
 
   showProgressModal: boolean = false;
   selectedUserForProgress: User | null = null;
@@ -274,6 +278,7 @@ export class Users implements OnInit {
       }
 
       this.closeUserModal();
+      // Recharger la liste des utilisateurs immédiatement
       this.loadUsers(this.currentPage);
     } catch (error: any) {
       this.formError = this.getErrorMessage(error);
@@ -283,32 +288,53 @@ export class Users implements OnInit {
   }
 
   private async createUserData(): Promise<void> {
-    const userData: any = {
-      name: this.userFormData.name,
-      email: this.userFormData.email,
-      role: this.userFormData.role,
-      password: this.userFormData.password,
-      password_confirmation: this.userFormData.confirmPassword,
-    };
+    return new Promise((resolve, reject) => {
+      const userData: any = {
+        name: this.userFormData.name,
+        email: this.userFormData.email,
+        role: this.userFormData.role,
+        password: this.userFormData.password,
+        password_confirmation: this.userFormData.confirmPassword,
+      };
 
-    this.userService.register(userData).subscribe((dataUser: any) => {
+      this.userService.register(userData).subscribe({
+        next: (dataUser: any) => {
+          console.log('Utilisateur créé avec succès:', dataUser);
+          resolve();
+        },
+        error: (error) => {
+          console.error('Erreur création utilisateur:', error);
+          reject(error);
+        }
+      });
     });
   }
 
   private async updateUserData(): Promise<void> {
-    if (!this.userFormData.id) throw new Error('ID utilisateur manquant');
+    return new Promise((resolve, reject) => {
+      if (!this.userFormData.id) {
+        reject(new Error('ID utilisateur manquant'));
+        return;
+      }
 
-    const userData: any = {
-      id: this.userFormData.id,
-      name: this.userFormData.name,
-      email: this.userFormData.email,
-      role: this.userFormData.role,
-    };
+      const userData: any = {
+        id: this.userFormData.id,
+        name: this.userFormData.name,
+        email: this.userFormData.email,
+        role: this.userFormData.role,
+      };
 
-    this.userService
-      .updateUser(userData, userData.id)
-      .subscribe((data: any) => {
+      this.userService.updateUser(userData, userData.id).subscribe({
+        next: (data: any) => {
+          console.log('Utilisateur mis à jour avec succès:', data);
+          resolve();
+        },
+        error: (error) => {
+          console.error('Erreur mise à jour utilisateur:', error);
+          reject(error);
+        }
       });
+    });
   }
 
   private getErrorMessage(error: any): string {
@@ -639,11 +665,12 @@ export class Users implements OnInit {
     ) {
       this.userService.deleteUser(user.id).subscribe({
         next: () => {
+          this.notificationService.setSuccessMessage('Utilisateur supprimé avec succès');
           this.loadUsers(this.currentPage);
         },
         error: (err) => {
           console.error('Erreur lors de la suppression:', err);
-          alert("Erreur lors de la suppression de l'utilisateur");
+          this.notificationService.setErrorMessage("Erreur lors de la suppression de l'utilisateur");
         },
       });
     }
@@ -668,11 +695,11 @@ export class Users implements OnInit {
 
     this.userService.updatePasswordUser(userData, user.id).subscribe({
       next: () => {
-        alert(`Email de réinitialisation envoyé à ${user.email}`);
+        this.notificationService.setSuccessMessage(`Mot de passe réinitialisé pour ${user.email}`);
       },
       error: (err) => {
         console.error('Erreur:', err);
-        alert("Erreur lors de l'envoi de l'email");
+        this.notificationService.setErrorMessage("Erreur lors de la réinitialisation du mot de passe");
       },
     });
   }

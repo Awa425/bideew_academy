@@ -10,6 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CourseService } from '../../../core/services/course.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-edit-lesson',
@@ -38,7 +39,8 @@ export class EditLessonComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private notificationService: NotificationService
   ) {
     this.lessonForm = this.fb.group({
       title: ['', Validators.required],
@@ -127,16 +129,44 @@ export class EditLessonComponent implements OnInit {
 
   onSubmit(): void {
     if (this.lessonForm.valid && this.courseId && this.lessonId) {
+      // Créer un FormData pour l'envoi
+      const formData = new FormData();
+
+      // Ajouter les champs de base
+      formData.append('title', this.lessonForm.get('title')?.value);
+      formData.append('duration_minutes', this.lessonForm.get('duration_minutes')?.value.toString());
+      formData.append('is_published', this.lessonForm.get('is_published')?.value ? '1' : '0');
+      formData.append('is_locked', this.lessonForm.get('is_locked')?.value ? '1' : '0');
+
+      // Gérer les contenus
+      const contents = this.contents.value;
+      contents.forEach((content: any, index: number) => {
+        formData.append(`content[${index}][type]`, content.type);
+
+        if (content.type === 'text' && content.data) {
+          formData.append(`content[${index}][data]`, content.data);
+        } else if (content.type === 'video') {
+          if (content.file) {
+            // Nouveau fichier uploadé
+            formData.append(`content[${index}][file]`, content.file);
+          } else if (content.external_url) {
+            formData.append(`content[${index}][external_url]`, content.external_url);
+          }
+        } else if (content.type === 'pdf' && content.file) {
+          formData.append(`content[${index}][file]`, content.file);
+        }
+      });
+
       this.courseService
-        .updateLesson(this.lessonId, this.lessonForm.value)
+        .updateLesson(this.lessonId, formData)
         .subscribe({
           next: (response) => {
-            alert('Leçon modifiée avec succès !');
+            this.notificationService.setSuccessMessage('Leçon modifiée avec succès !');
             this.goBack();
           },
           error: (err) => {
             console.error('Error updating lesson:', err);
-            alert(
+            this.notificationService.setErrorMessage(
               `Erreur lors de la modification: ${
                 err.error?.message || 'Erreur inconnue'
               }`

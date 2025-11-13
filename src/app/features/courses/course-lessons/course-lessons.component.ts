@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ActivatedRoute,
@@ -18,6 +18,9 @@ import { CourseService } from '../../../core/services/course.service';
 import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { SecureStorageService } from '../../../core/services/secure-storage.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-course-lessons',
@@ -40,7 +43,7 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './course-lessons.component.html',
   styleUrls: ['./course-lessons.component.scss'],
 })
-export class CourseLessonsComponent implements OnInit {
+export class CourseLessonsComponent implements OnInit, OnDestroy {
   lessons: any = [];
   users: any = [];
   lessonsLocked: any = [];
@@ -55,16 +58,29 @@ export class CourseLessonsComponent implements OnInit {
   unlockedLessons: number[] = [];
   token: string | null = '';
   userId: string | null = '';
+  userRole: string | null = '';
+  isDeleting: boolean = false;
+  lessonToDelete: any = null;
+
+  success: string = '';
+  error: string = '';
+  private successSubscription!: Subscription;
+  private errorSubscription!: Subscription;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private courseService: CourseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService,
+    private secureStorage: SecureStorageService
   ) {}
 
   ngOnInit() {
-    this.userId = localStorage.getItem('user_id');
+    // Utilisation de SecureStorageService au lieu de localStorage
+    this.userId = this.secureStorage.getUserId();
+    this.userRole = this.authService.getUserRole();
+
     this.authService.getUserById(this.userId).subscribe((data) => {
       this.users = data;
     });
@@ -75,6 +91,40 @@ export class CourseLessonsComponent implements OnInit {
     this.loadLessonsDataCourse(this.courseId);
     this.loadProgress();
     this.loadUserProgress(this.userId);
+
+    // S'abonner aux notifications
+    this.successSubscription = this.notificationService.currentSuccessMessage.subscribe(
+      message => {
+        this.success = message;
+        if (message) {
+          setTimeout(() => {
+            this.success = '';
+            this.notificationService.clearSuccessMessage();
+          }, 5000);
+        }
+      }
+    );
+
+    this.errorSubscription = this.notificationService.currentErrorMessage.subscribe(
+      message => {
+        this.error = message;
+        if (message) {
+          setTimeout(() => {
+            this.error = '';
+            this.notificationService.clearErrorMessage();
+          }, 5000);
+        }
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    if (this.successSubscription) {
+      this.successSubscription.unsubscribe();
+    }
+    if (this.errorSubscription) {
+      this.errorSubscription.unsubscribe();
+    }
   }
 
   private loadUserProgress(userID: any) {
@@ -137,7 +187,7 @@ export class CourseLessonsComponent implements OnInit {
   redirect(lessonId: any): void {
     if (this.users.user.role == 'apprenant') {
       if (!this.isLessonUnlocked(lessonId)) {
-        alert(
+        this.notificationService.setErrorMessage(
           'Veuillez compléter les leçons précédentes pour déverrouiller cette leçon'
         );
         return;
@@ -161,7 +211,7 @@ export class CourseLessonsComponent implements OnInit {
 
   redirect_quizz(): void {
     if (!this.isLessonUnlocked(this.lessons.quizzes.id)) {
-      alert('Veuillez compléter toutes les leçons pour accéder au quiz');
+      this.notificationService.setErrorMessage('Veuillez compléter toutes les leçons pour accéder au quiz');
       return;
     }
     this.router.navigate(['quizz', this.courseId], { relativeTo: this.route });
@@ -184,6 +234,57 @@ export class CourseLessonsComponent implements OnInit {
       default:
         return 'school';
     }
+  }
+
+  /**
+   * Vérifie si l'utilisateur peut modifier/supprimer (admin ou formateur)
+   */
+  canManageLessons(): boolean {
+    return this.userRole === 'admin' || this.userRole === 'formateur';
+  }
+
+  /**
+   * Ouvre la modal de confirmation de suppression
+   */
+  openDeleteModal(lesson: any): void {
+    this.lessonToDelete = lesson;
+  }
+
+  /**
+   * Ferme la modal de suppression
+   */
+  closeDeleteModal(): void {
+    this.lessonToDelete = null;
+  }
+
+  /**
+   * Confirme et effectue la suppression de la leçon
+   */
+  confirmDeleteLesson(): void {
+    if (!this.lessonToDelete || this.isDeleting) {
+      return;
+    }
+
+    this.isDeleting = true;
+    const lessonId = this.lessonToDelete.id;
+
+    this.courseService.deleteLesson(lessonId).subscribe({
+      next: () => {
+        this.notificationService.setSuccessMessage('Leçon supprimée avec succès');
+        // Retirer la leçon de la liste locale
+        this.lessons.lessons = this.lessons.lessons.filter((l: any) => l.id !== lessonId);
+        this.closeDeleteModal();
+        this.isDeleting = false;
+      },
+      error: (err) => {
+        console.error('Erreur lors de la suppression:', err);
+        this.notificationService.setErrorMessage(
+          err.error?.message || 'Erreur lors de la suppression de la leçon'
+        );
+        this.isDeleting = false;
+        this.closeDeleteModal();
+      },
+    });
   }
 
   updateProgress(lessonId: number): void {
@@ -255,6 +356,7 @@ export class CourseLessonsComponent implements OnInit {
   confirmAction() {
     this.showConfirmation = false;
   }
+  
   redirect_edit_lesson(lessonId: number): void {
     if (this.courseId) {
       this.router.navigate(
@@ -262,5 +364,16 @@ export class CourseLessonsComponent implements OnInit {
         { relativeTo: this.route.parent?.parent }
       );
     }
+  }
+
+  // Méthodes pour fermer les alertes
+  closeSuccessAlert(): void {
+    this.success = '';
+    this.notificationService.clearSuccessMessage();
+  }
+
+  closeErrorAlert(): void {
+    this.error = '';
+    this.notificationService.clearErrorMessage();
   }
 }

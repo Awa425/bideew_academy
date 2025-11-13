@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CourseService } from '../../core/services/course.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { SecureStorageService } from '../../core/services/secure-storage.service';
 import { Subscription } from 'rxjs';
 
 interface LessonProgress {
@@ -63,11 +64,13 @@ export class LearningPathComponent implements OnInit, OnDestroy {
   constructor(
     private courseService: CourseService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private secureStorage: SecureStorageService
   ) {}
 
   ngOnInit(): void {
-    this.userId = localStorage.getItem('user_id');
+    // Utilisation de SecureStorageService au lieu de localStorage
+    this.userId = this.secureStorage.getUserId();
     if (this.userId) {
       this.loadUserProgress();
     } else {

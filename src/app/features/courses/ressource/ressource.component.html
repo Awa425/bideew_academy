@@ -44,6 +44,17 @@
 
       <div class="view-toggle">
         <button
+          (click)="openAddModal()"
+          class="btn-add-resource"
+          title="Ajouter une ressource"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Ajouter
+        </button>
+        <button
           (click)="setViewMode('grid')"
           [class.active]="viewMode === 'grid'"
           class="toggle-btn"
@@ -141,6 +152,17 @@
 
         <div class="resource-actions">
           <button
+            (click)="openViewer(resource)"
+            class="btn-view"
+            title="Lire la ressource"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            Lire
+          </button>
+          <button
             (click)="handleDownload(resource)"
             [disabled]="isLoading"
             class="btn-download"
@@ -172,6 +194,208 @@
       <div class="no-resources-icon">📚</div>
       <h3>Aucune ressource trouvée</h3>
       <p>Essayez de modifier vos critères de recherche</p>
+    </div>
+  </div>
+
+  <!-- Modal pour ajouter une ressource -->
+  <div *ngIf="showAddModal" class="modal-overlay" (click)="closeAddModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Ajouter une ressource</h2>
+        <button class="btn-close-modal" (click)="closeAddModal()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Messages de notification -->
+      <div *ngIf="successMessage" class="alert alert-success">
+        {{ successMessage }}
+      </div>
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+
+      <form class="modal-form" (ngSubmit)="onSubmitResource()">
+        <div class="form-group">
+          <label for="resource-title">Titre <span class="required">*</span></label>
+          <input
+            type="text"
+            id="resource-title"
+            [(ngModel)]="newResource.title"
+            name="title"
+            placeholder="Ex: Guide d'utilisation Python"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="resource-type">Type de ressource <span class="required">*</span></label>
+          <select
+            id="resource-type"
+            [(ngModel)]="newResource.type"
+            name="type"
+            (change)="onTypeChange()"
+            class="form-control"
+            required
+          >
+            <option value="pdf">Document PDF</option>
+            <option value="video">Vidéo</option>
+            <option value="tool">Outil</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="resource-description">Description <span class="required">*</span></label>
+          <textarea
+            id="resource-description"
+            [(ngModel)]="newResource.description"
+            name="description"
+            rows="4"
+            placeholder="Décrivez la ressource..."
+            class="form-control"
+            required
+          ></textarea>
+        </div>
+
+        <!-- Champ pour URL externe (vidéos uniquement) -->
+        <div *ngIf="newResource.type === 'video'" class="form-group">
+          <label for="resource-url">URL de la vidéo (optionnel)</label>
+          <input
+            type="url"
+            id="resource-url"
+            [(ngModel)]="newResource.external_url"
+            name="external_url"
+            placeholder="https://youtube.com/watch?v=..."
+            class="form-control"
+          />
+          <small class="form-text">Laissez vide si vous voulez uploader un fichier</small>
+        </div>
+
+        <!-- Champ pour fichier (obligatoire sauf si URL vidéo fournie) -->
+        <div *ngIf="!newResource.external_url || newResource.type !== 'video'" class="form-group">
+          <label for="resource-file">
+            Fichier
+            <span *ngIf="newResource.type !== 'video' || !newResource.external_url" class="required">*</span>
+          </label>
+          <input
+            type="file"
+            id="resource-file"
+            (change)="onFileSelected($event)"
+            class="form-control"
+            [accept]="newResource.type === 'pdf' ? '.pdf' :
+                      newResource.type === 'video' ? '.mp4,.webm,.ogg,.avi' :
+                      '.txt,.js,.py'"
+          />
+          <small class="form-text">
+            <span *ngIf="newResource.type === 'pdf'">Format accepté: PDF (max 50MB)</span>
+            <span *ngIf="newResource.type === 'video'">Formats acceptés: MP4, WebM, OGG, AVI (max 50MB)</span>
+            <span *ngIf="newResource.type === 'tool'">Formats acceptés: TXT, JS, PY (max 50MB)</span>
+          </small>
+        </div>
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            (click)="closeAddModal()"
+            [disabled]="isSubmitting"
+            class="btn btn-secondary"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            [disabled]="!isFormValid() || isSubmitting"
+            class="btn btn-primary"
+          >
+            <span *ngIf="!isSubmitting">Ajouter</span>
+            <span *ngIf="isSubmitting">Ajout en cours...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal pour visualiser une ressource -->
+  <div *ngIf="showViewerModal && currentViewingResource" class="modal-overlay" (click)="closeViewer()">
+    <div class="viewer-modal-content" (click)="$event.stopPropagation()">
+      <div class="viewer-header">
+        <div class="viewer-title">
+          <h2>{{ currentViewingResource.title }}</h2>
+          <span class="viewer-type-badge">{{ currentViewingResource.type }}</span>
+        </div>
+        <button class="btn-close-modal" (click)="closeViewer()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="viewer-body">
+        <!-- PDF Viewer -->
+        <div *ngIf="currentViewingResource.type === 'pdf'" class="pdf-viewer">
+          <iframe
+            [src]="getResourceUrl(currentViewingResource)"
+            frameborder="0"
+            width="100%"
+            height="600px"
+          ></iframe>
+        </div>
+
+        <!-- Video Player -->
+        <div *ngIf="currentViewingResource.type === 'video'" class="video-viewer">
+          <!-- Si c'est une URL YouTube -->
+          <iframe
+            *ngIf="currentViewingResource.external_url && (currentViewingResource.external_url.includes('youtube') || currentViewingResource.external_url.includes('youtu.be'))"
+            [src]="getEmbedUrl(currentViewingResource.external_url)"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            width="100%"
+            height="500px"
+          ></iframe>
+
+          <!-- Si c'est un fichier vidéo local -->
+          <video
+            *ngIf="!currentViewingResource.external_url || (!currentViewingResource.external_url.includes('youtube') && !currentViewingResource.external_url.includes('youtu.be'))"
+            controls
+            width="100%"
+            height="500px"
+          >
+            <source [src]="getVideoUrl(currentViewingResource)" type="video/mp4">
+            Votre navigateur ne supporte pas la lecture de vidéos.
+          </video>
+        </div>
+
+        <!-- Code/Text Viewer -->
+        <div *ngIf="currentViewingResource.type === 'tool'" class="code-viewer">
+          <pre><code>{{ viewerContent }}</code></pre>
+        </div>
+      </div>
+
+      <div class="viewer-footer">
+        <p class="viewer-description">{{ currentViewingResource.description }}</p>
+        <div class="viewer-actions">
+          <button
+            (click)="handleDownload(currentViewingResource)"
+            class="btn btn-primary"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Télécharger
+          </button>
+          <button (click)="closeViewer()" class="btn btn-secondary">
+            Fermer
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

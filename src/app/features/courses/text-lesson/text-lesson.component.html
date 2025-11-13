@@ -1,16 +1,65 @@
 <div class="ppt-container">
-  <div class="ppt-slide">
-    <h2>{{ slides[currentSlideIndex].title }}</h2>
+  <!-- En-tête avec progression -->
+  <div class="ppt-header">
+    <div class="header-content">
+      <a [routerLink]="['../../']" class="btn-back" title="Retour au cours">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Retour</span>
+      </a>
+      <div class="progress-info">
+        <span class="slide-counter">Diapositive {{ currentSlideIndex + 1 }} / {{ slides.length }}</span>
+        <div class="progress-bar-container">
+          <div class="progress-bar" [style.width.%]="((currentSlideIndex + 1) / slides.length) * 100"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diapositive principale -->
+  <div class="ppt-slide" [@slideAnimation]>
+    <div class="slide-title-section">
+      <mat-icon class="slide-icon">description</mat-icon>
+      <h2 class="slide-title">{{ slides[currentSlideIndex].title }}</h2>
+    </div>
+
+    <mat-divider></mat-divider>
+
     <div class="ppt-content" [innerHTML]="slides[currentSlideIndex].content"></div>
   </div>
-  
+
+  <!-- Contrôles de navigation améliorés -->
   <div class="ppt-controls">
-    <a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR"><img src="../../../../assets/left-long-solid.svg" alt="" width="30"></a>
-    <button mat-stroked-button (click)="prevSlide()" [disabled]="currentSlideIndex === 0">
-      ← Précédent
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="prevSlide()"
+      [disabled]="currentSlideIndex === 0"
+      class="nav-button prev-button">
+      <mat-icon>navigate_before</mat-icon>
+      Précédent
     </button>
-    <button mat-raised-button (click)="nextSlide()" [disabled]="currentSlideIndex === slides.length - 1">
-      Suivant →
+
+    <!-- Indicateurs de diapositives -->
+    <div class="slide-indicators">
+      <button
+        *ngFor="let slide of slides; let i = index"
+        class="slide-indicator"
+        [class.active]="i === currentSlideIndex"
+        (click)="goToSlide(i)"
+        [attr.aria-label]="'Aller à la diapositive ' + (i + 1)"
+        matTooltip="Diapositive {{ i + 1 }}"
+      >
+      </button>
+    </div>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="nextSlide()"
+      [disabled]="currentSlideIndex === slides.length - 1"
+      class="nav-button next-button">
+      Suivant
+      <mat-icon>navigate_next</mat-icon>
     </button>
   </div>
 </div>

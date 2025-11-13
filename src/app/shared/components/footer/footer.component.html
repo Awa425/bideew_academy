@@ -13,9 +13,9 @@
       <div class="footer-section">
         <h3>Liens Rapides</h3>
         <ul>
-          <li><a routerLink="/home">Accueil</a></li>
-          <li><a routerLink="/courses">Cours</a></li>
-          <li><a routerLink="/learning-path">Parcours d'Apprentissage</a></li>
+          <li><a routerLink="home">Accueil</a></li>
+          <li><a routerLink="courses">Cours</a></li>
+          <li><a routerLink="learning-path" *ngIf="users.user?.role == 'apprenant'">Parcours d'Apprentissage</a></li>
         </ul>
       </div>
 

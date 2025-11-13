@@ -9,6 +9,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { Course, Lessons, Quiz } from '../models/course.model';
 import { envVars } from 'environments/environments';
 import { finalize } from 'rxjs';
+import { SecureStorageService } from './secure-storage.service';
 
 interface QuizSubmission {
   quiz_id: number;
@@ -22,7 +23,18 @@ interface QuizSubmission {
   providedIn: 'root',
 })
 export class CourseService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private secureStorage: SecureStorageService
+  ) {}
+
+  /**
+   * Obtient les headers HTTP avec le token d'authentification
+   */
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.secureStorage.getToken();
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  }
 
   private logRequest(
     url: string,
@@ -61,26 +73,37 @@ export class CourseService {
   }
 
   updateCourse(id: number, formData: FormData): Observable<any> {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
-    return this.http.put<any>(`${envVars.apiBaseUrl}/courses/${id}`, formData, {
+    // IMPORTANT: Laravel a des problèmes avec PUT + FormData
+    // Solution: Utiliser POST avec _method=PUT
+    formData.append('_method', 'PUT');
+
+    return this.http.post<any>(`${envVars.apiBaseUrl}/courses/${id}`, formData, {
       headers,
     });
   }
 
   updateLesson(id: number, formData: FormData): Observable<any> {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
     return this.http.put<any>(`${envVars.apiBaseUrl}/lessons/${id}`, formData, {
       headers,
     });
   }
 
+  /**
+   * Supprimer une leçon (réservé aux admin et formateurs)
+   */
+  deleteLesson(lessonId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${envVars.apiBaseUrl}/lessons/${lessonId}`, {
+      headers,
+    });
+  }
+
   getAllCoursesByFormateur(userID: number, page: number = 1): Observable<any> {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
     return this.http.get(
       `${envVars.apiBaseUrl}/courses/user/${userID}?page=${page}`,
@@ -91,8 +114,7 @@ export class CourseService {
   }
 
   addProgress(lesson_id: number): any {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
     return this.http.patch(
       `${envVars.apiBaseUrl}/lessons/${lesson_id}/progress`,
       {},
@@ -103,8 +125,7 @@ export class CourseService {
   }
 
   generedCertificat(course_id: any): any {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
     return this.http.post(
       `${envVars.apiBaseUrl}/certificates/generate`,
@@ -116,8 +137,7 @@ export class CourseService {
   }
 
   getRessourceByID(lesson_id: number): any {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
     return this.http.get(
       `${envVars.apiBaseUrl}/lesson/${lesson_id}/resources`,
@@ -127,9 +147,21 @@ export class CourseService {
     );
   }
 
+  /**
+   * Créer une ressource pour une leçon
+   */
+  createResource(lessonId: number, formData: FormData): Observable<any> {
+    const headers = this.getAuthHeaders();
+
+    return this.http.post(
+      `${envVars.apiBaseUrl}/lesson/${lessonId}/resources`,
+      formData,
+      { headers }
+    );
+  }
+
   getCertificat(certificat_id: number): any {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
     return this.http.get(
       `${envVars.apiBaseUrl}/certificates/${certificat_id}`,
@@ -141,8 +173,7 @@ export class CourseService {
   }
 
   createLesson(courseId: number, lessonData: any): Observable<any> {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
     return this.http.post(
       `${envVars.apiBaseUrl}/courses/${courseId}/lessons`,
@@ -151,8 +182,7 @@ export class CourseService {
     );
   }
   createQuiz(courseId: number, quizData: any): Observable<any> {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
     return this.http.post(
       `${envVars.apiBaseUrl}/courses/${courseId}/quizzes`,
@@ -162,8 +192,7 @@ export class CourseService {
   }
 
   getProgress(courseId: number): Observable<any> {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
     return this.http.get(`${envVars.apiBaseUrl}/courses/${courseId}/progress`, {
       headers,
@@ -171,8 +200,7 @@ export class CourseService {
   }
 
   getInfoUser(userID: string): Observable<any> {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
     return this.http.get(`${envVars.apiBaseUrl}/users/${userID}/details`, {
       headers,
@@ -180,8 +208,7 @@ export class CourseService {
   }
 
   CourseStart(courseId: number): Observable<any> {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
     return this.http.post(
       `${envVars.apiBaseUrl}/courses/${courseId}/start`,
@@ -193,8 +220,7 @@ export class CourseService {
   }
 
   createCourse(data: any): Observable<any> {
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
 
     return this.http.post(`${envVars.apiBaseUrl}/courses`, data, {
       headers,
@@ -202,7 +228,7 @@ export class CourseService {
   }
 
   calculateScore(courseId: number, data: any): Observable<any> {
-    const token = localStorage.getItem('access_token');
+    const token = this.secureStorage.getToken();
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -218,24 +244,21 @@ export class CourseService {
   }
 
   getCourseById(id: any) {
-    const token = localStorage.getItem('access_token'); 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
     return this.http.get(`${envVars.apiBaseUrl}/courses/${id}`, {
       headers,
     });
   }
 
   getLessonsByIdCourse(id: number) {
-    const token = localStorage.getItem('access_token'); 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
     return this.http.get(`${envVars.apiBaseUrl}/courses/${id}\lessons`, {
       headers,
     });
   }
 
   getLessonsByIdLesson(idCour: number, idLesson: number) {
-    const token = localStorage.getItem('access_token'); 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
     return this.http.get(
       `${envVars.apiBaseUrl}/courses/${idCour}\/lessons/${idLesson}`,
       {
@@ -245,8 +268,7 @@ export class CourseService {
   }
 
   getQuizzByLesson(idCour: any) {
-    const token = localStorage.getItem('access_token'); 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.getAuthHeaders();
     return this.http.get(`${envVars.apiBaseUrl}/courses/${idCour}\/quizzes`, {
       headers,
     });
@@ -301,7 +323,7 @@ export class CourseService {
   }
 
   private getDefaultHeaders(): HttpHeaders {
-    const token = localStorage.getItem('access_token');
+    const token = this.secureStorage.getToken();
     return new HttpHeaders({
       Accept: 'application/json',
       'Cache-Control': 'no-cache',

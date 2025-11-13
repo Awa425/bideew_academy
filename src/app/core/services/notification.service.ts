@@ -1,9 +1,13 @@
 import { Injectable, TemplateRef } from '@angular/core';
-import { MatSnackBar, MatSnackBarConfig, MatSnackBarRef } from '@angular/material/snack-bar';
+import {
+  MatSnackBar,
+  MatSnackBarConfig,
+  MatSnackBarRef,
+} from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ComponentType } from '@angular/cdk/overlay';
 import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 export type NotificationType = 'success' | 'error' | 'info' | 'warning';
 
@@ -18,16 +22,39 @@ export interface NotificationConfig {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NotificationService {
-  private defaultDuration = 5000; 
+  private defaultDuration = 5000;
   private loadingSubject = new Subject<boolean>();
-  
-  constructor(
-    private snackBar: MatSnackBar,
-    private dialog: MatDialog
-  ) {}
+
+  private successMessage = new BehaviorSubject<string>('');
+  private errorMessage = new BehaviorSubject<string>('');
+
+  currentSuccessMessage = this.successMessage.asObservable();
+  currentErrorMessage = this.errorMessage.asObservable();
+
+  constructor(private snackBar: MatSnackBar, private dialog: MatDialog) {}
+  setSuccessMessage(message: string) {
+    this.successMessage.next(message);
+  }
+
+  clearSuccessMessage() {
+    this.successMessage.next('');
+  }
+
+  setErrorMessage(message: string) {
+    this.errorMessage.next(message);
+  }
+
+  clearErrorMessage() {
+    this.errorMessage.next('');
+  }
+
+  clearAllMessages() {
+    this.successMessage.next('');
+    this.errorMessage.next('');
+  }
 
   show(config: NotificationConfig): void {
     const {
@@ -36,11 +63,11 @@ export class NotificationService {
       duration = this.defaultDuration,
       action = 'OK',
       verticalPosition = 'top',
-      horizontalPosition = 'center'
+      horizontalPosition = 'center',
     } = config;
 
     const panelClass = `notification-${type}`;
-    
+
     this.snackBar.open(message, action, {
       duration,
       panelClass: [panelClass, 'notification'],
@@ -49,41 +76,51 @@ export class NotificationService {
     });
   }
 
-  success(message: string, config?: Omit<NotificationConfig, 'message' | 'type'>): void {
+  success(
+    message: string,
+    config?: Omit<NotificationConfig, 'message' | 'type'>
+  ): void {
     this.show({
       message,
       type: 'success',
       icon: 'check_circle',
-      ...config
+      ...config,
     });
   }
 
-
-  error(message: string, config?: Omit<NotificationConfig, 'message' | 'type'>): void {
+  error(
+    message: string,
+    config?: Omit<NotificationConfig, 'message' | 'type'>
+  ): void {
     this.show({
       message,
       type: 'error',
       icon: 'error',
-      ...config
+      ...config,
     });
   }
 
-  info(message: string, config?: Omit<NotificationConfig, 'message' | 'type'>): void {
+  info(
+    message: string,
+    config?: Omit<NotificationConfig, 'message' | 'type'>
+  ): void {
     this.show({
       message,
       type: 'info',
       icon: 'info',
-      ...config
+      ...config,
     });
   }
 
-
-  warning(message: string, config?: Omit<NotificationConfig, 'message' | 'type'>): void {
+  warning(
+    message: string,
+    config?: Omit<NotificationConfig, 'message' | 'type'>
+  ): void {
     this.show({
       message,
       type: 'warning',
       icon: 'warning',
-      ...config
+      ...config,
     });
   }
 
@@ -103,7 +140,7 @@ export class NotificationService {
       width: '500px',
       panelClass: 'custom-dialog',
       autoFocus: false,
-      ...config
+      ...config,
     });
   }
 
@@ -118,39 +155,40 @@ export class NotificationService {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '450px',
       disableClose: true,
-      data: { 
-        title, 
-        message, 
-        confirmText, 
+      data: {
+        title,
+        message,
+        confirmText,
         cancelText,
         isDangerous,
-        icon
-      }
+        icon,
+      },
     });
 
     return dialogRef.afterClosed();
   }
 
-
-  showCustomNotification<T>(component: ComponentType<T>, config: MatSnackBarConfig = {}): MatSnackBarRef<T> {
+  showCustomNotification<T>(
+    component: ComponentType<T>,
+    config: MatSnackBarConfig = {}
+  ): MatSnackBarRef<T> {
     return this.snackBar.openFromComponent(component, {
       duration: this.defaultDuration,
       panelClass: ['custom-notification'],
       horizontalPosition: 'right',
       verticalPosition: 'top',
-      ...config
+      ...config,
     });
   }
 
-
   triggerAnimation(element: HTMLElement, animation: string): void {
     element.classList.add('animate__animated', `animate__${animation}`);
-    
+
     const handleAnimationEnd = () => {
       element.classList.remove('animate__animated', `animate__${animation}`);
       element.removeEventListener('animationend', handleAnimationEnd);
     };
-    
+
     element.addEventListener('animationend', handleAnimationEnd);
   }
 

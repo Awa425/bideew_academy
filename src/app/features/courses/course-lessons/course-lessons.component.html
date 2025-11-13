@@ -61,6 +61,38 @@
       </div>
     </div>
   </mat-card>
+  <!-- Messages de notification -->
+  <div class="row justify-content-center mt-3">
+    <div class="col-md-6">
+      <div
+        class="alert alert-success alert-dismissible fade show text-center"
+        role="alert"
+        *ngIf="success"
+      >
+        {{ success }}
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeSuccessAlert()"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div
+        class="alert alert-danger alert-dismissible fade show text-center"
+        role="alert"
+        *ngIf="error"
+      >
+        {{ error }}
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeErrorAlert()"
+          aria-label="Close"
+        ></button>
+      </div>
+    </div>
+  </div>
 
   <div class="lessons-grid" *ngIf="users.user?.role == 'apprenant'">
     <mat-card
@@ -227,9 +259,17 @@
           color="primary"
           (click)="redirect_edit_lesson(lesson.id)"
           matTooltip="Modifier cette leçon"
-          color="primary"
         >
           <mat-icon>edit</mat-icon>Modifier
+        </button>
+        <button
+          mat-raised-button
+          color="warn"
+          (click)="openDeleteModal(lesson)"
+          matTooltip="Supprimer cette leçon"
+          *ngIf="canManageLessons()"
+        >
+          <mat-icon>delete</mat-icon>Supprimer
         </button>
         <button mat-raised-button color="primary" (click)="startLesson(lesson)">
           <mat-icon>visibility</mat-icon>
@@ -278,6 +318,40 @@
           Annuler
         </button>
         <button class="btn-confirm" (click)="confirmAction()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de suppression de leçon -->
+  <div class="confirmation-popup" *ngIf="lessonToDelete">
+    <div class="popup-content">
+      <h3><mat-icon color="warn">warning</mat-icon> Supprimer la leçon</h3>
+      <p>
+        Êtes-vous sûr de vouloir supprimer la leçon
+        <strong>"{{ lessonToDelete.title }}"</strong> ?
+      </p>
+      <p class="text-muted">
+        Cette action est irréversible et supprimera également toutes les ressources
+        associées à cette leçon.
+      </p>
+      <div class="popup-actions">
+        <button
+          class="btn-cancel"
+          (click)="closeDeleteModal()"
+          [disabled]="isDeleting"
+        >
+          Annuler
+        </button>
+        <button
+          class="btn-confirm btn-danger"
+          (click)="confirmDeleteLesson()"
+          [disabled]="isDeleting"
+        >
+          <mat-icon *ngIf="isDeleting">
+            <mat-spinner diameter="20"></mat-spinner>
+          </mat-icon>
+          {{ isDeleting ? "Suppression..." : "Supprimer" }}
+        </button>
       </div>
     </div>
   </div>

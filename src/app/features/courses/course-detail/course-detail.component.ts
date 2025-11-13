@@ -17,6 +17,7 @@ import { FormsModule } from '@angular/forms';
 import { Course, Lessons } from '../../../core/models/course.model';
 import { CourseService } from '../../../core/services/course.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { SecureStorageService } from '../../../core/services/secure-storage.service';
 import { envVars } from 'environments/environments';
 
 interface VideoConfig {
@@ -77,7 +78,8 @@ export class CourseDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private dialog: MatDialog,
     private courseService: CourseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private secureStorage: SecureStorageService
   ) {}
 
   ngOnInit(): void {
@@ -85,7 +87,8 @@ export class CourseDetailComponent implements OnInit {
     this.loadCourseData(this.courId);
     this.api = `${envVars.apiBaseUrlImage}`;
 
-    this.userId = localStorage.getItem('user_id');
+    // Utilisation de SecureStorageService au lieu de localStorage
+    this.userId = this.secureStorage.getUserId();
     this.authService.getUserById(this.userId).subscribe((data) => {
       this.users = data;
       this.course_progress = this.users.courses_progress.filter(

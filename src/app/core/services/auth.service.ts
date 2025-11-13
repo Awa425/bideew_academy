@@ -5,6 +5,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { envVars } from 'environments/environments';
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { SecureStorageService } from './secure-storage.service';
 
 declare const google: any;
 
@@ -18,21 +19,25 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private secureStorage: SecureStorageService
   ) {
+    // Migration des données de localStorage vers le stockage sécurisé
+    this.secureStorage.migrateFromLocalStorage();
+
     this.loadGoogleAuthSdk();
     this.loadUserFromStorage();
   }
 
   private loadUserFromStorage() {
     try {
-      const savedUser = localStorage.getItem('user_role');
-      if (savedUser) {
-        this.currentUserSubject.next(savedUser);
+      const savedRole = this.secureStorage.getUserRole();
+      if (savedRole) {
+        this.currentUserSubject.next(savedRole);
       }
     } catch (error) {
-      console.error('Error parsing user from localStorage:', error);
-      localStorage.removeItem('user_role');
+      console.error('Error loading user from storage:', error);
+      this.secureStorage.clearAll();
       this.currentUserSubject.next(null);
     }
   }
@@ -69,10 +74,12 @@ export class AuthService {
   login(credentials: any): Observable<any> {
     return this.http.post<any>(`${envVars.apiBaseUrl}/login`, credentials).pipe(
       tap((response) => {
-        localStorage.setItem('access_token', response.token);
-        localStorage.setItem('user_id', response.user.id); 
-        localStorage.setItem('user_role', response.user.role);
-        
+        // Utilisation du stockage sécurisé
+        this.secureStorage.setToken(response.token);
+        this.secureStorage.setUserId(response.user.id.toString());
+        this.secureStorage.setUserRole(response.user.role);
+        this.secureStorage.setUserData(response.user);
+
         this.currentUserSubject.next(response.user.role);
       })
     );
@@ -84,7 +91,7 @@ export class AuthService {
   }
 
   register(userData: any): Observable<any> {
-    const token = localStorage.getItem('access_token');
+    const token = this.secureStorage.getToken();
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     return this.http.post(`${envVars.apiBaseUrl}/register`, userData, {
@@ -93,7 +100,7 @@ export class AuthService {
   }
 
   updateUser(userData: any, id: any): Observable<any> {
-    const token = localStorage.getItem('access_token');
+    const token = this.secureStorage.getToken();
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     return this.http.put(`${envVars.apiBaseUrl}/users/${id}`, userData, {
@@ -102,7 +109,7 @@ export class AuthService {
   }
 
   updatePasswordUser(userData: any, id: any): Observable<any> {
-    const token = localStorage.getItem('access_token');
+    const token = this.secureStorage.getToken();
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     return this.http.put(`${envVars.apiBaseUrl}/users/${id}`, userData, {
@@ -111,22 +118,21 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('user');
-    
+    // Nettoyage du stockage sécurisé
+    this.secureStorage.clearAll();
+
     this.currentUserSubject.next(null);
-    
+
     this.router.navigate(['/login']);
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('access_token');
+    // Vérifie que le token existe ET est valide (non expiré)
+    return this.secureStorage.isTokenValid();
   }
 
   getUserById(id: any) {
-    const token = localStorage.getItem('access_token');
+    const token = this.secureStorage.getToken();
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(`${envVars.apiBaseUrl}/users/${id}/details`, {
       headers,
@@ -134,7 +140,7 @@ export class AuthService {
   }
 
   deleteUser(id: any) {
-    const token = localStorage.getItem('access_token');
+    const token = this.secureStorage.getToken();
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.delete(`${envVars.apiBaseUrl}/users/${id}`, {
       headers,
@@ -142,7 +148,7 @@ export class AuthService {
   }
 
   getAllUser(params?: any) {
-    const token = localStorage.getItem('access_token');
+    const token = this.secureStorage.getToken();
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(`${envVars.apiBaseUrl}/users`, {
       headers,
@@ -157,12 +163,13 @@ export class AuthService {
         tap((response: any) => {
           console.log('loginWithGoogle', response);
           if (response.success) {
-            localStorage.setItem('access_token', response.token);
-            localStorage.setItem('user', JSON.stringify(response.user));
-            
+            // Utilisation du stockage sécurisé
+            this.secureStorage.setToken(response.token);
+            this.secureStorage.setUserData(response.user);
+
             if (response.user && response.user.role) {
-              localStorage.setItem('user_role', response.user.role);
-              localStorage.setItem('user_id', response.user.id);
+              this.secureStorage.setUserRole(response.user.role);
+              this.secureStorage.setUserId(response.user.id.toString());
               this.currentUserSubject.next(response.user.role);
             }
           } else {
@@ -198,8 +205,7 @@ export class AuthService {
       }
 
       google.accounts.id.initialize({
-        client_id:
-          '544702559305-0pj57qlosquuhhe7rh3otjdfdj3k7p1t.apps.googleusercontent.com',
+        client_id: envVars.googleClientId,
         callback: (response: any) => this.handleGoogleSignIn(response),
       });
 
@@ -226,8 +232,7 @@ export class AuthService {
     this.loginWithGoogle(response.credential).subscribe({
       next: (res: any) => {
         if (res.success && res.token) {
-          localStorage.setItem('access_token', res.token);
-          localStorage.setItem('user', JSON.stringify(res.user));
+          // Le stockage est déjà géré dans loginWithGoogle via tap()
 
           this.ngZone.run(() => {
             this.router.navigate(['/home']);
@@ -246,5 +251,33 @@ export class AuthService {
         }
       },
     });
+  }
+
+  /**
+   * Obtient le token d'authentification
+   */
+  getToken(): string | null {
+    return this.secureStorage.getToken();
+  }
+
+  /**
+   * Obtient l'ID de l'utilisateur connecté
+   */
+  getUserId(): string | null {
+    return this.secureStorage.getUserId();
+  }
+
+  /**
+   * Obtient les données complètes de l'utilisateur
+   */
+  getUserData(): any | null {
+    return this.secureStorage.getUserData();
+  }
+
+  /**
+   * Vérifie le temps restant avant expiration du token (en secondes)
+   */
+  getTokenExpirationTime(): number | null {
+    return this.secureStorage.getTokenExpirationTime();
   }
 }
