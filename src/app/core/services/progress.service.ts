@@ -21,7 +21,6 @@ export class ProgressService {
     const user = this.authService.currentUserValue;
     if (!user) return of(false);
     
-    // Mise à jour de la progression
     if (!user.progress[courseId]) {
       user.progress[courseId] = {
         completedLessons: [],
@@ -30,20 +29,16 @@ export class ProgressService {
       };
     }
     
-    // Vérifier si la leçon n'est pas déjà complétée
     if (!user.progress[courseId].completedLessons.includes(lessonId)) {
       user.progress[courseId].completedLessons.push(lessonId);
       
-      // Mettre à jour le pourcentage de progression
-      // Dans une vraie application, cela dépendrait du nombre total de leçons
       user.progress[courseId].progressPercentage = Math.min(
         100,
-        user.progress[courseId].completedLessons.length * 10 // Exemple : 10% par leçon
+        user.progress[courseId].completedLessons.length * 10 
       );
       
       user.progress[courseId].lastAccessed = new Date();
       
-      // Mettre à jour l'utilisateur
       this.authService.updateUser(user);
       
       return of(true);
@@ -59,7 +54,6 @@ export class ProgressService {
     const passed = score >= passingScore;
     
     if (passed) {
-      // Marquer le quiz comme réussi
       if (!user.progress[courseId]) {
         user.progress[courseId] = {
           completedLessons: [],
@@ -68,16 +62,13 @@ export class ProgressService {
         };
       }
       
-      // S'assurer que le quiz est marqué comme complété
       if (!user.progress[courseId].completedLessons.includes(quizId)) {
         user.progress[courseId].completedLessons.push(quizId);
       }
       
-      // Mettre à jour la progression
-      user.progress[courseId].progressPercentage = 100; // 100% si le quiz est réussi
+      user.progress[courseId].progressPercentage = 100; 
       user.progress[courseId].lastAccessed = new Date();
       
-      // Marquer le cours comme complété si ce n'était pas déjà le cas
       if (!user.completedCourses.includes(courseId)) {
         user.completedCourses.push(courseId);
       }

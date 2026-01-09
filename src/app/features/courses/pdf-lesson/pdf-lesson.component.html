@@ -1,0 +1,99 @@
+<div class="pdf-container">
+  <div class="title-bar" style="margin-top: 6%">
+    <a [routerLink]="['../../']" class="btn-btn-info" title="RETOUR">
+      <img src="../../../../assets/left-long-solid.svg" alt="" width="30" />
+    </a>
+    <h2>Titre : {{ lessons.title }}</h2>
+    <div class="controls">
+    </div>
+  </div>
+
+  <div *ngIf="pdf; else loading" class="pdf-viewer-container">
+    <div class="pdf-viewer-wrapper">
+      <pdf-viewer
+        [src]="pdf"
+        [page]="currentPage"
+        [zoom]="zoom"
+        [fit-to-page]="fitToPage"
+        [show-all]="false"
+        (after-load-complete)="onPdfLoadComplete($event)"
+        class="pdf-viewer"
+      >
+      </pdf-viewer>
+    </div>
+
+    <div class="slide-controls">
+      <div class="navigation-controls">
+        <button
+          (click)="goToFirst()"
+          [disabled]="currentPage === 1"
+          class="nav-btn"
+          title="Première page"
+        >
+          ⏮
+        </button>
+
+        <button
+          (click)="prevSlide()"
+          [disabled]="currentPage === 1"
+          class="nav-btn prev-btn"
+          title="Page précédente"
+        >
+          ◀
+        </button>
+
+        <div class="page-info">
+          <input
+            type="number"
+            [value]="currentPage"
+            (input)="onPageInputChange($event)"
+            (keyup.enter)="onPageInputEnter($event)"
+            [min]="1"
+            [max]="totalPages"
+            class="page-input"
+          />
+          <span class="page-separator"> / </span>
+          <span class="total-pages">{{ totalPages }}</span>
+        </div>
+
+        <button
+          (click)="nextSlide()"
+          [disabled]="currentPage === totalPages"
+          class="nav-btn next-btn"
+          title="Page suivante"
+        >
+          ▶
+        </button>
+
+        <button
+          (click)="goToLast()"
+          [disabled]="currentPage === totalPages"
+          class="nav-btn"
+          title="Dernière page"
+        >
+          ⏭
+        </button>
+      </div>
+
+      <div class="zoom-controls">
+        <button (click)="zoomOut()" class="zoom-btn" title="Zoom arrière">
+          🔍-
+        </button>
+        <span class="zoom-level">{{ (zoom * 100).toFixed(0) }}%</span>
+        <button (click)="zoomIn()" class="zoom-btn" title="Zoom avant">
+          🔍+
+        </button>
+        <button (click)="resetZoom()" class="zoom-btn" title="Réinitialiser">
+          ↻
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #loading>
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Chargement du PDF en cours...</p>
+    </div>
+  </ng-template>
+</div>

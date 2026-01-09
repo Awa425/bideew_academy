@@ -111,7 +111,6 @@ class Particle {
   ) {}
 
   update(mouse: { x: number; y: number; radius: number }) {
-    // Mouse interaction
     const dx = mouse.x - this.x;
     const dy = mouse.y - this.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
@@ -127,16 +126,12 @@ class Particle {
       this.y -= directionY * 5;
     }
     
-    // Move particle
     this.x += this.speedX;
     this.y += this.speedY;
-    
-    // Bounce off edges
     const canvas = this.ctx.canvas;
     if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
     if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
     
-    // Keep particles within canvas
     if (this.x > canvas.width + 5) this.x = -5;
     else if (this.x < -5) this.x = canvas.width + 5;
     if (this.y > canvas.height + 5) this.y = -5;

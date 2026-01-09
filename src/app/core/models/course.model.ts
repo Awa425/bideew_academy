@@ -1,29 +1,41 @@
 export interface Course {
   id: string;
   title: string;
+  subtitle?: string;
   description: string;
+  longDescription?: string;
   level: 'beginner' | 'intermediate' | 'advanced';
-  duration: number; // in hours
-  imageUrl: string;
+  duration_minutes: number;
+  image_path: string;
   instructor: string;
   rating: number;
   studentsEnrolled: number;
-  lessons: Lesson[];
   prerequisites: string[];
   learningObjectives: string[];
+  resources?: Resource[];
   createdAt: Date;
   updatedAt: Date;
+  category?: string;
+  language?: string;
+  tags?: string[];
 }
 
-export interface Lesson {
+export interface Lessons {
   id: string;
   title: string;
-  duration: number; // in minutes
+  description?: string; 
+  duration_minutes: number; 
+  order: number;
   type: 'video' | 'text' | 'quiz' | 'assignment';
-  content?: string; // URL or text content
+  content?: string; 
   isPreview: boolean;
+  course_id : Course[];
   resources: Resource[];
   quiz?: Quiz;
+  is_published?: string; 
+  created_at?: string; 
+  updated_at?: string; 
+  is_locked?: string; 
 }
 
 export interface Resource {
@@ -33,9 +45,13 @@ export interface Resource {
 }
 
 export interface Quiz {
+  id?: string;
+  courseId?: string;
+  title?: string;
+  description?: string;
   questions: Question[];
   passingScore: number;
-  timeLimit?: number; // in minutes
+  timeLimit?: number; 
 }
 
 export interface Question {
@@ -46,4 +62,25 @@ export interface Question {
   correctAnswers: string[] | string;
   explanation?: string;
   points: number;
+}
+export interface PaginationLinks {
+  url: string | null;
+  label: string;
+  active: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  current_page: number;
+  data: T[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: PaginationLinks[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
 }

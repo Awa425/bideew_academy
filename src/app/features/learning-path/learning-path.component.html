@@ -2,148 +2,171 @@
   <div class="hero-section">
     <div class="hero-bg"></div>
     <div class="hero-content">
-      <h1 class="animate__animated animate__fadeInDown">Parcours d'Apprentissage en Cybersécurité</h1>
-      <p class="animate__animated animate__fadeIn">Découvrez notre parcours complet pour devenir un expert en cybersécurité</p>
-      <div class="progress-bar">
-        <div class="progress"></div>
+      <div class="user-info">
+        <h1 class="animate__animated animate__fadeInDown">
+          Mon Parcours d'Apprentissage
+        </h1>
+        <p class="animate__animated animate__fadeIn" *ngIf="userProgress">
+          Bonjour <strong>{{ userProgress.user.name }}</strong>, 
+          voici l'historique complet de votre parcours
+        </p>
+      </div>
+      
+      <div class="stats-overview" *ngIf="userProgress">
+        <div class="stat-card">
+          <div class="stat-number">{{ getCompletedLessonsCount() }}</div>
+          <div class="stat-label">Leçons terminées</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{ getTotalLessonsCount() }}</div>
+          <div class="stat-label">Leçons totales</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{ userProgress.quizzes_attempted.length || 0 }}</div>
+          <div class="stat-label">Quiz tentés</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{ timelineItems.length }}</div>
+          <div class="stat-label">Activités</div>
+        </div>
+      </div>
+
+      <div class="global-progress-bar">
+        <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
       </div>
     </div>
   </div>
 
-  <div class="path-steps">
-    <!-- Étape 1 -->
-    <div class="step-card" [class.active]="currentStep >= 1">
-      <div class="step-number">1</div>
-      <div class="step-content">
-        <h3 class="animate__animated animate__fadeInUp">Fondamentaux de la Cybersécurité</h3>
-        <p class="animate__animated animate__fadeIn">Découvrez les concepts de base de la cybersécurité, y compris la terminologie, les menaces courantes et les principes de sécurité.</p>
-        <div class="step-details">
-          <span class="duration">4 semaines</span>
-          <span class="courses">3 cours</span>
+  <div class="timeline-container" *ngIf="userProgress && timelineItems.length > 0">
+    <div class="container">
+      <h2 class="timeline-title">Historique de votre parcours</h2>
+      
+      <div class="timeline">
+        <div class="timeline-line"></div>
+        
+        <div class="timeline-items">
+          <div 
+            class="timeline-item" 
+            *ngFor="let event of timelineItems; trackBy: trackByTimelineItem"
+            [class]="event.type"
+          >
+            <div class="timeline-marker" [style.background]="event.color">
+              <span class="timeline-icon">{{ getEventIcon(event.type) }}</span>
+            </div>
+            
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <h3 class="timeline-event-title">{{ event.title }}</h3>
+                <span class="timeline-date">{{ formatRelativeDate(event.date) }}</span>
+              </div>
+              
+              <p class="timeline-description">{{ event.description }}</p>
+              
+              <div class="timeline-actions" *ngIf="event.type === 'quiz_attempt'">
+                <button 
+                  class="action-btn retake" 
+                  (click)="retakeQuiz(event.item.quiz_id)"
+                >
+                  Refaire le quiz
+                </button>
+              </div>
+              
+              <div class="timeline-meta">
+                <span class="timeline-time">{{ formatDate(event.date) }}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <button class="start-btn" (click)="startStep(1)">Commencer</button>
       </div>
     </div>
-
-    <!-- Étape 2 -->
-    <div class="step-card" [class.active]="currentStep >= 2">
-      <div class="step-number">2</div>
-      <div class="step-content">
-        <h3 class="animate__animated animate__fadeInUp">Sécurité des Réseaux</h3>
-        <p class="animate__animated animate__fadeIn">Apprenez à sécuriser les réseaux, comprendre les protocoles et mettre en place des pare-feu efficaces.</p>
-        <div class="step-details">
-          <span class="duration">6 semaines</span>
-          <span class="courses">4 cours</span>
+  </div>
+  <div class="detailed-progress" *ngIf="userProgress && userProgress.lessons_progress.length > 0">
+    <div class="container">
+      <h2>Détail des leçons</h2>
+      
+      <div class="lessons-grid">
+        <div 
+          class="lesson-card detailed" 
+          *ngFor="let lesson of userProgress.lessons_progress; trackBy: trackByLesson"
+          [class.completed]="lesson.is_completed"
+          [class.in-progress]="!lesson.is_completed"
+        >
+          <div class="lesson-status-badge" [class]="lesson.is_completed ? 'completed' : 'in-progress'">
+            {{ lesson.is_completed ? 'Terminée' : 'En cours' }}
+          </div>
+          
+          <div class="lesson-content">
+            <h3 class="lesson-title">{{ lesson.lesson_title }}</h3>
+            <p class="lesson-course">Cours: {{ lesson.course_title }}</p>
+            
+            <div class="lesson-meta">
+              <span class="lesson-id">Leçon #{{ lesson.lesson_id }}</span>
+              <span class="lesson-date" *ngIf="lesson.completed_at">
+                Terminée le: {{ formatDate(lesson.completed_at) }}
+              </span>
+              <span class="lesson-date" *ngIf="!lesson.completed_at">
+                Commencée le: {{ formatRelativeDate(estimateStartDate(lesson.completed_at)) }}
+              </span>
+            </div>
+          </div>
         </div>
-        <button class="start-btn" (click)="startStep(2)">Commencer</button>
-      </div>
-    </div>
-
-    <!-- Étape 3 -->
-    <div class="step-card" [class.active]="currentStep >= 3">
-      <div class="step-number">3</div>
-      <div class="step-content">
-        <h3 class="animate__animated animate__fadeInUp">Test d'Intrusion</h3>
-        <p class="animate__animated animate__fadeIn">Découvrez les techniques de test d'intrusion éthique et apprenez à identifier les vulnérabilités.</p>
-        <div class="step-details">
-          <span class="duration">8 semaines</span>
-          <span class="courses">5 cours</span>
-        </div>
-        <button class="start-btn" (click)="startStep(3)">Commencer</button>
-      </div>
-    </div>
-
-    <!-- Étape 4 -->
-    <div class="step-card" [class.active]="currentStep >= 4">
-      <div class="step-number">4</div>
-      <div class="step-content">
-        <h3 class="animate__animated animate__fadeInUp">Développement Sécurisé</h3>
-        <p class="animate__animated animate__fadeIn">Apprenez à développer des applications sécurisées et à implémenter des bonnes pratiques de sécurité.</p>
-        <div class="step-details">
-          <span class="duration">6 semaines</span>
-          <span class="courses">4 cours</span>
-        </div>
-        <button class="start-btn" (click)="startStep(4)">Commencer</button>
-      </div>
-    </div>
-
-    <!-- Étape 5 -->
-    <div class="step-card" [class.active]="currentStep >= 5">
-      <div class="step-number">5</div>
-      <div class="step-content">
-        <h3 class="animate__animated animate__fadeInUp">Administration Système Sécurisée</h3>
-        <p class="animate__animated animate__fadeIn">Maîtrisez l'administration système sécurisée pour Linux et Windows.</p>
-        <div class="step-details">
-          <span class="duration">8 semaines</span>
-          <span class="courses">5 cours</span>
-        </div>
-        <button class="start-btn" (click)="startStep(5)">Commencer</button>
-      </div>
-    </div>
-
-    <!-- Étape 6 -->
-    <div class="step-card" [class.active]="currentStep >= 6">
-      <div class="step-number">6</div>
-      <div class="step-content">
-        <h3 class="animate__animated animate__fadeInUp">Droit et Éthique de la Cybersécurité</h3>
-        <p class="animate__animated animate__fadeIn">Comprenez les implications légales et éthiques de la cybersécurité.</p>
-        <div class="step-details">
-          <span class="duration">5 semaines</span>
-          <span class="courses">3 cours</span>
-        </div>
-        <button class="start-btn" (click)="startStep(6)">Commencer</button>
       </div>
     </div>
   </div>
 
-  <div class="path-features">
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21L5 12l14-9"/>
-          <polyline points="9 10 9 4 15 4 15 10"/>
-          <line x1="12" y1="18" x2="12" y2="12"/>
-        </svg>
-      </div>
-      <div class="feature-content">
-        <h3 class="animate__animated animate__fadeInUp">Progression Personnalisée</h3>
-        <p class="animate__animated animate__fadeIn">Suivez votre progression et adaptez le parcours à votre rythme d'apprentissage.</p>
-      </div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-          <line x1="8" y1="21" x2="16" y2="21"></line>
-          <line x1="12" y1="17" x2="12" y2="21"></line>
-        </svg>
-      </div>
-      <div class="feature-content">
-        <h3 class="animate__animated animate__fadeInUp">Projets Pratiques</h3>
-        <p class="animate__animated animate__fadeIn">Appliquez vos connaissances avec des projets réels et des cas d'étude.</p>
-      </div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-        </svg>
-      </div>
-      <div class="feature-content">
-        <h3 class="animate__animated animate__fadeInUp">Support Expert</h3>
-        <p class="animate__animated animate__fadeIn">Accédez à un support technique et à une communauté d'experts.</p>
+  <div class="quizzes-section" *ngIf="userProgress && userProgress.quizzes_attempted.length > 0">
+    <div class="container">
+      <h2>Détail des quiz</h2>
+      
+      <div class="quiz-list">
+        <div 
+          class="quiz-card" 
+          *ngFor="let quiz of userProgress.quizzes_attempted; trackBy: trackByQuiz"
+        >
+          <div class="quiz-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9,9h6v6H9z"></path>
+            </svg>
+          </div>
+          
+          <div class="quiz-content">
+            <h4 class="quiz-title">{{ quiz.quiz_title || 'Quiz' }}</h4>
+            <div class="quiz-meta">
+              <span class="quiz-score" *ngIf="quiz.score !== undefined">
+                Score: {{ quiz.score }}{{ quiz.max_score ? '/' + quiz.max_score : '' }}
+              </span>
+              <span class="quiz-date" *ngIf="quiz.attempted_at">
+                Tenté le {{ formatDate(quiz.attempted_at) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="quiz-actions">
+            <button class="retake-btn" (click)="retakeQuiz(quiz.quiz_id)">
+              Refaire
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
-  <div class="cta-section">
-    <div class="cta-content">
-      <h2 class="animate__animated animate__fadeInUp">Prêt à Commencer Votre Parcours ?</h2>
-      <p class="animate__animated animate__fadeIn">Rejoignez des milliers d'étudiants qui ont déjà commencé leur parcours en cybersécurité avec nous.</p>
-      <button class="primary-btn" (click)="startLearning()">Commencer le Parcours</button>
+  <div class="empty-state" *ngIf="userProgress && timelineItems.length === 0">
+    <div class="empty-icon">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+      </svg>
     </div>
+    <h3>Aucune activité récente</h3>
+    <p>Commencez votre parcours d'apprentissage en cybersécurité dès maintenant !</p>
+    <button class="start-learning-btn" (click)="exploreCoursePage()">
+      Explorer les cours
+    </button>
+  </div>
+
+  <div class="loading-state" *ngIf="!userProgress">
+    <div class="spinner"></div>
+    <p>Chargement de votre parcours...</p>
   </div>
 </div>

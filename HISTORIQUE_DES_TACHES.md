@@ -14,28 +14,28 @@
 ### 1. Modèle d'Utilisateur
 - **Fichier** : `core/models/user.model.ts`
 - **Champs** :
-  - Identifiants et informations personnelles
-  - Rôles et permissions
-  - Préférences utilisateur
+  - Identifiants et informations personnelles : "Stockage des données personnelles de l'utilisateur."
+  - Rôles et permissions : "Définition des rôles et des permissions utilisateur."
+  - Préférences utilisateur : "Enregistrement des préférences d'affichage et de notifications."
 
 ### 2. Modèle de Cours
 - **Fichier** : `core/models/course.model.ts`
 - **Champs** :
-  - Titre et description
-  - Niveau de difficulté
-  - Durée estimée
-  - Date de création et de mise à jour
-  - Statut de complétion
-  - Métadonnées (tags, catégories, etc.)
+  - Titre et description : "Définition du titre et de la description du cours."
+  - Niveau de difficulté : "Indication du niveau de difficulté du cours."
+  - Durée estimée : "Estimation du temps nécessaire pour compléter le cours."
+  - Date de création et de mise à jour : "Suivi des dates de création et de mise à jour du cours."
+  - Statut de complétion : "Indication de l'état d'avancement du cours."
+  - Métadonnées (tags, catégories, etc.) : "Ajout de tags et de catégories pour le cours."
 
 ## Services Principaux
 
 ### 1. Gestion des Thèmes (ThemeService)
 - **Fichier** : `core/services/theme.service.ts`
 - **Fonctionnalités** :
-  - Gestion des modes d'affichage (clair, sombre, système)
-  - Personnalisation des couleurs d'accentuation (bleu, vert, violet, orange, rouge)
-  - Ajustement de la taille de police (16px par défaut)
+  - Gestion des modes d'affichage (clair, sombre, système) : "Permet de basculer entre différents modes d'affichage."
+  - Personnalisation des couleurs d'accentuation (bleu, vert, violet, orange, rouge) : "Choix des couleurs d'accentuation pour l'interface utilisateur."
+  - Ajustement de la taille de police (16px par défaut) : "Modification de la taille de police pour améliorer la lisibilité."
   - Mode contraste élevé pour l'accessibilité
   - Réduction des animations pour les utilisateurs sensibles aux mouvements
   - Persistance des préférences utilisateur dans le stockage local

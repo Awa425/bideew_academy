@@ -1,0 +1,332 @@
+<div class="video-modal" *ngIf="currentVideo" [@fadeInOut]>
+  <div class="video-backdrop" (click)="closeVideo()"></div>
+  <div
+    class="video-container"
+    (mousemove)="showVideoControls()"
+    (mouseleave)="onMouseLeaveVideo()"
+    [class.playing]="isVideoPlaying"
+  >
+    <button
+      class="close-button"
+      matRipple
+      (click)="closeVideo()"
+      matTooltip="Fermer"
+    >
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+
+    <div class="video-wrapper">
+      <video
+        #videoPlayer
+        class="video-player"
+        (timeupdate)="onTimeUpdate()"
+        (ended)="onVideoEnded()"
+        (click)="togglePlayPause()"
+        preload="metadata"
+        [muted]="isMuted"
+        [poster]="currentVideo.thumbnail"
+      >
+        <source [src]="currentVideo.src" type="video/mp4" />
+        Votre navigateur ne supporte pas la lecture de vidéos HTML5.
+      </video>
+
+      <div
+        class="video-overlay"
+        *ngIf="!isVideoPlaying"
+        (click)="togglePlayPause()"
+      >
+        <button
+          class="play-button"
+          mat-fab
+          color="primary"
+          aria-label="Lire la vidéo"
+        >
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+      </div>
+
+      <div
+        class="video-controls"
+        [class.hidden]="!showControls && isVideoPlaying"
+      >
+        <div class="progress-bar-container">
+          <div class="progress-bar" (click)="onProgressBarClick($event)">
+            <div
+              class="progress"
+              [style.width.%]="(currentTime / duration) * 100 || 0"
+            >
+              <div class="progress-handle"></div>
+            </div>
+          </div>
+          <div class="time-display">
+            <span>{{ formatTime(currentTime) }}</span> /
+            <span>{{ formatTime(duration) }}</span>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <div class="left-controls">
+            <button
+              mat-icon-button
+              (click)="togglePlayPause()"
+              matTooltip="{{ isVideoPlaying ? 'Mettre en pause' : 'Lire' }}"
+            >
+              <mat-icon>{{ isVideoPlaying ? "pause" : "play_arrow" }}</mat-icon>
+            </button>
+
+            <div class="volume-control">
+              <button
+                mat-icon-button
+                (click)="toggleMute()"
+                matTooltip="{{
+                  isMuted ? 'Activer le son' : 'Désactiver le son'
+                }}"
+              >
+                <mat-icon>{{
+                  isMuted || volume === 0
+                    ? "volume_off"
+                    : volume > 0.5
+                    ? "volume_up"
+                    : "volume_down"
+                }}</mat-icon>
+              </button>
+              <div class="volume-slider-container">
+                <mat-slider
+                  class="volume-slider"
+                  [(ngModel)]="volume"
+                  (ngModelChange)="onVolumeChange($event)"
+                  [displayWith]="formatVolume"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                >
+                </mat-slider>
+              </div>
+            </div>
+
+            <div class="time-elapsed">
+              {{ formatTime(currentTime) }} / {{ formatTime(duration) }}
+            </div>
+          </div>
+
+          <div class="right-controls">
+            <div class="playback-rate" matTooltip="Vitesse de lecture">
+              <button
+                mat-button
+                [matMenuTriggerFor]="playbackMenu"
+                class="playback-button"
+              >
+                {{ playbackRate }}x
+                <mat-icon>arrow_drop_down</mat-icon>
+              </button>
+              <mat-menu #playbackMenu="matMenu" class="playback-menu">
+                <button
+                  mat-menu-item
+                  (click)="setPlaybackRate(0.5)"
+                  [class.active]="playbackRate === 0.5"
+                >
+                  0.5x
+                </button>
+                <button
+                  mat-menu-item
+                  (click)="setPlaybackRate(1)"
+                  [class.active]="playbackRate === 1"
+                >
+                  1x (Normal)
+                </button>
+                <button
+                  mat-menu-item
+                  (click)="setPlaybackRate(1.25)"
+                  [class.active]="playbackRate === 1.25"
+                >
+                  1.25x
+                </button>
+                <button
+                  mat-menu-item
+                  (click)="setPlaybackRate(1.5)"
+                  [class.active]="playbackRate === 1.5"
+                >
+                  1.5x
+                </button>
+                <button
+                  mat-menu-item
+                  (click)="setPlaybackRate(2)"
+                  [class.active]="playbackRate === 2"
+                >
+                  2x
+                </button>
+              </mat-menu>
+            </div>
+
+            <button
+              mat-icon-button
+              (click)="toggleFullscreen()"
+              matTooltip="Plein écran"
+            >
+              <mat-icon>{{
+                isFullscreen ? "fullscreen_exit" : "fullscreen"
+              }}</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<main class="course-detail-container" *ngIf="course">
+  <header class="course-header">
+    <div
+      class="course-cover"
+      style="background-image: url('{{ api }}{{ course.image_path }}');"
+    >
+      <div class="course-overlay"></div>
+      <div class="course-header-content" role="banner">
+        <div
+          class="course-badge"
+          [class]="getLevelColor(course.level)"
+          [attr.aria-label]="'Niveau du cours : ' + course.level"
+        >
+          {{ course.level | titlecase }}
+        </div>
+        <h1 class="course-title">{{ course.title }}</h1>
+        <div
+          class="course-meta"
+          role="contentinfo"
+          aria-label="Informations du cours"
+        >
+          <span class="meta-item">
+            <mat-icon>schedule</mat-icon>
+            {{ course.duration_minutes }} heures
+          </span>
+          <span class="meta-item">
+            <mat-icon aria-hidden="true">person</mat-icon>
+            Dr. {{ course.user.name }}
+          </span>
+        </div>
+        <button
+          mat-raised-button
+          color="accent"
+          class="start-course-button"
+          (click)="enrollInCourse()"
+          aria-label="Commencer le cours"
+        >
+          <mat-icon aria-hidden="true">play_circle</mat-icon>
+          Commencer le cours
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="course-content" role="main">
+    <div class="main-content">
+      <h2 class="visually-hidden">Contenu principal du cours</h2>
+      <a [routerLink]="['../']" class="btn-btn-info" title="RETOUR"
+        ><img src="../../../../assets/left-long-solid.svg" alt="" width="30"
+      /></a>
+      <mat-tab-group
+        [(selectedIndex)]="selectedTabIndex"
+        animationDuration="0ms"
+        aria-label="Navigation des sections du cours"
+      >
+        <mat-tab label="Aperçu">
+          <div class="tab-content">
+            <section aria-labelledby="about-course-heading">
+              <h2 id="about-course-heading">À propos de ce cours</h2>
+              <p class="course-description">{{ course.description }}</p>
+
+              <h3 id="learning-objectives-heading">Ce que vous apprendrez</h3>
+              <mat-divider></mat-divider>
+              <ul
+                class="learning-objectives"
+                aria-labelledby="learning-objectives-heading"
+              >
+                <li *ngFor="let objective of course.objectifList">
+                  <mat-icon aria-hidden="true">check_circle</mat-icon>
+                  <span>{{ objective }}</span>
+                </li>
+              </ul>
+
+              <h3 id="prerequisites-heading">Prérequis</h3>
+              <mat-divider></mat-divider>
+              <div
+                class="prerequisites"
+                aria-labelledby="prerequisites-heading"
+              >
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let prereq of course.prerequisList">
+                    {{ prereq }}
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
+            </section>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <aside class="sidebar">
+      <mat-card class="enroll-card" *ngIf="users?.user?.role === 'apprenant'">
+        <mat-card-header>
+          <mat-card-title>Commencer le cours</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="progress-container">
+            <div class="progress-info">
+              <span>Progression</span>
+              <span>{{ course_progress?.progress_percent }}%</span>
+            </div>
+            <mat-progress-bar
+              mode="determinate"
+              [value]="course_progress?.progress_percent"
+              aria-label="Progression du cours"
+            ></mat-progress-bar>
+          </div>
+          <div class="course-features">
+            <div class="feature">
+              <mat-icon aria-hidden="true">check</mat-icon>
+              <span>Accès à vie</span>
+            </div>
+            <div class="feature">
+              <mat-icon aria-hidden="true">check</mat-icon>
+              <span>Certificat de réussite</span>
+            </div>
+            <div class="feature">
+              <mat-icon aria-hidden="true">check</mat-icon>
+              <span>Accès mobile et TV</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="instructor-card">
+        <mat-card-header>
+          <div mat-card-avatar class="instructor-avatar">
+            <mat-icon aria-hidden="true">account_circle</mat-icon>
+          </div>
+          <mat-card-title>Votre instructeur</mat-card-title>
+          <mat-card-subtitle>{{ course.instructor }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>
+            Expert en cybersécurité avec plus de 10 ans d'expérience dans le
+            domaine.
+          </p>
+          <div class="instructor-stats">
+            <div class="stat">
+              <span class="stat-value">4.9</span>
+              <span class="stat-label">Note</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">24,567</span>
+              <span class="stat-label">Étudiants</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">15</span>
+              <span class="stat-label">Cours</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </aside>
+  </div>
+</main>

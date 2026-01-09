@@ -1,4 +1,3 @@
-/* Variables de thème */
 :host {
   --primary-color: #3f51b5;
   --accent-color: #ff4081;
@@ -218,7 +217,6 @@ swiper-slide {
   }
 }
 
-/* Animation d'entrée des slides */
 swiper-slide-active {
   .slide-text {
     transform: translateY(0);
@@ -226,7 +224,6 @@ swiper-slide-active {
   }
 }
 
-/* Styles responsifs */
 @media (max-width: 1200px) {
   .slide-content {
     .slide-title {

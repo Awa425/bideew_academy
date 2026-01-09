@@ -1,0 +1,1213 @@
+<div class="user-management-container">
+  <section class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="animate__animated animate__fadeInDown">
+          Gestion des Utilisateurs
+        </h1>
+        <p class="subtitle animate__animated animate__fadeIn">
+          Gérez les utilisateurs de votre plateforme de formation
+        </p>
+      </div>
+      <div class="header-actions animate__animated animate__fadeInRight">
+        <button class="primary-btn" (click)="openAddUserModal()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <line x1="19" y1="8" x2="19" y2="14" />
+            <line x1="22" y1="11" x2="16" y2="11" />
+          </svg>
+          Nouvel Utilisateur
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div *ngIf="error" class="error-message">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+    </svg>
+    {{ error }}
+  </div>
+
+  <div *ngIf="isLoading" class="loading-indicator">
+    <div class="spinner"></div>
+    <p>Chargement des utilisateurs...</p>
+  </div>
+  <section
+    class="table-section animate__animated animate__fadeInUp animate__delay-1s"
+    *ngIf="!isLoading"
+  >
+    <div class="table-header">
+      <div class="search-filters">
+        <div class="search-box">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Rechercher un utilisateur..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+          />
+        </div>
+        <div class="filter-dropdown">
+          <select [(ngModel)]="selectedRole" (change)="onRoleChange()">
+            <option value="">Tous les rôles</option>
+            <option value="admin">Administrateur</option>
+            <option value="formateur">Formateur</option>
+            <option value="apprenant">Apprenant</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th (click)="sortBy('name')" class="sortable">Utilisateur</th>
+            <th (click)="sortBy('email')" class="sortable">Email</th>
+            <th (click)="sortBy('role')" class="sortable">Rôle</th>
+            <th (click)="sortBy('created_at')" class="sortable">
+              Date d'inscription
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let user of paginatedUsers; trackBy: trackByUserId"
+            class="user-row"
+          >
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">
+                  <img [src]="user.avatar" [alt]="user.name" />
+                </div>
+                <div class="user-details">
+                  <span class="user-name">{{ user.name }}</span>
+                  <span class="user-id">#{{ user.id }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="user-email">{{ user.email }}</span>
+              <span
+                *ngIf="!user.email_verified_at"
+                class="email-unverified"
+                title="Email non vérifié"
+                >⚠️</span
+              >
+            </td>
+            <td>
+              <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+                {{ getRoleText(user.role) }}
+              </span>
+            </td>
+            <td>
+              <span class="created-date" [title]="user.created_at">
+                {{ user.created_at | date : "dd/MM/yyyy" }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button
+                  class="action-btn view-btn"
+                  (click)="viewUser(user)"
+                  title="Voir détails"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+                <button
+                  class="action-btn edit-btn"
+                  (click)="editUser(user)"
+                  title="Modifier"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M12 20h9" />
+                    <path
+                      d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+                    />
+                  </svg>
+                </button>
+                <div class="dropdown">
+                  <button
+                    class="action-btn more-btn"
+                    (click)="toggleDropdown(user.id)"
+                    title="Plus d'actions"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="12" cy="12" r="1" />
+                      <circle cx="12" cy="5" r="1" />
+                      <circle cx="12" cy="19" r="1" />
+                    </svg>
+                  </button>
+                  <div class="dropdown-menu" [class.show]="user.showDropdown">
+                    <button (click)="resetPassword(user)" class="dropdown-item">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <rect
+                          x="3"
+                          y="11"
+                          width="18"
+                          height="11"
+                          rx="2"
+                          ry="2"
+                        />
+                        <circle cx="12" cy="16" r="1" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      Réinitialiser mot de passe
+                    </button>
+                    <button
+                      *ngIf="user.role === 'apprenant'"
+                      (click)="viewUserProgress(user)"
+                      class="dropdown-item"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                      </svg>
+                      Voir progression détaillée
+                    </button>
+                    <hr />
+                    <button
+                      (click)="deleteUser(user)"
+                      class="dropdown-item danger"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path
+                          d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                        />
+                      </svg>
+                      Supprimer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="users.length === 0 && !isLoading" class="empty-state">
+        <div class="empty-icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1"
+          >
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </div>
+        <h3>Aucun utilisateur trouvé</h3>
+        <p>Aucun utilisateur ne correspond à vos critères de recherche.</p>
+        <button class="primary-btn" (click)="clearFilters()">
+          Réinitialiser les filtres
+        </button>
+      </div>
+    </div>
+    <div class="table-footer" *ngIf="users.length > 0">
+      <div class="table-info">
+        <span>
+          Affichage de {{ startIndex + 1 }} à {{ endIndex }} sur
+          {{ totalFilteredUsers }} utilisateurs
+        </span>
+        <div class="selected-info" *ngIf="selectedUsers.length > 0">
+          {{ selectedUsers.length }} utilisateur(s) sélectionné(s)
+        </div>
+      </div>
+
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button
+          class="pagination-btn"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1 || isLoading"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="15,18 9,12 15,6" />
+          </svg>
+          Précédent
+        </button>
+
+        <div class="pagination-numbers">
+          <button
+            *ngFor="let page of visiblePages"
+            class="pagination-number"
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)"
+            [disabled]="isLoading"
+          >
+            {{ page }}
+          </button>
+        </div>
+
+        <button
+          class="pagination-btn"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages || isLoading"
+        >
+          Suivant
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="9,18 15,12 9,6" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+  <div class="modal-overlay" *ngIf="showUserModal" (click)="closeUserModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          {{ isEditMode ? "Modifier l'utilisateur" : "Nouvel utilisateur" }}
+        </h2>
+        <button class="modal-close" (click)="closeUserModal()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form class="user-form" (ngSubmit)="onSubmitUser()" #userForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Nom complet *</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              [(ngModel)]="userFormData.name"
+              required
+              #nameField="ngModel"
+              placeholder="Entrez le nom complet"
+              [class.error]="
+                nameField.invalid && (nameField.dirty || nameField.touched)
+              "
+            />
+            <div
+              class="error-message"
+              *ngIf="
+                nameField.invalid && (nameField.dirty || nameField.touched)
+              "
+            >
+              <span *ngIf="nameField.errors?.['required']"
+                >Le nom est obligatoire</span
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Adresse email *</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="userFormData.email"
+              required
+              email
+              #emailField="ngModel"
+              placeholder="exemple@domaine.com"
+              [class.error]="
+                emailField.invalid && (emailField.dirty || emailField.touched)
+              "
+            />
+            <div
+              class="error-message"
+              *ngIf="
+                emailField.invalid && (emailField.dirty || emailField.touched)
+              "
+            >
+              <span *ngIf="emailField.errors?.['required']"
+                >L'email est obligatoire</span
+              >
+              <span *ngIf="emailField.errors?.['email']"
+                >Format d'email invalide</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row" *ngIf="!isEditMode">
+          <div class="form-group" *ngIf="!isEditMode">
+            <label for="password">Mot de passe *</label>
+            <div class="password-input">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                name="password"
+                [(ngModel)]="userFormData.password"
+                required
+                minlength="8"
+                #passwordField="ngModel"
+                placeholder="Minimum 8 caractères"
+                [class.error]="
+                  passwordField.invalid &&
+                  (passwordField.dirty || passwordField.touched)
+                "
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePasswordVisibility()"
+              >
+                <svg
+                  *ngIf="!showPassword"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <svg
+                  *ngIf="showPassword"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                  <path
+                    d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"
+                  />
+                  <path
+                    d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"
+                  />
+                  <line x1="2" y1="2" x2="22" y2="22" />
+                </svg>
+              </button>
+            </div>
+            <div
+              class="error-message"
+              *ngIf="
+                passwordField.invalid &&
+                (passwordField.dirty || passwordField.touched)
+              "
+            >
+              <span *ngIf="passwordField.errors?.['required']"
+                >Le mot de passe est obligatoire</span
+              >
+              <span *ngIf="passwordField.errors?.['minlength']"
+                >Le mot de passe doit contenir au moins 8 caractères</span
+              >
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirmer le mot de passe *</label>
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              id="confirmPassword"
+              name="confirmPassword"
+              [(ngModel)]="userFormData.confirmPassword"
+              required
+              #confirmPasswordField="ngModel"
+              placeholder="Confirmer le mot de passe"
+              [class.error]="
+                (confirmPasswordField.invalid &&
+                  (confirmPasswordField.dirty ||
+                    confirmPasswordField.touched)) ||
+                passwordMismatch
+              "
+            />
+            <div
+              class="error-message"
+              *ngIf="
+                (confirmPasswordField.invalid &&
+                  (confirmPasswordField.dirty ||
+                    confirmPasswordField.touched)) ||
+                passwordMismatch
+              "
+            >
+              <span *ngIf="confirmPasswordField.errors?.['required']"
+                >La confirmation est obligatoire</span
+              >
+              <span *ngIf="passwordMismatch"
+                >Les mots de passe ne correspondent pas</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="role">Rôle *</label>
+            <select
+              id="role"
+              name="role"
+              [(ngModel)]="userFormData.role"
+              required
+              #roleField="ngModel"
+              [class.error]="
+                roleField.invalid && (roleField.dirty || roleField.touched)
+              "
+            >
+              <option value="">Sélectionner un rôle</option>
+              <option value="admin">Administrateur</option>
+              <option value="formateur">Formateur</option>
+              <option value="apprenant">Apprenant</option>
+            </select>
+            <div
+              class="error-message"
+              *ngIf="
+                roleField.invalid && (roleField.dirty || roleField.touched)
+              "
+            >
+              <span *ngIf="roleField.errors?.['required']"
+                >Le rôle est obligatoire</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="form-error" *ngIf="formError">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+          </svg>
+          {{ formError }}
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="closeUserModal()"
+            [disabled]="isSubmitting"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="userForm.invalid || isSubmitting || passwordMismatch"
+          >
+            <span *ngIf="isSubmitting" class="button-spinner"></span>
+            {{ isEditMode ? "Mettre à jour" : "Créer l'utilisateur" }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div
+    class="modal-overlay"
+    *ngIf="showUserDetailsModal"
+    (click)="closeUserDetailsModal()"
+  >
+    <div
+      class="modal-container details-modal"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <h2>Détails de l'utilisateur</h2>
+        <button class="modal-close" (click)="closeUserDetailsModal()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="user-details" *ngIf="selectedUserDetails">
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <img
+              [src]="selectedUserDetails.avatar"
+              [alt]="selectedUserDetails.name"
+            />
+          </div>
+          <div class="profile-info">
+            <h3>{{ selectedUserDetails.name }}</h3>
+            <p class="user-email">{{ selectedUserDetails.email }}</p>
+            <div class="user-badges">
+              <span
+                class="role-badge"
+                [ngClass]="getRoleClass(selectedUserDetails.role)"
+              >
+                {{ getRoleText(selectedUserDetails.role) }}
+              </span>
+              <span
+                *ngIf="!selectedUserDetails.email_verified_at"
+                class="verification-badge unverified"
+              >
+                Email non vérifié
+              </span>
+              <span
+                *ngIf="selectedUserDetails.email_verified_at"
+                class="verification-badge verified"
+              >
+                Email vérifié
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="details-section">
+          <div class="section-header">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <h4>Informations générales</h4>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>ID Utilisateur</label>
+              <span>#{{ selectedUserDetails.id }}</span>
+            </div>
+            <div class="info-item">
+              <label>Date d'inscription</label>
+              <span>{{
+                selectedUserDetails.created_at | date : "dd/MM/yyyy à HH:mm"
+              }}</span>
+            </div>
+            <div class="info-item">
+              <label>Dernière mise à jour</label>
+              <span>{{
+                selectedUserDetails.updated_at | date : "dd/MM/yyyy à HH:mm"
+              }}</span>
+            </div>
+            <div
+              class="info-item"
+              *ngIf="selectedUserDetails.email_verified_at"
+            >
+              <label>Email vérifié le</label>
+              <span>{{
+                selectedUserDetails.email_verified_at
+                  | date : "dd/MM/yyyy à HH:mm"
+              }}</span>
+            </div>
+          </div>
+        </div>
+        <div
+          class="details-section"
+          *ngIf="selectedUserDetails.role === 'apprenant'"
+        >
+          <div class="section-header">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            <h4>Progression des formations</h4>
+          </div>
+
+          <div
+            class="progress-overview"
+            *ngIf="
+              getUserCourseCount(selectedUserDetails) > 0;
+              else noCoursesTemplate
+            "
+          >
+            <div class="progress-stats">
+              <div class="stat-item">
+                <span class="stat-value">{{
+                  getUserCourseCount(selectedUserDetails)
+                }}</span>
+                <span class="stat-label">Cours inscrit(s)</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value"
+                  >{{ getUserProgress(selectedUserDetails) }}%</span
+                >
+                <span class="stat-label">Progression moyenne</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">{{
+                  getCompletedCoursesCount(selectedUserDetails)
+                }}</span>
+                <span class="stat-label">Cours terminé(s)</span>
+              </div>
+            </div>
+
+            <div class="courses-list">
+              <h5>Détail par cours</h5>
+              <div
+                class="course-item"
+                *ngFor="let progress of selectedUserDetails.course_progress"
+              >
+                <div class="course-info">
+                  <div class="course-name">
+                    Cours #{{ progress.course_id }}
+                    <span
+                      class="course-status"
+                      [class]="getCourseStatusClass(progress)"
+                    >
+                      {{ getCourseStatusText(progress) }}
+                    </span>
+                  </div>
+                  <div class="course-progress">
+                    <div class="progress-bar">
+                      <div
+                        class="progress-fill"
+                        [style.width.%]="progress.progress_percent"
+                      ></div>
+                    </div>
+                    <span class="progress-text"
+                      >{{ progress.progress_percent }}%</span
+                    >
+                  </div>
+                  <div class="course-details">
+                    <span *ngIf="progress.started_at" class="course-date">
+                      Débuté le {{ progress.started_at | date : "dd/MM/yyyy" }}
+                    </span>
+                    <span *ngIf="progress.completed_at" class="course-date">
+                      Terminé le
+                      {{ progress.completed_at | date : "dd/MM/yyyy" }}
+                    </span>
+                    <span class="lessons-count">
+                      {{ progress.completed_lessons!.length || 0 }} leçon(s)
+                      complétée(s)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noCoursesTemplate>
+            <div class="no-courses">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+              <h5>Aucun cours inscrit</h5>
+              <p>
+                Cet utilisateur n'est inscrit à aucune formation pour le moment.
+              </p>
+            </div>
+          </ng-template>
+        </div>
+        <div class="details-section">
+          <div class="section-header">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" />
+            </svg>
+            <h4>Actions rapides</h4>
+          </div>
+          <div class="quick-actions">
+            <button
+              class="quick-action-btn"
+              (click)="resetPasswordFromDetails()"
+              title="Réinitialiser le mot de passe"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <circle cx="12" cy="16" r="1" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              Réinitialiser mot de passe
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal-overlay"
+  *ngIf="showProgressModal"
+  (click)="closeProgressModal()"
+>
+  <div
+    class="modal-container progress-modal"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal-header">
+      <h2>Progression Détaillée - {{ selectedUserForProgress?.name }}</h2>
+      <button class="modal-close" (click)="closeProgressModal()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="progress-content" *ngIf="selectedUserForProgress">
+      <div class="progress-summary">
+        <div class="summary-stats">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">{{
+                getUserCourseCount(selectedUserForProgress)
+              }}</span>
+              <span class="stat-label">Cours Inscrits</span>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12,6 12,12 16,14" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number"
+                >{{ getUserProgress(selectedUserForProgress) }}%</span
+              >
+              <span class="stat-label">Progression Moyenne</span>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22,4 12,14.01 9,11.01" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">{{
+                getCompletedCoursesCount(selectedUserForProgress)
+              }}</span>
+              <span class="stat-label">Cours Terminés</span>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">{{
+                getInProgressCoursesCount(selectedUserForProgress)
+              }}</span>
+              <span class="stat-label">Cours En Cours</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="courses-section">
+        <div class="section-header">
+          <h3>Détail des Cours</h3>
+          <div class="course-filters">
+            <select
+              [(ngModel)]="progressFilter"
+              (change)="filterProgressData()"
+            >
+              <option value="">Tous les cours</option>
+              <option value="completed">Terminés</option>
+              <option value="in-progress">En cours</option>
+              <option value="not-started">Non commencés</option>
+            </select>
+          </div>
+        </div>
+
+        <div
+          class="courses-list"
+          *ngIf="paginatedProgressData.length > 0; else noProgressData"
+        >
+          <div
+            class="course-card"
+            *ngFor="let progress of paginatedProgressData"
+          >
+            <div class="course-header">
+              <div class="course-title">
+                <h4>Cours #{{ progress.course_id }}</h4>
+                <span
+                  class="course-status-badge"
+                  [ngClass]="getCourseStatusClass(progress)"
+                >
+                  {{ getCourseStatusText(progress) }}
+                </span>
+              </div>
+              <div class="course-progress-info">
+                <span class="progress-percentage"
+                  >{{ progress.progress_percent }}%</span
+                >
+              </div>
+            </div>
+
+            <div class="course-progress-bar">
+              <div class="progress-track">
+                <div
+                  class="progress-fill"
+                  [style.width.%]="progress.progress_percent"
+                ></div>
+              </div>
+            </div>
+
+            <div class="course-details-grid">
+              <div class="detail-item" *ngIf="progress.started_at">
+                <label>Date de début :</label>
+                <span>{{
+                  progress.started_at | date : "dd/MM/yyyy à HH:mm"
+                }}</span>
+              </div>
+
+              <div class="detail-item" *ngIf="progress.completed_at">
+                <label>Date de fin :</label>
+                <span>{{
+                  progress.completed_at | date : "dd/MM/yyyy à HH:mm"
+                }}</span>
+              </div>
+
+              <div class="detail-item">
+                <label>Leçons complétées :</label>
+                <span>{{ getCompletedLessonsCount(progress) }} leçon(s)</span>
+              </div>
+
+              <div class="detail-item" *ngIf="progress.current_lesson_id">
+                <label>Leçon actuelle :</label>
+                <span>Leçon #{{ progress.current_lesson_id }}</span>
+              </div>
+            </div>
+
+            <div
+              class="lessons-section"
+              *ngIf="
+                progress.completed_lessons &&
+                progress.completed_lessons.length > 0
+              "
+            >
+              <div class="lessons-header">
+                <button
+                  class="toggle-lessons"
+                  (click)="toggleLessonsDetails(progress.id)"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline
+                      [attr.points]="
+                        progress.showLessons
+                          ? '6 9 12 15 18 9'
+                          : '9 18 15 12 9 6'
+                      "
+                    />
+                  </svg>
+                  Voir les leçons complétées ({{
+                    progress.completed_lessons.length
+                  }})
+                </button>
+              </div>
+
+              <div class="lessons-list" *ngIf="progress.showLessons">
+                <div
+                  class="lesson-item"
+                  *ngFor="let lessonId of progress.completed_lessons"
+                >
+                  <div class="lesson-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polyline points="9 11 12 14 22 4" />
+                      <path
+                        d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+                      />
+                    </svg>
+                  </div>
+                  <span>Leçon #{{ lessonId }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noProgressData>
+          <div class="no-progress-data">
+            <div class="empty-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="64"
+                height="64"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            </div>
+            <h4>Aucune donnée de progression</h4>
+            <p>
+              Cet utilisateur n'a pas encore commencé de cours correspondant aux
+              filtres sélectionnés.
+            </p>
+          </div>
+        </ng-template>
+        <div class="progress-pagination" *ngIf="totalProgressPages > 1">
+          <button
+            class="pagination-btn"
+            (click)="previousProgressPage()"
+            [disabled]="currentProgressPage === 1"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="15,18 9,12 15,6" />
+            </svg>
+            Précédent
+          </button>
+
+          <div class="pagination-info">
+            <span
+              >Page {{ currentProgressPage }} sur {{ totalProgressPages }}</span
+            >
+            <span class="items-info"
+              >({{ filteredProgressData.length }} cours au total)</span
+            >
+          </div>
+
+          <button
+            class="pagination-btn"
+            (click)="nextProgressPage()"
+            [disabled]="currentProgressPage === totalProgressPages"
+          >
+            Suivant
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="9,18 15,12 9,6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

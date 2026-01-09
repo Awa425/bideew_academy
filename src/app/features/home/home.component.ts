@@ -32,6 +32,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
   ]
 })
 export class HomeComponent {
+  isLoginPage: boolean = true;
   features = [
     {
       icon: '📚',

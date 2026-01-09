@@ -3,36 +3,38 @@
     <div class="footer-content">
       <div class="footer-section">
         <h3>À Propos de Nous</h3>
-        <p>Cyber Academy est votre partenaire de confiance en éducation en cybersécurité. Nous proposons des parcours d'apprentissage complets et des ressources pour vous aider à maîtriser la cybersécurité.</p>
+        <p>
+          Bideew Academy est votre partenaire de confiance en éducation en
+          cybersécurité. Nous proposons des parcours d'apprentissage complets et
+          des ressources pour vous aider à maîtriser la cybersécurité.
+        </p>
       </div>
 
       <div class="footer-section">
         <h3>Liens Rapides</h3>
         <ul>
-          <li><a routerLink="/home">Accueil</a></li>
-          <li><a routerLink="/courses">Cours</a></li>
-          <li><a routerLink="/learning-path">Parcours d'Apprentissage</a></li>
-          <li><a routerLink="/resources">Ressources</a></li>
+          <li><a routerLink="home">Accueil</a></li>
+          <li><a routerLink="courses">Cours</a></li>
+          <li><a routerLink="learning-path" *ngIf="users.user?.role == 'apprenant'">Parcours d'Apprentissage</a></li>
         </ul>
       </div>
 
       <div class="footer-section">
         <h3>Contactez-nous</h3>
         <ul>
-          <li><a href="mailto:contact@cyberacademy.com">Email</a></li>
-          <li><a href="tel:+1234567890">Téléphone</a></li>
-          <li><a href="https://twitter.com/cyberacademy">Twitter</a></li>
-          <li><a href="https://linkedin.com/company/cyberacademy">LinkedIn</a></li>
-        </ul>
-      </div>
+          <li>
+            <a href="mailto:contact&#64;bideew-tech.com"
+              >contact&#64;bideew-tech.com</a
+            >
+          </li>
 
-      <div class="footer-section">
-        <h3>Newsletter</h3>
-        <p>Inscrivez-vous à notre newsletter pour recevoir les dernières actualités et nouvelles en cybersécurité.</p>
-        <form class="newsletter-form">
-          <input type="email" placeholder="Entrez votre email" required>
-          <button type="submit">S'inscrire</button>
-        </form>
+          <li><a href="#">+221 77 905 72 91</a></li>
+          <li>
+            <a href="https://www.facebook.com/share/179qpd1XLM/?mibextid=wwXIfr"
+              >Facebook : Bideew Technologie</a
+            >
+          </li>
+        </ul>
       </div>
     </div>
 
